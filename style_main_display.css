@@ -126,3 +126,22 @@ button:hover {
 .write-btn:hover {
   background-color: #1f57c8; 
 }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-btn {
+  padding: 10px 16px;
+  background-color: #2f6fed;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.login-btn:hover {
+  background-color: #1f57c8;
+}
