@@ -494,7 +494,9 @@
             <nav>
                 <a href="#" class="menu-link">핫한 공구</a>
                 <a href="#" class="menu-link">트러스트 맵</a>
-                <button class="btn-login-nav" onclick="openModal()">로그인</button>
+                <a href="loginfront.html">
+                    <button class="btn-login-nav">로그인</button>
+                </a>
             </nav>
         </div>
     </header>
@@ -602,50 +604,7 @@
         </svg>
     </div>
 
-    <!-- 4. 모바일 앱 느낌의 로그인 모달 -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="login-card">
-            <!-- 닫기 버튼 -->
-            <button class="btn-close-modal" onclick="closeModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            
-            <div class="login-logo">KU GONGGU</div>
-            <p class="login-desc">고려대 포털 계정으로 빠르게 시작하세요</p>
-            
-            <div class="input-group">
-                <input type="text" placeholder="포털 아이디">
-            </div>
-            <div class="input-group">
-                <input type="password" placeholder="비밀번호">
-            </div>
-            
-            <button class="btn-login-submit" onclick="closeModal()">로그인하기</button>
-        </div>
-    </div>
+   
 
-    <!-- 5. 모달 동작 자바스크립트 -->
-    <script>
-        const modal = document.getElementById('loginModal');
-
-        function openModal() {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; 
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto'; 
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-    </script>
 </body>
 </html>
