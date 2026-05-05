@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KU 공구앱 - 마이페이지 대시보드 (PC)</title>
+  
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v3.2.1/dist/web/static/pretendard.min.css" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --ku-crimson: #8B0029; 
+      --ku-crimson-light: #a3143f;
+      --ku-crimson-gradient: linear-gradient(135deg, var(--ku-crimson-light), var(--ku-crimson));
+      --bg-color: #f1f3f5; /* 빈 느낌을 줄이려고 배경을 살짝 더 차분하게 누름 */
+      --card-bg: #ffffff;
+      --text-main: #212529;
+      --text-sub: #868e96;
+      --text-dark: #495057;
+      --border-color: #dee2e6;
+      --border-radius-lg: 16px; 
+      --border-radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      font-family: 'Pretendard', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 1. 상단 글로벌 헤더 */
+    .top-header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+
+    .logo { font-size: 24px; font-weight: 800; color: var(--ku-crimson); display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    
+    .top-nav { display: flex; gap: 32px; height: 100%; }
+    .top-nav a { text-decoration: none; color: var(--text-dark); font-size: 16px; font-weight: 600; display: flex; align-items: center; height: 100%; border-bottom: 3px solid transparent; transition: all 0.2s; }
+    .top-nav a:hover, .top-nav a.active { color: var(--ku-crimson); border-bottom-color: var(--ku-crimson); }
+    
+    .header-icons { display: flex; gap: 20px; font-size: 24px; color: var(--text-dark); cursor: pointer; }
+
+    /* 2. 메인 대시보드 레이아웃 */
+    .pc-layout {
+      max-width: 1100px; /* 너무 퍼지지 않게 1100px로 타이트하게 조절 */
+      margin: 40px auto 80px;
+      padding: 0 24px;
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    /* 공통 카드 스타일 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    /* 3. 좌측 사이드바 (정보 + 메뉴) */
+    .sidebar {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+
+    /* 프로필 & 신뢰도 카드 */
+    .profile-card { padding: 32px 24px 24px; text-align: center; }
+    .profile-avatar { width: 80px; height: 80px; background: var(--ku-crimson-gradient); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: 800; margin: 0 auto 16px; }
+    .profile-info h2 { margin: 0 0 4px 0; font-size: 20px; }
+    .profile-info p { margin: 0 0 24px 0; color: var(--text-sub); font-size: 14px; }
+    
+    .trust-box { background-color: #f8f9fa; border-radius: var(--border-radius-sm); padding: 16px; margin-bottom: 16px; text-align: left; }
+    .trust-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+    .trust-score { color: var(--ku-crimson); font-weight: 800; }
+    .progress-bar-bg { width: 100%; height: 6px; background-color: #e9ecef; border-radius: 6px; }
+    .progress-bar-fill { height: 100%; width: 86%; background: var(--ku-crimson-gradient); border-radius: 6px; }
+
+    .btn-outline { width: 100%; padding: 12px; background-color: white; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-dark); font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-outline:hover { background-color: #f8f9fa; }
+
+    /* 사이드바 메뉴 리스트 (세로 공간 채우기) */
+    .sidebar-menu { padding: 12px 0; }
+    .menu-item { padding: 16px 24px; display: flex; align-items: center; gap: 12px; color: var(--text-dark); font-weight: 600; text-decoration: none; transition: background 0.2s; }
+    .menu-item:hover { background-color: #f8f9fa; color: var(--ku-crimson); }
+    .menu-item i { font-size: 20px; color: var(--text-sub); }
+    .menu-item:hover i { color: var(--ku-crimson); }
+
+    /* 4. 우측 메인 콘텐츠 */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 32px; /* 섹션 사이 큼직한 간격 */
+    }
+
+    /* 4-1. 퀵 요약 위젯 (상단 4분할 공간 채우기) */
+    .quick-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .stat-widget { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .stat-title { font-size: 14px; color: var(--text-sub); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .stat-title i { font-size: 18px; }
+    .stat-value { font-size: 24px; font-weight: 800; color: var(--text-main); }
+
+    /* 섹션 타이틀 공통 */
+    .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border-color); }
+    .section-title { font-size: 20px; font-weight: 700; margin: 0; }
+    .view-all { color: var(--text-sub); font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .view-all:hover { color: var(--text-main); }
+
+    /* 4-2. 공구 리스트 바둑판 */
+    .room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .room-item { padding: 24px; cursor: pointer; transition: all 0.2s; }
+    .room-item:hover { border-color: var(--ku-crimson); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+    .room-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    
+    .badge { padding: 6px 10px; border-radius: var(--border-radius-sm); font-size: 12px; font-weight: 700; }
+    .badge.active { background-color: #fff0f4; color: var(--ku-crimson); }
+    .badge.wait { background-color: #e7f5ff; color: #1c7ed6; } /* 다른 상태 뱃지 추가 */
+    
+    .room-date { font-size: 13px; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
+    .room-title { margin: 0 0 20px 0; font-size: 18px; font-weight: 600; line-height: 1.4; }
+    .room-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 16px; }
+    
+    .host-info { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-sub); }
+    .participant-info { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-dark); background-color: #f8f9fa; padding: 6px 12px; border-radius: 20px; }
+
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="top-header">
+    <div class="logo"><i class="ph-fill ph-shopping-bag"></i> KU GONGGU</div>
+    <nav class="top-nav">
+      <a href="#">홈</a> <a href="#">탐색</a> <a href="#">채팅</a> <a href="#" class="active">마이페이지</a>
+    </nav>
+    <div class="header-icons"><i class="ph ph-bell"></i></div>
+  </header>
+
+  <!-- 대시보드 레이아웃 -->
+  <div class="pc-layout">
+    
+    <!-- 좌측 사이드바 -->
+    <aside class="sidebar">
+      <!-- 카드 1: 프로필 & 신뢰도 -->
+      <div class="card profile-card">
+        <div class="profile-avatar">정</div>
+        <div class="profile-info">
+          <h2>정아</h2>
+          <p>@j_kim_cs</p>
+        </div>
+        <div class="trust-box">
+          <div class="trust-header">
+            <span>크림슨 지수</span>
+            <span class="trust-score">86%</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+        </div>
+        <button class="btn-outline">프로필 수정</button>
+      </div>
+
+      <!-- 카드 2: 서브 메뉴 리스트 (세로 공간 채우기 용도) -->
+      <div class="card sidebar-menu">
+        <a href="#" class="menu-item"><i class="ph ph-wallet"></i> 결제/정산 내역</a>
+        <a href="#" class="menu-item"><i class="ph ph-heart"></i> 찜한 공구</a>
+        <a href="#" class="menu-item"><i class="ph ph-chat-centered-text"></i> 내가 쓴 글/댓글</a>
+        <div style="height: 1px; background: var(--border-color); margin: 8px 0;"></div>
+        <a href="#" class="menu-item"><i class="ph ph-headphones"></i> 고객센터</a>
+        <a href="#" class="menu-item"><i class="ph ph-gear"></i> 환경설정</a>
+      </div>
+    </aside>
+
+    <!-- 우측 메인 콘텐츠 -->
+    <main class="content-area">
+      
+      <!-- 섹션 1: 퀵 요약 위젯 -->
+      <div class="quick-stats-grid">
+        <div class="card stat-widget">
+          <div class="stat-title"><i class="ph-fill ph-coin" style="color: #fcc419;"></i> 나의 포인트</div>
+          <div class="stat-value">2,500 P</div>
+        </div>
+        <div class="card stat-widget">
+          <div class="stat-title"><i class="ph-fill ph-ticket" style="color: #ff922b;"></i> 할인 쿠폰</div>
+          <div class="stat-value">1 장</div>
+        </div>
+        <div class="card stat-widget">
+          <div class="stat-title"><i class="ph-fill ph-users" style="color: var(--ku-crimson);"></i> 참여중 공구</div>
+          <div class="stat-value">2 건</div>
+        </div>
+        <div class="card stat-widget">
+          <div class="stat-title"><i class="ph-fill ph-heart" style="color: #fa5252;"></i> 관심 찜</div>
+          <div class="stat-value">5 건</div>
+        </div>
+      </div>
+
+      <!-- 섹션 2: 나의 공구 내역 -->
+      <section>
+        <div class="section-header">
+          <h3 class="section-title">최근 참여 내역</h3>
+          <span class="view-all">전체보기 <i class="ph ph-caret-right"></i></span>
+        </div>
+        <div class="room-grid">
+          <div class="card room-item">
+            <div class="room-header">
+              <span class="badge active">모집중</span>
+              <span class="room-date"><i class="ph ph-clock"></i>오늘 18:00 마감</span>
+            </div>
+            <h4 class="room-title">[하나스퀘어] 이산수학 제본 공구팟</h4>
+            <div class="room-footer">
+              <span class="host-info"><i class="ph-fill ph-crown"></i> @cs_master</span>
+              <div class="participant-info"><i class="ph ph-users"></i> 3 / 5명</div>
+            </div>
+          </div>
+          <div class="card room-item">
+            <div class="room-header">
+              <span class="badge wait">배송 대기</span>
+              <span class="room-date"><i class="ph ph-truck"></i>내일 도착 예정</span>
+            </div>
+            <h4 class="room-title">에어팟 프로 폼팁 공동구매</h4>
+            <div class="room-footer">
+              <span class="host-info"><i class="ph-fill ph-crown"></i> @apple_fan</span>
+              <div class="participant-info"><i class="ph ph-users"></i> 3 / 3명 (완료)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 섹션 3: 찜한 공구 (하단 빈공간 채우기) -->
+      <section>
+        <div class="section-header">
+          <h3 class="section-title">방금 찜한 공구</h3>
+          <span class="view-all">더보기 <i class="ph ph-caret-right"></i></span>
+        </div>
+        <div class="room-grid">
+          <div class="card room-item" style="border-left: 4px solid var(--ku-crimson);">
+            <div class="room-header">
+              <span class="badge active">모집중</span>
+              <span class="room-date"><i class="ph ph-clock"></i>내일 12:00 마감</span>
+            </div>
+            <h4 class="room-title">자취생 필수 햇반 36개입 N빵</h4>
+            <div class="room-footer">
+              <span class="host-info"><i class="ph-fill ph-crown"></i> @foodie</span>
+              <div class="participant-info"><i class="ph ph-users"></i> 1 / 4명</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>
