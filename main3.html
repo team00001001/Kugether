@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고대공구 | 확실한 공동구매</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ku-crimson: #A41034;
+            --ku-gold: #8B6331; /* 포인트를 위한 골드 톤 추가 */
+            --dark-gray: #1a1a1a;
+            --soft-gray: #f8f9fa;
+            --glass-white: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            /* 배경을 더 채워 보이게 하는 미세한 그라데이션 */
+            background: linear-gradient(135deg, #ffffff 0%, #f4f4f4 100%);
+            background-attachment: fixed;
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 1. 상단바 유리효과(Glassmorphism) 적용 */
+        header {
+            background-color: var(--ku-crimson);
+            color: white;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(164, 16, 52, 0.15);
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            font-style: italic;
+            cursor: pointer;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        /* 2. 메인 검색 섹션 추가 */
+        .search-section {
+            margin-top: 120px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .search-bar-container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 20px 30px;
+            border-radius: 50px;
+            border: 2px solid transparent;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: var(--ku-crimson);
+            box-shadow: 0 10px 40px rgba(164, 16, 52, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
+            color: var(--ku-crimson);
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 3. 히어로 섹션 개선 */
+        main {
+            max-width: 1200px;
+            margin: 40px auto 100px;
+            padding: 0 25px;
+        }
+
+        .hero {
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=1200') center/cover;
+            padding: 60px;
+            color: white;
+            margin-bottom: 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        /* 4. 카테고리 칩 스타일 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 6px;
+            height: 24px;
+            background-color: var(--ku-crimson);
+            margin-right: 12px;
+            border-radius: 10px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .category-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s;
+            border: 1px solid #eee;
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--ku-crimson);
+            color: var(--ku-crimson);
+        }
+
+        /* 5. 공구 카드 섹션 리터칭 */
+        .gonggu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .card-img {
+            height: 200px;
+            background: linear-gradient(45deg, #eee, #f9f9f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .trust-tag {
+            display: inline-block;
+            background: #fff0f3;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            color: var(--ku-crimson);
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .card-price {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--ku-crimson);
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #666;
+        }
+
+        /* 6. 채팅 및 상단 이동 버튼 */
+        .floating-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .btn-round {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .chat-btn { background-color: var(--ku-crimson); }
+        .top-btn { background-color: var(--dark-gray); font-size: 0.8rem; }
+
+        .btn-round:hover { transform: scale(1.1); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">KOREA GONGGU</div>
+            <nav>
+                <a href="#">홈</a>
+                <a href="#">실시간 인기</a>
+                <a href="#">참여 내역</a>
+                <a href="#" style="background: white; color: var(--ku-crimson); padding: 8px 20px; border-radius: 5px; margin-left: 20px;">마이페이지</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 고급스러운 검색창 섹션 -->
+    <div class="search-section">
+        <div class="search-bar-container">
+            <input type="text" class="search-bar" placeholder="찾으시는 공구 상품이나 키워드를 입력하세요 (예: 닭가슴살, 휴지)">
+            <button class="search-icon">🔍</button>
+        </div>
+    </div>
+
+    <main>
+        <!-- 히어로 섹션: 배경 이미지와 오버레이 적용 -->
+        <section class="hero">
+            <h2>확실하게,<br>함께 사면 더 싸니까.</h2>
+            <p>고려대학교 학생 인증을 거친 안전한 공동구매 플랫폼</p>
+        </section>
+
+        <!-- 카테고리 섹션 -->
+        <div class="section-header">
+            <div class="section-title">카테고리별 탐색</div>
+        </div>
+        <section class="category-grid">
+            <div class="category-item">🍎 식재료/간식</div>
+            <div class="category-item">🏠 자취/생활용품</div>
+            <div class="category-item">📖 전공/문구</div>
+            <div class="category-item">📦 기타 아이템</div>
+        </section>
+
+        <!-- 추천 공구 섹션 -->
+        <div class="section-header">
+            <div class="section-title">지금 뜨는 공동구매</div>
+            <div style="font-weight: 700; color: #888; cursor: pointer; font-size: 0.9rem;">전체보기 ></div>
+        </div>
+        
+        <section class="gonggu-grid">
+            <div class="card">
+                <div class="card-img">IMAGE</div>
+                <div class="card-body">
+                    <div class="trust-tag">정기배송 가능</div>
+                    <div class="card-title">프리미엄 닭가슴살 혼합 패키지</div>
+                    <div class="card-footer">
+                        <div class="card-price">1,200원~</div>
+                        <div class="status-tag">12/30명 참여중</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-img">IMAGE</div>
+                <div class="card-body">
+                    <div class="trust-tag">오늘 마감</div>
+                    <div class="card-title">3겹 엠보싱 롤화장지 30롤</div>
+                    <div class="card-footer">
+                        <div class="card-price">8,500원</div>
+                        <div class="status-tag">28/30명 완료</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-img">IMAGE</div>
+                <div class="card-body">
+                    <div class="trust-tag">최저가 보장</div>
+                    <div class="card-title">컴퓨터학과 전공 서적 공동제본</div>
+                    <div class="card-footer">
+                        <div class="card-price">15,000원</div>
+                        <div class="status-tag">5/10명 참여중</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="floating-buttons">
+        <button class="btn-round top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">TOP</button>
+        <button class="btn-round chat-btn">💬</button>
+    </div>
+
+</body>
+</html>

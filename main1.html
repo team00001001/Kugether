@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고대공구 | 확실한 공동구매</title>
+    <!-- Google Fonts: 본문용 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 1. 디자인 가이드라인 (정아님 스타일) */
+        :root {
+            --ku-crimson: #A41034; /* 고려대 상징색 */
+            --dark-gray: #333333;
+            --light-gray: #f4f4f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        /* 2. 레이아웃: 상단바 (박제 영역) */
+        header {
+            background-color: var(--ku-crimson);
+            color: white;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            font-style: italic;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* 3. 메인 콘텐츠 영역 (자유 영역) */
+        main {
+            margin-top: 100px; /* 상단바 높이만큼 띄우기 */
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 20px;
+        }
+
+        /* 히어로 섹션: 확실하고 카리스마 있는 문구 */
+        .hero {
+            border-left: 10px solid var(--ku-crimson);
+            padding: 30px;
+            background-color: var(--light-gray);
+            margin-bottom: 50px;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        /* 카테고리 섹션 (정아님 담당) */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 5px;
+            height: 20px;
+            background-color: var(--ku-crimson);
+            margin-right: 10px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .category-item {
+            border: 2px solid #eeeeee;
+            padding: 20px;
+            text-align: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-item:hover {
+            border-color: var(--ku-crimson);
+            color: var(--ku-crimson);
+            background-color: #fff9f9;
+        }
+
+        /* 공구 카드 섹션 (친구들 담당 예시) */
+        .gonggu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            border: 1px solid #e1e1e1;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-img {
+            height: 180px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .trust-tag {
+            font-size: 0.75rem;
+            color: var(--ku-crimson);
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        .card-price {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--ku-crimson);
+        }
+
+        /* 4. 채팅 플로팅 버튼 */
+        .chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--ku-crimson);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(164, 16, 52, 0.4);
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 레이아웃: 상단바 -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">KOREA GONGGU</div>
+            <nav>
+                <a href="#">홈</a>
+                <a href="#">카테고리</a>
+                <a href="#">신뢰도조회</a>
+                <a href="#" style="background: white; color: var(--ku-crimson); padding: 5px 15px; margin-left: 15px;">로그인</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- 히어로 섹션 -->
+        <section class="hero">
+            <h2>확실하게,<br>함께 사면 더 싸니까.</h2>
+            <p>고려대학교 학생들만을 위한 고퀄리티 공동구매 플랫폼</p>
+        </section>
+
+        <!-- 카테고리 섹션 -->
+        <div class="section-title">카테고리</div>
+        <section class="category-grid">
+            <div class="category-item">🍎 식재료/간식</div>
+            <div class="category-item">🏠 자취/생활용품</div>
+            <div class="category-item">📖 전공/문구</div>
+            <div class="category-item">📦 기타</div>
+        </section>
+
+        <!-- 추천 공구 섹션 -->
+        <div class="section-title">추천 공동구매</div>
+        <section class="gonggu-grid">
+            <!-- 카드 예시 1 -->
+            <div class="card">
+                <div class="card-img">상품 이미지</div>
+                <div class="card-body">
+                    <div class="trust-tag">신뢰도 99%</div>
+                    <div class="card-title">대용량 닭가슴살 10kg</div>
+                    <div class="card-price">1,200원~</div>
+                </div>
+            </div>
+            <!-- 카드 예시 2 -->
+            <div class="card">
+                <div class="card-img">상품 이미지</div>
+                <div class="card-body">
+                    <div class="trust-tag">신뢰도 100%</div>
+                    <div class="card-title">자취방 필수품 두루마리 휴지</div>
+                    <div class="card-price">8,500원</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 채팅 버튼 -->
+    <button class="chat-btn">💬</button>
+
+</body>
+</html>

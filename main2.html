@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KU GONGGU | Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+KR:wght@300;500;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-crimson: #7A0A24;
+            --brand-crimson: #A41034;
+            --bg-gradient: linear-gradient(135deg, #fdfcfb 0%, #e2d1d1 100%);
+            --glass-white: rgba(255, 255, 255, 0.7);
+            --border-soft: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        /* [Header] 검색창이 포함된 프리미엄 상단바 */
+        header {
+            background: rgba(122, 10, 36, 0.95);
+            backdrop-filter: blur(15px);
+            height: 80px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 100%; max-width: 1300px;
+            margin: 0 auto; padding: 0 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem; font-weight: 900; color: white;
+            letter-spacing: 1px; flex-shrink: 0;
+        }
+
+        /* 검색창 디자인 (앱 스타일) */
+        .search-area {
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px 12px 45px;
+            color: white;
+            font-weight: 500;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+        .search-input:focus {
+            background: white;
+            color: var(--dark-crimson);
+        }
+
+        .search-icon {
+            position: absolute; left: 15px; top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        nav { display: flex; align-items: center; flex-shrink: 0; }
+        nav a {
+            color: white; text-decoration: none;
+            margin-left: 20px; font-size: 0.8rem; font-weight: 700;
+        }
+
+        /* [Main] 더 꽉 찬 느낌의 레이아웃 */
+        main { max-width: 1300px; margin: 120px auto 60px; padding: 0 24px; }
+
+        .hero-banner {
+            background: var(--glass-white);
+            backdrop-filter: blur(10px);
+            border: 1px solid white;
+            padding: 50px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-text h2 { font-size: 3rem; font-weight: 900; color: var(--dark-crimson); line-height: 1.1; }
+        .hero-text p { margin-top: 15px; color: #555; font-size: 1.1rem; }
+
+        /* 통계 지표 (화려함을 더해주는 요소) */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;
+        }
+        .stat-card {
+            background: white; padding: 25px;
+            border-bottom: 4px solid var(--dark-crimson);
+        }
+        .stat-card small { font-size: 0.7rem; color: #999; font-weight: 700; text-transform: uppercase; }
+        .stat-card h4 { font-size: 1.8rem; font-weight: 900; color: var(--dark-crimson); }
+
+        /* [Grid System] */
+        .section-title {
+            font-size: 1.1rem; font-weight: 900; margin-bottom: 25px;
+            color: var(--dark-crimson); display: flex; align-items: center;
+        }
+        .section-title::before { content: ""; width: 20px; height: 2px; background: var(--dark-crimson); margin-right: 10px; }
+
+        .item-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;
+        }
+
+        /* 아이템 카드 디자인 업그레이드 */
+        .item-card {
+            background: white;
+            border: 1px solid var(--border-soft);
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        }
+
+        .item-img {
+            height: 220px; background: #eee;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: #ccc; position: relative;
+        }
+        .trust-indicator {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: 4px; background: #eee;
+        }
+        .trust-bar { height: 100%; background: var(--dark-crimson); width: 95%; }
+
+        .item-info { padding: 25px; }
+        .item-tag { font-size: 0.7rem; font-weight: 900; color: var(--brand-crimson); margin-bottom: 8px; display: block; }
+        .item-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; }
+
+        .item-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; border-top: 1px solid #f0f0f0;
+        }
+        .price { font-size: 1.5rem; font-weight: 900; color: var(--dark-crimson); }
+        .btn-join {
+            background: var(--dark-crimson); color: white; border: none;
+            padding: 10px 20px; font-weight: 900; cursor: pointer;
+        }
+
+        /* 채팅 버튼 (화려한 그림자) */
+        .fab {
+            position: fixed; bottom: 40px; right: 40px;
+            width: 65px; height: 65px; background: var(--dark-crimson);
+            color: white; border: none; font-size: 1.5rem;
+            box-shadow: 0 15px 40px rgba(122, 10, 36, 0.4);
+            cursor: pointer; transition: 0.3s;
+        }
+        .fab:hover { transform: scale(1.1) rotate(5deg); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="logo">KU GONGGU</div>
+            
+            <!-- 검색창 추가 -->
+            <div class="search-area">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="필요한 공구 항목을 검색하세요...">
+            </div>
+
+            <nav>
+                <a href="#">DASHBOARD</a>
+                <a href="#">TRUST-MAP</a>
+                <a href="#" style="border: 2px solid white; padding: 6px 15px;">MY PAGE</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- 화려함을 더해주는 히어로 배너 -->
+        <section class="hero-banner">
+            <div class="hero-text">
+                <h2>확실하게, <br>함께 사면 더 싸니까.</h2>
+                <p>고려대학교 학생들을 위한 고성능 공동구매 시스템</p>
+            </div>
+            <div style="font-size: 5rem; opacity: 0.1;">KU</div>
+        </section>
+
+        <!-- 정보량을 늘려 꽉 차 보이게 하는 통계 섹션 -->
+        <div class="section-title">SYSTEM REAL-TIME STATUS</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <small>Active Campaigns</small>
+                <h4>128 건</h4>
+            </div>
+            <div class="stat-card">
+                <small>Average Trust Score</small>
+                <h4>98.2%</h4>
+            </div>
+            <div class="stat-card">
+                <small>Total Participation</small>
+                <h4>2,405 명</h4>
+            </div>
+        </div>
+
+        <div class="section-title">FEATURED OPPORTUNITIES</div>
+        <div class="item-grid">
+            <div class="item-card">
+                <div class="item-img">
+                    PREVIEW
+                    <div class="trust-indicator"><div class="trust-bar" style="width: 98%;"></div></div>
+                </div>
+                <div class="item-info">
+                    <span class="item-tag">TRUST VERIFIED</span>
+                    <h4 class="item-title">아이패드 종이질감 필름 (30인 한정)</h4>
+                    <div class="item-footer">
+                        <span class="price">₩ 9,500</span>
+                        <button class="btn-join">참여하기</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="item-img">
+                    PREVIEW
+                    <div class="trust-indicator"><div class="trust-bar" style="width: 100%;"></div></div>
+                </div>
+                <div class="item-info">
+                    <span class="item-tag">OFFICIAL GROUP</span>
+                    <h4 class="item-title">전공 서적 공동 제본 (인문/사회)</h4>
+                    <div class="item-footer">
+                        <span class="price">₩ 14,000</span>
+                        <button class="btn-join">참여하기</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item-card">
+                <div class="item-img">
+                    PREVIEW
+                    <div class="trust-indicator"><div class="trust-bar" style="width: 92%;"></div></div>
+                </div>
+                <div class="item-info">
+                    <span class="item-tag">FRESH FOOD</span>
+                    <h4 class="item-title">닭가슴살 5kg 대량 구매</h4>
+                    <div class="item-footer">
+                        <span class="price">₩ 42,000</span>
+                        <button class="btn-join">참여하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button class="fab">💬</button>
+
+</body>
+</html>
