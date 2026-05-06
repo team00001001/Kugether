@@ -341,165 +341,14 @@
         .count-info span {
             color: var(--ku-crimson);
         }
-
-        /* ==========================================
-           5. 플로팅 게시글 작성 버튼
-           ========================================== */
-        .write-fab {
-            position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 64px;
-            height: 64px;
-            background: var(--ku-crimson-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(138, 21, 56, 0.4);
-            cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 900;
-        }
-
-        .write-fab:hover {
-            transform: scale(1.1) rotate(10deg);
-        }
-
-        /* ==========================================
-           6. 로그인 모달 (앱 스타일의 부드러운 팝업)
-           ========================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .login-card {
-            background: var(--surface-color);
-            padding: 50px 40px;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            position: relative;
-            transform: translateY(30px) scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .modal-overlay.active .login-card {
-            transform: translateY(0) scale(1);
-        }
-
-        .btn-close-modal {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: #F5F5F5;
-            border: none;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #777;
-            transition: background 0.2s;
-        }
-
-        .btn-close-modal:hover {
-            background: #E0E0E0;
-            color: var(--text-dark);
-        }
-
-        .login-logo {
-            color: var(--ku-crimson);
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .login-desc {
-            color: var(--text-gray);
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            background: #FAFAFA;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: var(--ku-crimson);
-            background: var(--surface-color);
-            box-shadow: 0 0 0 4px rgba(138, 21, 56, 0.1);
-        }
-
-        .btn-login-submit {
-            width: 100%;
-            background: var(--ku-crimson-gradient);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(138, 21, 56, 0.3);
-        }
-
-        .btn-login-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(138, 21, 56, 0.4);
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- 1. 상단바 -->
-    <header>
-        <div class="nav-inner">
-            <a href="#" class="logo">KU GONGGU</a>
-            <nav>
-                <a href="login.html">
-                    <button class="btn-login-nav">로그인</button>
-                </a>
-            </nav>
-        </div>
-    </header>
+    <!-- 동적으로 헤더가 삽입될 영역 -->
+    <div id="header-placeholder"></div>
 
-    <!-- 2. 메인 컨텐츠 영역 -->
+    <!-- 메인 컨텐츠 영역 -->
     <main>
         <!-- 다이나믹 히어로 섹션 -->
         <section class="hero-section">
@@ -544,7 +393,6 @@
         <section class="room-grid">
             <!-- 공구방 예시 1 -->
             <div class="room-item">
-                
                 <div class="room-content">
                     <div class="tag-group">
                         <span class="room-tag tag-hot">🔥 마감임박</span>
@@ -592,7 +440,49 @@
                 </div>
             </div>
         </section>
-    </main>   
+    </main>
 
+    <script>
+        // 1. 페이지 열리자마자 헤더 가져오기
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+                return res.text();
+            })
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                
+                // 2. 헤더 조립 끝나자마자 버튼 상태 확인
+                updateHeader();
+            })
+            .catch(err => console.error(err));
+
+        function updateHeader() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            // 헤더 안의 버튼 뭉치들 찾기
+            const authButtons = document.querySelectorAll('.auth-only');
+            const guestButtons = document.querySelectorAll('.guest-only');
+
+            if (isLoggedIn) {
+                authButtons.forEach(btn => btn.style.display = 'inline-block');
+                guestButtons.forEach(btn => btn.style.display = 'none');
+            } else {
+                authButtons.forEach(btn => btn.style.display = 'none');
+                guestButtons.forEach(btn => btn.style.display = 'inline-block');
+            }
+        }
+
+        // 3. 로그아웃 기능 (버튼 클릭 감시)
+        document.addEventListener('click', function(e) {
+            if(e.target && e.target.id === 'logout-btn') {
+                localStorage.removeItem('isLoggedIn'); 
+                alert('로그아웃 되었습니다.');
+                
+                // 메인 초기화면으로 이동 (파일명이 다를 경우 수정)
+                location.href = 'main_beforelogin.html'; 
+            }
+        });
+    </script>
 </body>
 </html>
