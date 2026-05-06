@@ -629,6 +629,28 @@
             </div>
         </section>
     </main>   
+        <!-- 3. 플로팅 게시글 작성 버튼 (Pen Icon) -->
+         <!-- style="display: none;"을 추가해 기본적으로 숨겨둡니다 -->
+<a href="writefront.html" id="write-fab" class="write-fab" title="공구방 만들기" style="display: none;">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+    </svg>
+</a>
+<script>
+    window.onload = function() {
+        // 1. 로그인 상태 확인 (예: 로컬 스토리지에 'isLoggedIn'이 'true'로 저장되어 있다고 가정)
+        // 실제 프로젝트에서는 로그인 성공 시 localStorage.setItem('isLoggedIn', 'true')를 실행해줘야 합니다.
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const fabButton = document.getElementById('write-fab');
 
+        // 2. 로그인 상태라면 버튼을 보여줌
+        if (isLoggedIn === 'true') {
+            fabButton.style.display = 'flex'; // 혹은 'block'
+        } else {
+            fabButton.style.display = 'none';
+        }
+    };
+</script>
 </body>
 </html>
