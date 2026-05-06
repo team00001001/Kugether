@@ -531,7 +531,7 @@
         if(e.target && e.target.id === 'logout-btn') {
             localStorage.removeItem('isLoggedIn'); // 기록 삭제
             alert('로그아웃 되었습니다.');
-            location.reload(); // 새로고침하여 초기 상태로 복구
+            location.href = 'main_login.html'; // 
         }
     });
 </script>
