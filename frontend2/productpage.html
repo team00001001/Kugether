@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이패드 종이질감 필름 공동구매 | 상세페이지</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --text-dark: #111827;
+            --text-gray: #4b5563;
+            --border: #e5e7eb;
+            --bg-body: #f9fafb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 20px; font-weight: 800; color: var(--primary); cursor: pointer; }
+
+        /* 메인 컨테이너 레이아웃 */
+        .main-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr 380px; /* 상세내용 1 : 사이드바 380px */
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        /* 왼쪽 상세 콘텐츠 영역 */
+        .detail-section {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .main-img {
+            width: 100%;
+            height: 400px;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #9ca3af;
+        }
+
+        .content-body {
+            padding: 32px;
+        }
+
+        .category { font-size: 14px; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+        .main-title { font-size: 28px; font-weight: 700; margin-bottom: 24px; line-height: 1.3; }
+
+        /* 섹션 구분 */
+        .section-box { margin-bottom: 40px; }
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid var(--text-dark); padding-bottom: 8px; }
+
+        .info-list { list-style: none; }
+        .info-list li { margin-bottom: 12px; display: flex; align-items: flex-start; }
+        .info-list li span:first-child { font-weight: 600; width: 100px; color: var(--text-gray); flex-shrink: 0; }
+
+        /* 오른쪽 사이드바 (고정) */
+        .sidebar {
+            position: sticky;
+            top: 104px;
+            height: fit-content;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .price-box { margin-bottom: 20px; }
+        .price-label { font-size: 14px; color: var(--text-gray); }
+        .price-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+
+        .progress-container { margin-bottom: 24px; }
+        .progress-text { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; font-weight: 600; }
+        .progress-bg { height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); width: 80%; border-radius: 5px; }
+
+        .host-mini {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .host-circle { width: 32px; height: 32px; border-radius: 50%; background: #ccc; margin-right: 12px; }
+        .host-name { font-size: 14px; font-weight: 600; }
+
+        .btn-join {
+            width: 100%;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-join:hover { background: #3730a3; transform: translateY(-2px); }
+
+        .deadline-tag {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #ef4444;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">⚡ 공구의민족</div>
+        <div class="nav-links" style="display: flex; gap: 24px; font-size: 14px; font-weight: 500;">
+            <span>탐색하기</span>
+            <span>내 공구</span>
+            <span>알림</span>
+            <span>로그인</span>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <main class="detail-section">
+            <div class="main-img">
+                📸 제품 상세 이미지 영역 (1100 x 400 최적화)
+            </div>
+
+            <div class="content-body">
+                <p class="category">태블릿 악세서리 > 필름</p>
+                <h1 class="main-title">아이패드 종이질감 필름 공동구매 (배송비 N빵 / 강남역 직거래 가능)</h1>
+
+                <div class="section-box">
+                    <h3 class="section-title">📦 공구 정보</h3>
+                    <ul class="info-list">
+                        <li><span>제품명</span> <span>애플유저 추천 OOO 종이질감 필름 (전기종)</span></li>
+                        <li><span>구매처</span> <span>해외 공식 홈페이지 (직구)</span></li>
+                        <li><span>수령방법</span> <span>강남역 직거래 또는 반값택배 (+1,800원)</span></li>
+                        <li><span>진행상태</span> <span><b>입금 대기중</b> (30명 달성 시 즉시 주문)</span></li>
+                    </ul>
+                </div>
+
+                <div class="section-box">
+                    <h3 class="section-title">💡 상세 설명</h3>
+                    <p style="white-space: pre-line; color: var(--text-gray);">
+                        아이패드 드로잉 하시는 분들이라면 다들 아시는 그 필름입니다!
+                        국내 판매가보다 직구가 훨씬 저렴해서 30명 모아보려 합니다.
+
+                        인원이 모두 모이면 단체톡방 개설 후 입금 안내 드릴 예정입니다.
+                        배송비는 총액에서 1/N로 정확히 계산하여 엑셀 공유 드립니다.
+                        
+                        - 해외 배송 기간: 약 1주일 예상
+                        - 아이패드 프로, 에어, 미니 등 전 기종 선택 가능
+                    </p>
+                </div>
+
+                <div class="section-box">
+                    <h3 class="section-title">🙋‍♂️ 현재 참여 멤버 (24명)</h3>
+                    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <span style="font-size: 11px;">김*수</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <span style="font-size: 11px;">이*미</span>
+                        </div>
+                        <div style="text-align: center; opacity: 0.5;">
+                            <div style="width: 40px; height: 40px; border: 1px dashed #ccc; border-radius: 50%; margin: 0 auto 5px;"></div>
+                            <span style="font-size: 11px;">대기중</span>
+                        </div>
+                        </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="action-card">
+                <div class="price-box">
+                    <p class="price-label">1인당 예상 금액</p>
+                    <p class="price-value">12,500원</p>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span>모집 현황</span>
+                        <span>24명 / 30명 (80%)</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <span class="deadline-tag">⚠️ 남은 시간 14:20:05</span>
+                </div>
+
+                <div class="host-mini">
+                    <div class="host-circle"></div>
+                    <div>
+                        <p class="host-name">애플농장주 (방장)</p>
+                        <p style="font-size: 12px; color: var(--text-gray);">신뢰도 98% · 인증됨</p>
+                    </div>
+                </div>
+
+                <button class="btn-join" onclick="alert('참여 신청이 완료되었습니다!')">지금 공구 참여하기</button>
+                <p style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 16px;">
+                    참여 시 방장이 개설한 카톡방으로 초대됩니다.
+                </p>
+            </div>
+
+            <div style="margin-top: 20px; padding: 10px; font-size: 13px; color: #6b7280;">
+                <p>📍 해당 공구는 신뢰도 인증을 완료한 유저가 진행하고 있습니다. </p>
+            </div>
+        </aside>
+    </div>
+
+</body>
+</html>
