@@ -630,5 +630,71 @@
             }
         });
     </script>
+    <script>
+async function loadProductDetail() {
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+
+    if (!productId) {
+        alert('상품 ID가 없습니다.');
+        location.href = 'product_list.html';
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/products/${productId}`);
+        const product = await response.json();
+
+        if (!response.ok) {
+            alert(product.error || '상품 정보를 불러오지 못했습니다.');
+            return;
+        }
+
+        document.querySelector('.title').textContent = product.title;
+
+        document.querySelector('.original-price').textContent =
+            `1인당 예상 가격`;
+
+        document.querySelector('.n-pay-price').innerHTML =
+            `${Number(product.price).toLocaleString()}원 <span>(${product.currentCount}명 참여 중)</span>`;
+
+        document.querySelector('.count').textContent =
+            `${product.currentCount}명 / ${product.targetCount}명`;
+
+        const percent = Math.min(
+            Math.round((product.currentCount / product.targetCount) * 100),
+            100
+        );
+
+        document.querySelector('.progress-fill').style.width = `${percent}%`;
+
+        document.querySelector('.deadline-text').textContent =
+            `⏳ 모집 기간: ${product.duration}`;
+
+        document.querySelector('.content-body').textContent =
+            product.description;
+
+        const image = document.querySelector('.product-image');
+
+        if (product.imageUrl) {
+            image.src = product.imageUrl;
+        } else {
+            image.removeAttribute('src');
+            image.alt = '이미지 준비중';
+        }
+
+        const categoryBadge = document.querySelector('.tag-study');
+        if (categoryBadge) {
+            categoryBadge.textContent = product.category;
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('서버 연결 실패');
+    }
+}
+
+loadProductDetail();
+</script>
 </body>
 </html>

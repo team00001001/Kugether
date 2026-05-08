@@ -8,8 +8,8 @@ let allProducts = [];
 
 // [추가] URL에서 카테고리 정보 미리 읽어오기
 const urlParams = new URLSearchParams(window.location.search);
-const currentCategory = urlParams.get('category'); 
-
+const currentCategory = urlParams.get('category');
+const searchKeyword = urlParams.get('search') || '';
 // 2. 데이터 불러오기
 function fetchProducts() {
     fetch(API_URL)
@@ -19,12 +19,15 @@ function fetchProducts() {
         })
         .then(data => {
             allProducts = data;
-            
-            // [수정] 페이지 로드 시 URL 카테고리와 검색창 글자를 모두 고려해 첫 화면 띄우기
-            const initialKeyword = searchInput ? searchInput.value.trim() : "";
+
+            if (searchInput && searchKeyword) {
+                searchInput.value = searchKeyword;
+            }
+
+            const initialKeyword = searchKeyword || "";
+
             filterAndRender(initialKeyword);
-            
-            // 카테고리가 있을 경우 검색창 UI 변경
+
             if (currentCategory && searchInput) {
                 searchInput.placeholder = `"${currentCategory}" 내에서 검색...`;
             }
@@ -63,7 +66,7 @@ function renderRooms(rooms, keyword) {
         const badgeStyle = isClosed ? "background-color: #E9ECEF; color: #868E96;" : "";
 
         const cardHTML = `
-            <div class="product-card">
+            <div class="product-card" onclick="location.href='product.html?id=${room.id}'">
                 <div class="img-area" style="padding: 0;">
                     <img src="${room.imageUrl}" alt="${room.title}" 
                          onerror="this.outerHTML='<div style=\\'font-size: 60px;\\'>📦</div>'" 

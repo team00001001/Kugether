@@ -552,7 +552,7 @@
                 <p class="hero-sub-text">배달비 절약부터 대량구매 할인까지. 학우들과 함께하세요!</p>
                 
                 <div class="search-input-box">
-                    <input type="text" placeholder="반가워요😊">
+                    <input type="text" placeholder="반가워요😊" id="main-search">
                 </div>
             </div>
             <div class="hero-image-area"></div>
@@ -661,6 +661,22 @@
     }
 
     loadRecentProducts();
+</script>
+<script>
+    const mainSearch = document.getElementById('main-search');
+
+    mainSearch.addEventListener('keydown', (e) => {
+
+        if (e.key === 'Enter') {
+
+            const keyword = mainSearch.value.trim();
+
+            if (!keyword) return;
+
+            location.href =
+                `product_list.html?search=${encodeURIComponent(keyword)}`;
+        }
+    });
 </script>
 </body>
 </html>
