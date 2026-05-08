@@ -1,5 +1,5 @@
 // 1. 데이터 파일 경로 및 기초 설정
-const API_URL = 'products.json';
+const API_URL = 'http://localhost:3000/products';
 const roomGrid = document.getElementById('roomGrid');
 const searchInput = document.getElementById('main-search');
 const resultText = document.getElementById('resultText');

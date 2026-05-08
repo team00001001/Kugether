@@ -4,21 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 상세 | KU GONGGU</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             /* 메인 컬러 */
             --ku-crimson: #8A1538;
-            --surface-color: #FFFFFF;
-            --text-dark: #333333; 
-            --text-gray: #888888;
-            --border-light: #f0e6e6; 
-
-            /* 카테고리 파스텔 톤 (main_login.html 기준) */
+            --ku-crimson-light: #FDF2F4; 
+            
+            /* UI 컬러 */
+            --bg-color: #F8F9FA; 
+            --surface-color: #FFFFFF; 
+            --border-color: #EAECEF; 
+            
+            /* 텍스트 컬러 */
+            --text-primary: #1A1A1A; 
+            --text-secondary: #4A5056; 
+            --text-tertiary: #818991; 
+            --text-dark: #222222; /* 헤더 호버 효과용 */
+            
+            /* 카테고리 파스텔 톤 */
             --color-food: #FFF3E0;
             --color-living: #E3F2FD;
             --color-study: #E8F5E9;
             --color-etc: #F3E5F5;
+            
+            /* 그림자 */
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(138, 21, 56, 0.06); 
         }
 
         * {
@@ -26,247 +38,431 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Pretendard', sans-serif;
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
-            color: var(--text-dark);
-            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
             overflow-x: hidden;
-            padding-top: 100px; 
-        }
-
-        .container {
-            max-width: 900px; 
-            margin: 0 auto;
-            padding: 0 24px 100px;
+            padding-top: 100px; /* 헤더 높이(70px)를 고려하여 여백을 100px로 증가 */
         }
 
         /* ==========================================
-           1. 상품 상단 요약
+           main_login.html과 완벽히 동일한 헤더 CSS
+           ========================================== */
+        header {
+            background-color: var(--ku-crimson);
+            backdrop-filter: blur(8px);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a.menu-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a.menu-link:hover {
+            color: var(--text-dark);
+        }
+
+        .btn-login-nav {
+            background: var(--ku-crimson);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(138, 21, 56, 0.3);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .btn-login-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(138, 21, 56, 0.4);
+        }
+        /* ========================================== */
+
+        .container {
+            max-width: 940px; 
+            margin: 0 auto;
+            padding: 0px 20px 100px; 
+        }
+
+        /* 공통 카드 스타일 */
+        .card {
+            background: var(--surface-color);
+            border-radius: 24px; 
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0,0,0,0.03); 
+        }
+
+        /* ==========================================
+           1. 상품 상단 요약 (Hero Section)
            ========================================== */
         .product-hero {
             display: flex;
-            gap: 32px;
-            background: var(--surface-color);
-            padding: 32px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(138, 21, 56, 0.04); 
+            gap: 40px; 
+            padding: 40px;
             margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        /* 이미지 영역 개선 */
+        .product-image-container {
+            flex: 0 0 360px; 
+            width: 360px;
+            height: 360px;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #F1F3F5;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
         }
 
         .product-image {
-            flex: 1;
-            max-width: 360px;
-            height: 360px;
-            border-radius: 12px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            background-color: #f9f9f9;
+        }
+        
+        /* 이미지가 없을 때를 위한 스타일 */
+        .product-image[src="none"] {
+            display: none; 
         }
 
         .product-info {
             flex: 1;
             display: flex;
             flex-direction: column;
+            padding-top: 8px;
         }
 
+        /* 뱃지 그룹 */
         .badge-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
-        /* 뱃지 공통 스타일 */
         .category-badge {
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
+            letter-spacing: -0.2px;
         }
 
-        /* 파란색 금지 취소! main_login의 파스텔톤 적용 */
+        /* 태그 컬러 세분화 */
         .tag-hot { background-color: #FFF0F0; color: #FF4B4B; }
-        .tag-official { background-color: #F0F7FF; color: #007AFF; }
+        .tag-official { background-color: #E8F2FF; color: #007AFF; }
         
-        /* 카테고리 파스텔 톤 뱃지 */
-        .tag-study { background-color: var(--color-study); color: #2E7D32; } /* 스터디/전공: 파스텔 그린 */
-        .tag-food { background-color: #FFF8E1; color: #FFB300; }
-        .tag-living { background-color: var(--color-living); color: #1565C0; } /* 자취/생필품: 파스텔 블루 */
-        .tag-etc { background-color: var(--color-etc); color: #6A1B9A; } /* 기타: 파스텔 퍼플 */
+        /* 카테고리별 컬러 */
+        .tag-study { background-color: var(--color-study); color: #2E7D32; }
+        .tag-food { background-color: #FFF8E1; color: #F57F17; }
+        .tag-living { background-color: var(--color-living); color: #1565C0; }
+        .tag-etc { background-color: var(--color-etc); color: #6A1B9A; }
 
+        /* 제목 */
         .title {
-            font-size: 1.6rem; 
+            font-size: 1.75rem; 
             font-weight: 700;
-            line-height: 1.35;
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
-        }
-
-        .price-box {
+            line-height: 1.3;
+            color: var(--text-primary);
             margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-light);
+            letter-spacing: -0.5px;
         }
 
+        /* 가격 박스 개선 */
+        .price-box {
+            margin-bottom: 24px;
+            padding: 20px;
+            background-color: var(--bg-color); 
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .original-price-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
         .original-price {
-            font-size: 0.95rem;
-            color: var(--text-gray);
             text-decoration: line-through;
-            margin-bottom: 4px;
+            color: var(--text-tertiary);
+            margin-left: 8px;
+        }
+
+        .n-pay-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .n-pay-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
         }
 
         .n-pay-price {
-            font-size: 1.6rem; 
-            font-weight: 700;
+            font-size: 1.8rem; 
+            font-weight: 800;
             color: var(--ku-crimson);
+            letter-spacing: -0.5px;
         }
 
         .n-pay-price span {
-            font-size: 1rem;
-            color: var(--text-dark);
-            font-weight: 500;
-            margin-left: 4px;
+            font-size: 0.95rem;
+            color: var(--text-tertiary);
+            font-weight: 400;
+            margin-left: 2px;
         }
 
-        /* 모집 현황 진행바 */
+        /* 모집 현황 진행바 개선 */
         .progress-section {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .status-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-label {
             font-weight: 600;
             font-size: 0.95rem;
+            color: var(--text-primary);
         }
 
-        .status-header .count {
+        .status-count {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-count strong {
             color: var(--ku-crimson);
             font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .progress-bar-bg {
-            width: 100%;
-            height: 8px; 
-            background-color: #f0f0f0;
-            border-radius: 8px;
+            flex: 1;
+            height: 10px; 
+            background-color: var(--border-color);
+            border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 8px;
         }
 
         .progress-fill {
             height: 100%;
             background: var(--ku-crimson); 
-            border-radius: 8px;
-            transition: width 0.5s ease;
+            border-radius: 5px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        
+        .progress-percent {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--ku-crimson);
+            width: 35px;
+            text-align: right;
         }
 
         .deadline-text {
+            margin-top: 10px;
             font-size: 0.85rem;
-            color: var(--text-gray);
+            color: var(--text-tertiary);
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
+        /* 참여 버튼 개선 */
         .join-btn {
             margin-top: auto;
             width: 100%;
             background: var(--ku-crimson); 
             color: white;
             border: none;
-            padding: 16px;
-            font-size: 1rem; 
-            font-weight: 600;
-            border-radius: 12px;
+            padding: 18px; 
+            font-size: 1.05rem; 
+            font-weight: 700;
+            border-radius: 14px;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(138, 21, 56, 0.2);
         }
 
         .join-btn:hover {
-            opacity: 0.9;
+            background-color: #72112e; 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(138, 21, 56, 0.25);
+        }
+        
+        .join-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(138, 21, 56, 0.2);
         }
 
         /* ==========================================
            2. 호스트 정보 및 상세 설명
            ========================================== */
         .details-section {
-            background: var(--surface-color);
-            padding: 32px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(138, 21, 56, 0.04);
+            padding: 40px;
         }
 
-        .host-info {
+        /* 호스트 정보 개선 */
+        .host-info-card {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 16px;
-            background: #fffcfc;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-light);
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 14px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-color);
         }
 
         .host-avatar {
-            width: 44px;
-            height: 44px;
-            background: var(--ku-crimson);
-            color: white;
+            width: 48px;
+            height: 48px;
+            background-color: #EAECEF; 
+            color: var(--text-secondary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .host-details {
             flex: 1;
         }
 
+        .host-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
         .host-name {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--text-dark);
-            margin-bottom: 2px;
-        }
-
-        .host-trust {
-            font-size: 0.85rem;
-            color: #007AFF; /* 여기서도 파란색 복구 */
-            font-weight: 600;
-        }
-
-        .content-title {
-            font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-light);
+            font-size: 1.05rem;
+            color: var(--text-primary);
+        }
+        
+        .host-dept {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        .host-trust-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #83485a;
+            font-weight: 600;
+        }
+        
+        .trust-icon {
+            font-size: 0.9rem;
+        }
+
+        /* 본문 내용 개선 */
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: -0.3px;
         }
 
         .content-body {
-            font-size: 0.95rem; 
-            line-height: 1.7;
-            color: #555;
+            font-size: 0.98rem; 
+            line-height: 1.8; 
+            color: var(--text-secondary);
             white-space: pre-line;
+            letter-spacing: -0.1px;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- 헤더 영역 -->
     <div id="header-placeholder"></div>
 
     <div class="container">
-        <!-- 1. 상품 상단 영역 -->
-        <section class="product-hero">
-            <img src="none" alt="아이패드 필름" class="product-image">
+        <section class="product-hero card">
+            <div class="product-image-container">
+                <img src="none" alt="아이패드 필름 상품 이미지" class="product-image">
+                <span>이미지 준비중</span>
+            </div>
             
             <div class="product-info">
-                <!-- 태그 묶음(badge-group) -->
                 <div class="badge-group">
                     <span class="category-badge tag-hot">🔥 마감임박</span>
                     <span class="category-badge tag-official">✓ 신뢰도 인증</span>
@@ -276,20 +472,29 @@
                 <h1 class="title">아이패드 종이질감 필름 공동구매 (배송비 N빵)</h1>
                 
                 <div class="price-box">
-                    <div class="original-price">총 상품 금액 : 30,000원 + 배송비 3,000원</div>
-                    <div class="n-pay-price">인당 5,500원 <span>(6명 기준)</span></div>
+                    <div class="original-price-row">
+                        <span>총 상품 금액 (30,000원 + 배송비 3,000원)</span>
+                        <span class="original-price">33,000원</span>
+                    </div>
+                    <div class="n-pay-row">
+                        <span class="n-pay-label">공구 참여가 (인당)</span>
+                        <div class="n-pay-price">5,500원 <span>(6명 기준)</span></div>
+                    </div>
                 </div>
 
                 <div class="progress-section">
                     <div class="status-header">
-                        <span>모집 현황</span>
-                        <span class="count">24명 / 30명</span>
+                        <span class="status-label">모집 현황</span>
+                        <span class="status-count">현재 <strong>24명</strong> / 목표 30명</span>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-fill" style="width: 80%;"></div> 
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-fill" style="width: 80%;"></div> 
+                        </div>
+                        <div class="progress-percent">80%</div>
                     </div>
                     <div class="deadline-text">
-                        ⏳ 마감까지 2일 14시간 남음 (3월 25일 마감)
+                        <span>⏳</span> 마감까지 2일 14시간 남음 (3월 25일 23:59 마감)
                     </div>
                 </div>
 
@@ -297,32 +502,36 @@
             </div>
         </section>
 
-        <!-- 2. 상세 설명 영역 -->
-        <section class="details-section">
-            <div class="host-info">
+        <section class="details-section card">
+            <div class="host-info-card">
                 <div class="host-avatar">호</div>
                 <div class="host-details">
-                    <div class="host-name">호랑이학우 (경영학과 21)</div>
-                    <div class="host-trust">✓ 고대생 인증 완료 · 크림슨 지수 38.5도</div>
+                    <div class="host-name-row">
+                        <span class="host-name">호랑이학우</span>
+                        <span class="host-dept">경영학과 21학번</span>
+                    </div>
+                    <div class="host-trust-bar">
+                        <span class="trust-icon">✓</span> 고대생 인증 완료 · 크림슨 지수 30
+                    </div>
                 </div>
             </div>
 
-            <h2 class="content-title">상세 내용</h2>
+            <h2 class="content-title">공구 상세 내용</h2>
             <div class="content-body">
                 안녕하세요! 아이패드 필름 교체할 때가 되었는데 배송비가 아까워서 공구원 모집합니다.
                 
-                📌 제품: 랩씨 종이질감 필름 (기종 상관없이 맞춰서 주문 가능합니다)
-                📌 수령 장소: 정경관 앞 벤치 또는 안암역 3번 출구
-                📌 수령 일시: 다음주 수요일(27일) 오후 3시 이후
+                📌 <strong>제품</strong>: 랩씨 종이질감 필름 (기종 상관없이 맞춰서 주문 가능합니다)
+                📌 <strong>수령 장소</strong>: 정경관 앞 벤치 또는 안암역 3번 출구
+                📌 <strong>수령 일시</strong>: 다음주 수요일(27일) 오후 3시 이후
                 
                 현재 4명 모였고 2명만 더 모이면 바로 결제하겠습니다. 
-                참여 원하시는 분들은 기종 꼭 남겨주세요!
+                참여 원하시는 분들은 오픈채팅방 들어오셔서 기종 꼭 남겨주세요!
             </div>
         </section>
     </div>
 
-    <!-- 스크립트: 헤더 불러오기 및 로직 -->
     <script>
+        // 헤더 불러오기 (실제 환경에서는 동작)
         fetch('header.html')
             .then(res => {
                 if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
@@ -334,6 +543,7 @@
             })
             .catch(err => console.error(err));
 
+        // 로그인 상태에 따른 헤더 UI 업데이트 (예시)
         function updateHeader() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const authButtons = document.querySelectorAll('.auth-only');
@@ -348,6 +558,7 @@
             }
         }
 
+        // 로그아웃 로직
         document.addEventListener('click', function(e) {
             if(e.target && e.target.id === 'logout-btn') {
                 localStorage.removeItem('isLoggedIn');
@@ -356,15 +567,20 @@
             }
         });
 
+        // 공구 참여 버튼 로직
         function joinGroupBuy() {
+            // 데모를 위해 로그인 상태를 true로 가정 (개발 시 제거)
+            localStorage.setItem('isLoggedIn', 'true'); 
+
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
             if(!isLoggedIn) {
                 alert("로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.");
                 location.href = "login.html"; 
             } else {
-                if(confirm("정말로 이 공동구매에 참여하시겠습니까?")) {
-                    alert("참여가 완료되었습니다! 채팅방이 생성되었습니다.");
-                    location.href = "chat.html"; 
+                if(confirm("정말로 이 공동구매에 참여하시겠습니까?\n참여 후 취소는 어려울 수 있습니다.")) {
+                    alert("참여가 완료되었습니다! 호스트와의 채팅방으로 이동합니다.");
+                    location.href = "chat.html";
                 }
             }
         }

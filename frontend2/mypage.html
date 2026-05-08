@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KU GONGGU - 마이페이지</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* main_login.html과 동일한 컬러 변수 추가 */
+            --ku-crimson: #8A1538;
+            --text-dark: #222222;
+
+            /* mypage.html 고유 변수 */
             --crimson: #8B0029;
-            --bg-gray: #EDF0F3; /* 사진 속 특유의 연회색 배경 */
+            --bg-gray: #EDF0F3;
             --card-white: #FFFFFF;
             --text-main: #333333;
             --text-sub: #888888;
@@ -20,22 +26,81 @@
             color: var(--text-main);
         }
 
-        /* 헤더 스타일 (header.html이 불러와졌을 때 깨지지 않도록 유지) */
+        /* ==========================================
+           main_login.html과 완벽히 동일한 헤더 CSS
+           ========================================== */
         header {
-            background-color: var(--crimson);
-            padding: 15px 8%;
+            background-color: var(--ku-crimson);
+            backdrop-filter: blur(8px);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0 24px;
         }
 
-        .logo { font-size: 1.4rem; font-weight: 800; text-decoration: none; color: white; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.9rem; }
+        .logo {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a.menu-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a.menu-link:hover {
+            color: var(--text-dark);
+        }
+
+        .btn-login-nav {
+            background: var(--ku-crimson);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(138, 21, 56, 0.3);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .btn-login-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(138, 21, 56, 0.4);
+        }
+        /* ========================================== */
 
         .container {
             max-width: 1200px;
-            /* 💡 수정된 부분: 위쪽 여백을 25px로 줄여서 헤더와 적당히 가깝게 올림 */
+            /* 고정된 헤더 높이(70px)를 고려하여 상단 여백을 100px로 유지합니다. */
             margin: 100px auto 40px auto; 
             display: flex;
             gap: 25px;
@@ -112,11 +177,9 @@
 </head>
 <body>
 
-<!-- 동적 헤더가 들어갈 자리 -->
 <div id="header-placeholder"></div>
 
 <div class="container">
-    <!-- 사이드바 -->
     <div class="sidebar">
         <div class="card profile-card">
             <div class="profile-circle">믿</div>
@@ -142,7 +205,6 @@
         </div>
     </div>
 
-    <!-- 메인 컨텐츠 -->
     <div class="main-content">
         <div class="top-stats">
             <div class="stat-card"><span class="stat-label">올린 공고</span><span class="stat-value">5 건</span></div>
