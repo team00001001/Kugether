@@ -288,7 +288,45 @@
     </div>
 
     <script>
-        // 헤더 불러오기 (실제 환경에서는 동작)
+        // 1. URL에서 상품 ID 가져오기 (예: chat.html?id=2)
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+
+        // 2. products.json 데이터를 불러와 화면 업데이트하기
+        if (productId) {
+            fetch('products.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('네트워크 응답이 정상이 아닙니다.');
+                    return response.json();
+                })
+                .then(products => {
+                    // ID가 일치하는 상품 찾기
+                    const product = products.find(p => p.id === productId);
+
+                    if (product) {
+                        // 제목 업데이트
+                        const chatTitle = document.querySelector('.chat-title');
+                        chatTitle.innerHTML = `${product.title}<br>실시간 채팅방`;
+
+                        // 오픈 채팅방 링크 업데이트
+                        const enterBtn = document.querySelector('.enter-btn');
+                        enterBtn.href = product.chatUrl;
+
+                        // 뒤로가기 링크 업데이트 (해당 상품 상세 페이지로)
+                        const backLink = document.querySelector('.back-link');
+                        backLink.href = `product.html?id=${product.id}`;
+                    } else {
+                        alert('해당 상품 정보를 찾을 수 없습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('데이터를 불러오는 중 오류 발생:', error);
+                });
+        } else {
+            console.warn('상품 ID가 전달되지 않았습니다.');
+        }
+
+        // 헤더 불러오기 로직 (기존 코드 유지)
         fetch('header.html')
             .then(res => {
                 if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
@@ -300,7 +338,6 @@
             })
             .catch(err => console.error(err));
 
-        // 로그인 상태에 따른 헤더 UI 업데이트 (예시)
         function updateHeader() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const authButtons = document.querySelectorAll('.auth-only');
@@ -315,18 +352,12 @@
             }
         }
 
-        // 로그아웃 로직
         document.addEventListener('click', function(e) {
             if(e.target && e.target.id === 'logout-btn') {
                 localStorage.removeItem('isLoggedIn');
                 alert('로그아웃 되었습니다.');
                 location.href = 'main_login.html'; 
             }
-        });
-
-        // 입장 버튼 클릭 로직
-        document.querySelector('.enter-btn').addEventListener('click', function() {
-            console.log('채팅방 입장 버튼 클릭됨');
         });
     </script>
 </body>
