@@ -588,56 +588,7 @@
 
         <!-- 공구방 리스트 -->
         <div class="section-title">⚡최근 올라온 공구방</div>
-        <section class="room-grid">
-            <!-- 공구방 예시 1 -->
-            <div class="room-item" onclick="location.href='product.html'">
-                
-                <div class="room-content">
-                    <div class="tag-group">
-                        <span class="room-tag tag-hot">🔥 마감임박</span>
-                        <span class="room-tag tag-official">✓ 신뢰도 인증</span>
-                    </div>
-                    <h3 class="room-title">아이패드 종이질감 필름 공동구매 (배송비 N빵)</h3>
-                    <div class="room-progress-bar">
-                        <div class="progress-fill" style="width: 80%;"></div>
-                    </div>
-                    <div class="room-footer">
-                        <span class="count-info">모집 <span>24명</span> / 30명</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 공구방 예시 2 -->
-            <div class="room-item">
-                <div class="room-content">
-                    <div class="tag-group">
-                        <span class="room-tag tag-study">📚 전공 / 문구</span>
-                    </div>
-                    <h3 class="room-title">경영/경제 전공 서적 공동 제본 신청받아요</h3>
-                    <div class="room-progress-bar">
-                        <div class="progress-fill" style="width: 45%;"></div>
-                    </div>
-                    <div class="room-footer">
-                        <span class="count-info">모집 <span>9명</span> / 20명</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 공구방 예시 3 -->
-            <div class="room-item">
-                <div class="room-content">
-                    <div class="tag-group">
-                        <span class="room-tag tag-food">🍊 식재료</span>
-                    </div>
-                    <h3 class="room-title">자취생 필수! 제주 감귤 10kg 박스 나누실 분</h3>
-                    <div class="room-progress-bar">
-                        <div class="progress-fill" style="width: 25%;"></div>
-                    </div>
-                    <div class="room-footer">
-                        <span class="count-info">모집 <span>1명</span> / 4명</span>
-                    </div>
-                </div>
-            </div>
+        <section class="room-grid" id="recent-room-grid">
         </section>
     </main>   
         <!-- 3. 플로팅 게시글 작성 버튼 (Pen Icon) -->
@@ -663,6 +614,53 @@
         }
     };
 </script>
+<script>
+    async function loadRecentProducts() {
+        const roomGrid = document.getElementById('recent-room-grid');
 
+        try {
+            const response = await fetch('http://localhost:3000/products');
+            const products = await response.json();
+
+            const recentProducts = products.slice(0, 3);
+
+            roomGrid.innerHTML = '';
+
+            recentProducts.forEach(product => {
+                const percent = Math.min(
+                    Math.round((product.currentCount / product.targetCount) * 100),
+                    100
+                );
+
+                const cardHTML = `
+                    <div class="room-item" onclick="location.href='product.html?id=${product.id}'">
+                        <div class="room-content">
+                            <div class="tag-group">
+                                <span class="room-tag tag-study">${product.category}</span>
+                            </div>
+                            <h3 class="room-title">${product.title}</h3>
+                            <div class="room-progress-bar">
+                                <div class="progress-fill" style="width: ${percent}%;"></div>
+                            </div>
+                            <div class="room-footer">
+                                <span class="count-info">
+                                    모집 <span>${product.currentCount}명</span> / ${product.targetCount}명
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                roomGrid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+
+        } catch (error) {
+            console.error(error);
+            roomGrid.innerHTML = '<p>최근 공구방을 불러오지 못했습니다.</p>';
+        }
+    }
+
+    loadRecentProducts();
+</script>
 </body>
 </html>

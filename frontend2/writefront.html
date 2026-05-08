@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -239,6 +240,58 @@
             <button type="submit" class="submit-btn">공동구매 등록하기</button>
         </form>
     </main>
+   
 
+    <script>
+        document.querySelector('.write-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const categoryMap = {
+                food: '식재료 / 배달',
+                living: '자취 / 생필품',
+                study: '전공 / 문구',
+                etc: '기타 물품'
+            };
+
+            const periodValue = document.getElementById('periodValue').value;
+            const periodUnit = document.getElementById('periodUnit').selectedOptions[0].textContent.split(' ')[0];
+
+            const productData = {
+                title: document.getElementById('productName').value,
+                category: categoryMap[document.getElementById('category').value],
+                targetCount: Number(document.getElementById('people').value),
+                price: Number(document.getElementById('price').value),
+                duration: `${periodValue}${periodUnit}`,
+                location: document.getElementById('location').value,
+                imageUrl: document.getElementById('imageUrl').value,
+                chatUrl: document.getElementById('chatUrl').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    alert(result.error || '상품 등록 실패');
+                    return;
+                }
+
+                alert('상품 등록 성공!');
+                location.href = 'product_list.html';
+
+            } catch (error) {
+                console.error(error);
+                alert('서버 연결 실패. 백엔드 서버가 켜져 있는지 확인해줘.');
+            }
+        });
+    </script>
 </body>
 </html>
