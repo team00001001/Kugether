@@ -84,35 +84,50 @@ const imageSrc = hasValidImage
     ? product.imageUrl
     : fallbackImage;
 
-    const cardHTML = `
-        <div class="product-card" onclick="location.href='product.html?id=${product.id}'" style="cursor:pointer;">
-            <div class="img-area">
-                <img 
-                    src="${imageSrc}"
-                    onerror="if(this.src !== '${fallbackImage}') this.src='${fallbackImage}'"
-                    style="width:100%; height:200px; object-fit:cover; border-radius:15px;"
-                >
+   const cardHTML = `
+    <div class="product-card" onclick="location.href='product.html?id=${product.id}'" style="cursor:pointer;">
+
+        <div class="img-area">
+            <img 
+                src="${imageSrc}"
+                class="product-thumbnail"
+                onerror="
+                    this.src='${fallbackImage}';
+                    const overlay = this.nextElementSibling;
+                    if (overlay) overlay.style.display='flex';
+                "
+            >
+
+            <div class="no-image-overlay" style="display:${hasValidImage ? 'none' : 'flex'};">
+                등록된 사진이 없습니다
             </div>
-            <div class="card-body" style="padding:15px;">
-                <div class="category-tag" style="font-size:12px; color:#888; margin-bottom:5px;">
-                    ${product.category} | 📍 ${product.location || '교내'}
+        </div>
+
+        <div class="card-body" style="padding:15px;">
+            <div class="category-tag" style="font-size:12px; color:#888; margin-bottom:5px;">
+                ${product.category} | 📍 ${product.location || '교내'}
+            </div>
+
+            <div class="product-title" style="font-size:18px; font-weight:700; margin-bottom:10px;">
+                ${product.title}
+            </div>
+
+            <div class="progress-container" style="background:#eee; height:8px; border-radius:4px; margin-bottom:10px;">
+                <div class="progress-fill" style="width:${percent}%; background:var(--main-burgundy); height:100%; border-radius:4px;"></div>
+            </div>
+
+            <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="price" style="font-weight:800; font-size:1.1rem;">
+                    ${Number(product.price).toLocaleString()}원
                 </div>
-                <div class="product-title" style="font-size:18px; font-weight:700; margin-bottom:10px;">
-                    ${product.title}
-                </div>
-                <div class="progress-container" style="background:#eee; height:8px; border-radius:4px; margin-bottom:10px;">
-                    <div class="progress-fill" style="width:${percent}%; background:var(--main-burgundy); height:100%; border-radius:4px;"></div>
-                </div>
-                <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="price" style="font-weight:800; font-size:1.1rem;">${Number(product.price).toLocaleString()}원</div>
-                    <div class="status" style="font-size:12px; font-weight:600; color:${isClosed ? '#aaa' : 'var(--main-burgundy)'}">
-                        ${isClosed ? '모집마감' : `모집중 ${product.currentCount}/${product.targetCount}`}
-                    </div>
+
+                <div class="status" style="font-size:12px; font-weight:600; color:${isClosed ? '#aaa' : 'var(--main-burgundy)'}">
+                    ${isClosed ? '모집마감' : `모집중 ${product.currentCount}/${product.targetCount}`}
                 </div>
             </div>
         </div>
-    `;
-
+    </div>
+`;
     roomGrid.insertAdjacentHTML('beforeend', cardHTML);
 });
 
