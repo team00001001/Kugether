@@ -8,7 +8,7 @@
     <style>
         :root {
             --ku-crimson: #8A1538;
-            --text-dark: #222222; /* 헤더용 컬러 변수 추가 */
+            --text-dark: #222222; 
             
             --bg-color: #F8F9FA;
             --surface-color: #FFFFFF;
@@ -29,7 +29,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-primary);
-            padding-top: 100px; /* 고정 헤더를 고려하여 상단 여백을 살짝 늘림 */
+            padding-top: 100px; 
             min-height: 100vh;
         }
 
@@ -228,7 +228,7 @@
         <h1 class="page-title">내 참여 채팅방 <span id="count-badge">0</span></h1>
         
         <div id="chat-list" class="chat-list">
-            </div>
+        </div>
 
         <div id="empty-view" class="empty-state" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -239,24 +239,52 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. 페이지 열리자마자 헤더 가져오기
-            fetch('header.html')
-                .then(res => {
-                    if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
-                    return res.text();
-                })
-                .then(data => {
-                    document.getElementById('header-placeholder').innerHTML = data;
-                    updateHeader(); // 로그인 상태에 따른 헤더 버튼 업데이트
-                })
-                .catch(err => console.error(err));
+        // 1. 페이지 열리자마자 헤더 가져오기 (mypage.html과 동일)
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+                return res.text();
+            })
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                updateHeader(); // 로그인 상태에 따른 헤더 버튼 업데이트
+            })
+            .catch(err => console.error(err));
 
+        // 헤더 로그인/로그아웃 상태 업데이트 함수
+        function updateHeader() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            const authButtons = document.querySelectorAll('.auth-only');
+            const guestButtons = document.querySelectorAll('.guest-only');
+
+            if (isLoggedIn) {
+                authButtons.forEach(btn => btn.style.display = 'inline-block');
+                guestButtons.forEach(btn => btn.style.display = 'none');
+            } else {
+                authButtons.forEach(btn => btn.style.display = 'none');
+                guestButtons.forEach(btn => btn.style.display = 'inline-block');
+            }
+        }
+
+        // 2. 로그아웃 기능 (버튼 클릭 감시 - mypage.html과 동일)
+        document.addEventListener('click', function(e) {
+            if(e.target && e.target.id === 'logout-btn') {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userNickname');
+                localStorage.removeItem('userEmail');
+                alert('로그아웃 되었습니다.');
+                location.href = 'main_login.html'; 
+            }
+        });
+
+        // 3. 채팅방 리스트 렌더링 로직
+        document.addEventListener('DOMContentLoaded', async () => {
             const listContainer = document.getElementById('chat-list');
             const emptyView = document.getElementById('empty-view');
             const countBadge = document.getElementById('count-badge');
 
-            // 2. 참여한 상품 ID 목록 가져오기 (localStorage)
+            // 참여한 상품 ID 목록 가져오기 (localStorage)
             const joinedIds = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
 
             if (joinedIds.length === 0) {
@@ -265,11 +293,12 @@
             }
 
             try {
-                // 3. 전체 상품 데이터 불러오기
-                const response = await fetch('products.json');
+                // (선택 사항) 만약 mypage.html처럼 json server를 사용 중이라면 
+                // 아래 URL을 'http://localhost:3000/products'로 변경하셔도 됩니다.
+                const response = await fetch('products.json'); 
                 const allProducts = await response.json();
 
-                // 4. 내가 참여한 상품만 필터링
+                // 내가 참여한 상품만 필터링
                 const myProducts = allProducts.filter(p => joinedIds.includes(p.id.toString()) || joinedIds.includes(p.id));
                 
                 countBadge.innerText = myProducts.length;
@@ -279,7 +308,7 @@
                     return;
                 }
 
-                // 5. 화면에 리스트 그리기
+                // 화면에 리스트 그리기
                 myProducts.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'chat-card';
@@ -303,22 +332,6 @@
                 alert('목록을 불러오는 중 오류가 발생했습니다.');
             }
         });
-
-        // 헤더 로그인/로그아웃 상태 업데이트 함수
-        function updateHeader() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            
-            const authButtons = document.querySelectorAll('.auth-only');
-            const guestButtons = document.querySelectorAll('.guest-only');
-
-            if (isLoggedIn) {
-                authButtons.forEach(btn => btn.style.display = 'inline-block');
-                guestButtons.forEach(btn => btn.style.display = 'none');
-            } else {
-                authButtons.forEach(btn => btn.style.display = 'none');
-                guestButtons.forEach(btn => btn.style.display = 'inline-block');
-            }
-        }
     </script>
 </body>
 </html>
