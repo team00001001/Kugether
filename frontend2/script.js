@@ -1,127 +1,112 @@
-// 1. 데이터 파일 경로 및 기초 설정
 const API_URL = 'http://localhost:3000/products';
 const roomGrid = document.getElementById('roomGrid');
-const searchInput = document.getElementById('main-search');
+const loadMoreArea = document.getElementById('loadMoreArea');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
 const resultText = document.getElementById('resultText');
 
-let allProducts = []; 
+let allProducts = [];      // 전체 데이터 저장용
+let filteredProducts = []; // 필터링된 데이터 저장용
+let displayCount = 6;      // 초기에 보여줄 개수
 
-// [추가] URL에서 카테고리 정보 미리 읽어오기
+// URL에서 파라미터 미리 읽기
 const urlParams = new URLSearchParams(window.location.search);
 const currentCategory = urlParams.get('category');
-const searchKeyword = urlParams.get('search') || '';
-// 2. 데이터 불러오기
-function fetchProducts() {
-    fetch(API_URL)
-        .then(response => {
-            if(!response.ok) throw new Error("네트워크 오류");
-            return response.json();
-        })
-        .then(data => {
-            allProducts = data;
+const initialSearch = urlParams.get('search') || '';
 
-            if (searchInput && searchKeyword) {
-                searchInput.value = searchKeyword;
-            }
+// 1. 데이터 가져오기 (가장 먼저 실행)
+async function fetchProducts() {
+    try {
+        const response = await fetch(API_URL);
+        allProducts = await response.json();
+        
+        console.log("가져온 데이터 개수:", allProducts.length);
 
-            const initialKeyword = searchKeyword || "";
-
-            filterAndRender(initialKeyword);
-
-            if (currentCategory && searchInput) {
-                searchInput.placeholder = `"${currentCategory}" 내에서 검색...`;
-            }
-        })
-        .catch(error => console.error('데이터를 불러오지 못했습니다:', error));
+        // 데이터 가져오기에 성공하면 바로 필터링 및 렌더링 실행
+        applyFilter(initialSearch);
+    } catch (error) {
+        console.error("데이터 로딩 실패:", error);
+        if(roomGrid) roomGrid.innerHTML = "<p>서버와 연결할 수 없습니다.</p>";
+    }
 }
 
-// 3. 화면에 카드를 그리는 함수 (기존과 동일)
-function renderRooms(rooms, keyword) {
+// 2. 필터링 로직
+function applyFilter(keyword) {
+    const term = keyword.toLowerCase().trim();
+
+    filteredProducts = allProducts.filter(p => {
+        // [중요] 카테고리가 주소창에 있을 때만 카테고리 필터링 적용
+        const matchCat = currentCategory ? (p.category === currentCategory) : true;
+        
+        // 검색어 필터링
+        const matchSearch = p.title.toLowerCase().includes(term) || 
+                            p.category.toLowerCase().includes(term);
+        
+        return matchCat && matchSearch;
+    });
+
+    displayCount = 6; // 필터링 될 때마다 6개로 초기화
+    renderGrid();
+}
+
+// 3. 화면에 그리기
+function renderGrid() {
     if (!roomGrid) return;
-    roomGrid.innerHTML = ''; 
+    roomGrid.innerHTML = '';
 
-    // 결과 텍스트 업데이트 로직
-    if (resultText) {
-        if (currentCategory && !keyword) {
-            resultText.style.display = 'block';
-            resultText.innerHTML = `<span>'${currentCategory}'</span> 카테고리 결과입니다.`;
-        } else if (keyword) {
-            resultText.style.display = 'block';
-            const categoryInfo = currentCategory ? `[${currentCategory}] 내 ` : "";
-            resultText.innerHTML = `<span>${categoryInfo}'${keyword}'</span> 검색 결과입니다.`;
-        } else {
-            resultText.style.display = 'none';
-        }
-    }
-
-    if(rooms.length === 0) {
-        roomGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 60px 0; font-size: 18px;">검색 결과가 없습니다.</p>';
+    if (filteredProducts.length === 0) {
+        roomGrid.innerHTML = '<p style="text-align:center; padding: 50px;">해당하는 공구 물품이 없습니다.</p>';
+        if(loadMoreArea) loadMoreArea.style.display = 'none';
         return;
     }
 
-    rooms.forEach(room => {
-        const formattedPrice = room.price.toLocaleString();
-        const isClosed = room.currentCount >= room.targetCount;
-        const statusText = isClosed ? "모집마감" : "모집중";
-        const badgeStyle = isClosed ? "background-color: #E9ECEF; color: #868E96;" : "";
+    // 6개씩 끊어서 보여주기
+    const toShow = filteredProducts.slice(0, displayCount);
+    
+    toShow.forEach(product => {
+        // 메인 페이지에서 썼던 계산 로직 그대로 활용 (진행률)
+        const percent = Math.min(Math.round((product.currentCount / product.targetCount) * 100), 100);
+        const isClosed = product.currentCount >= product.targetCount;
 
         const cardHTML = `
-            <div class="product-card" onclick="location.href='product.html?id=${room.id}'">
-                <div class="img-area" style="padding: 0;">
-                    <img src="${room.imageUrl}" alt="${room.title}" 
-                         onerror="this.outerHTML='<div style=\\'font-size: 60px;\\'>📦</div>'" 
-                         style="width: 100%; height: 100%; object-fit: cover;">
+            <div class="product-card" onclick="location.href='product.html?id=${product.id}'" style="cursor:pointer;">
+                <div class="img-area">
+                    <img src="${product.imageUrl || 'default.png'}" onerror="this.src='default.png'" style="width:100%; height:200px; object-fit:cover; border-radius:15px;">
                 </div>
-                <div class="card-body">
-                    <div class="category-tag">
-                        ${room.category} <span style="color:#ddd; margin:0 6px;">|</span> 📍 ${room.location}
+                <div class="card-body" style="padding:15px;">
+                    <div class="category-tag" style="font-size:12px; color:#888; margin-bottom:5px;">
+                        ${product.category} | 📍 ${product.location || '교내'}
                     </div>
-                    <div class="product-title">${room.title}</div>
-                    <p style="font-size: 13px; color: #777; margin-bottom: 8px;">
-                        작성자: ${room.writer || '익명 학우'}
-                    </p>
-                    <p style="font-size: 13px; color: #666; margin-bottom: 16px; margin-top: -6px; font-weight: 500;">
-                        ⏳ ${room.duration} 남음 · 👥 ${room.currentCount}/${room.targetCount}명
-                    </p>
-                    <div class="card-footer">
-                        <div class="price">${formattedPrice}원</div>
-                        <div class="badge" style="${badgeStyle}">${statusText}</div>
+                    <div class="product-title" style="font-size:18px; font-weight:700; margin-bottom:10px;">
+                        ${product.title}
+                    </div>
+                    <div class="progress-container" style="background:#eee; height:8px; border-radius:4px; margin-bottom:10px;">
+                        <div class="progress-fill" style="width:${percent}%; background:var(--main-burgundy); height:100%; border-radius:4px;"></div>
+                    </div>
+                    <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="price" style="font-weight:800; font-size:1.1rem;">${Number(product.price).toLocaleString()}원</div>
+                        <div class="status" style="font-size:12px; font-weight:600; color:${isClosed ? '#aaa' : 'var(--main-burgundy)'}">
+                            ${isClosed ? '모집마감' : `모집중 ${product.currentCount}/${product.targetCount}`}
+                        </div>
                     </div>
                 </div>
             </div>
         `;
         roomGrid.insertAdjacentHTML('beforeend', cardHTML);
     });
+
+    // 더보기 버튼 표시 여부
+    if(loadMoreArea) {
+        loadMoreArea.style.display = displayCount < filteredProducts.length ? 'block' : 'none';
+    }
 }
 
-// 4. [핵심 수정] 검색과 카테고리를 동시에 필터링하는 함수
-function filterAndRender(keyword) {
-    const lowerKeyword = keyword.trim().toLowerCase();
-
-    const filteredProducts = allProducts.filter(product => {
-        // 조건 1: 카테고리 필터링 (URL 파라미터가 있을 때만 작동)
-        const matchesCategory = currentCategory ? (product.category === currentCategory) : true;
-        
-        // 조건 2: 검색어 필터링
-        const matchesSearch = !lowerKeyword || (
-            product.title.toLowerCase().includes(lowerKeyword) ||
-            product.category.toLowerCase().includes(lowerKeyword) ||
-            (product.description && product.description.toLowerCase().includes(lowerKeyword))
-        );
-
-        return matchesCategory && matchesSearch; // 두 조건 모두 만족해야 함
-    });
-
-    renderRooms(filteredProducts, keyword);
-}
-
-// 5. 사용자가 검색창에 글자를 칠 때마다 실행
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const keyword = e.target.value.trim();
-        filterAndRender(keyword);
+// 4. 더보기 클릭 이벤트
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+        displayCount += 6;
+        renderGrid();
     });
 }
 
-// 6. 실행 시작
+// 실행!
 fetchProducts();
