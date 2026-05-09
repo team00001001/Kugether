@@ -34,3 +34,40 @@ router.post('/signup', async (req, res) => {
 
 // 만든 라우터를 밖에서 쓸 수 있게 내보내기
 module.exports = router;
+
+// 🚀 로그인 API
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. DB에서 해당 이메일을 가진 사용자 찾기
+        const [rows] = await pool.promise().query(
+            'SELECT * FROM users WHERE email = ?',
+            [email]
+        );
+
+        // 2. 사용자가 없으면 (배열 길이가 0이면) 에러 전송
+        if (rows.length === 0) {
+            return res.status(401).json({ message: '가입되지 않은 이메일입니다.' });
+        }
+
+        const user = rows[0]; // 찾은 사용자 정보
+
+        // 3. 비밀번호 확인 (입력한 비밀번호와 DB에 암호화된 비밀번호 비교)
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordMatch) {
+            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        }
+
+        // 4. 로그인 성공! 프론트엔드에 성공 메시지와 닉네임 전달
+        res.status(200).json({
+            message: '로그인 성공!',
+            nickname: user.nickname
+        });
+
+    } catch (error) {
+        console.error('로그인 에러:', error);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
+});
