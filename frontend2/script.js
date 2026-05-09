@@ -63,36 +63,58 @@ function renderGrid() {
     const toShow = filteredProducts.slice(0, displayCount);
     
     toShow.forEach(product => {
-        // 메인 페이지에서 썼던 계산 로직 그대로 활용 (진행률)
-        const percent = Math.min(Math.round((product.currentCount / product.targetCount) * 100), 100);
-        const isClosed = product.currentCount >= product.targetCount;
+    const percent = Math.min(Math.round((product.currentCount / product.targetCount) * 100), 100);
+    const isClosed = product.currentCount >= product.targetCount;
 
-        const cardHTML = `
-            <div class="product-card" onclick="location.href='product.html?id=${product.id}'" style="cursor:pointer;">
-                <div class="img-area">
-                    <img src="${product.imageUrl || 'default.png'}" onerror="this.src='default.png'" style="width:100%; height:200px; object-fit:cover; border-radius:15px;">
+    const defaultImages = {
+        '식재료 / 배달': 'images/default-food.png',
+        '자취 / 생필품': 'images/default-living.png',
+        '전공 / 문구': 'images/default-study.png',
+        '기타 물품': 'images/default-etc.png'
+    };
+
+    const fallbackImage = defaultImages[product.category] || 'images/default-etc.png';
+
+    const hasValidImage =
+    product.imageUrl &&
+    product.imageUrl !== 'none' &&
+    product.imageUrl.trim() !== '';
+
+const imageSrc = hasValidImage
+    ? product.imageUrl
+    : fallbackImage;
+
+    const cardHTML = `
+        <div class="product-card" onclick="location.href='product.html?id=${product.id}'" style="cursor:pointer;">
+            <div class="img-area">
+                <img 
+                    src="${imageSrc}"
+                    onerror="if(this.src !== '${fallbackImage}') this.src='${fallbackImage}'"
+                    style="width:100%; height:200px; object-fit:cover; border-radius:15px;"
+                >
+            </div>
+            <div class="card-body" style="padding:15px;">
+                <div class="category-tag" style="font-size:12px; color:#888; margin-bottom:5px;">
+                    ${product.category} | 📍 ${product.location || '교내'}
                 </div>
-                <div class="card-body" style="padding:15px;">
-                    <div class="category-tag" style="font-size:12px; color:#888; margin-bottom:5px;">
-                        ${product.category} | 📍 ${product.location || '교내'}
-                    </div>
-                    <div class="product-title" style="font-size:18px; font-weight:700; margin-bottom:10px;">
-                        ${product.title}
-                    </div>
-                    <div class="progress-container" style="background:#eee; height:8px; border-radius:4px; margin-bottom:10px;">
-                        <div class="progress-fill" style="width:${percent}%; background:var(--main-burgundy); height:100%; border-radius:4px;"></div>
-                    </div>
-                    <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div class="price" style="font-weight:800; font-size:1.1rem;">${Number(product.price).toLocaleString()}원</div>
-                        <div class="status" style="font-size:12px; font-weight:600; color:${isClosed ? '#aaa' : 'var(--main-burgundy)'}">
-                            ${isClosed ? '모집마감' : `모집중 ${product.currentCount}/${product.targetCount}`}
-                        </div>
+                <div class="product-title" style="font-size:18px; font-weight:700; margin-bottom:10px;">
+                    ${product.title}
+                </div>
+                <div class="progress-container" style="background:#eee; height:8px; border-radius:4px; margin-bottom:10px;">
+                    <div class="progress-fill" style="width:${percent}%; background:var(--main-burgundy); height:100%; border-radius:4px;"></div>
+                </div>
+                <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="price" style="font-weight:800; font-size:1.1rem;">${Number(product.price).toLocaleString()}원</div>
+                    <div class="status" style="font-size:12px; font-weight:600; color:${isClosed ? '#aaa' : 'var(--main-burgundy)'}">
+                        ${isClosed ? '모집마감' : `모집중 ${product.currentCount}/${product.targetCount}`}
                     </div>
                 </div>
             </div>
-        `;
-        roomGrid.insertAdjacentHTML('beforeend', cardHTML);
-    });
+        </div>
+    `;
+
+    roomGrid.insertAdjacentHTML('beforeend', cardHTML);
+});
 
     // 더보기 버튼 표시 여부
     if(loadMoreArea) {

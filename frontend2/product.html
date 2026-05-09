@@ -589,11 +589,28 @@
                 }
 
                 // 이미지 업데이트
-                const imgEl = document.getElementById('product-img');
-                if (product.imageUrl) {
-                    imgEl.src = product.imageUrl;
-                    imgEl.style.display = 'block'; // 이미지가 있을 때만 노출
-                }
+              const defaultImages = {
+    '식재료 / 배달': 'images/default-food.png',
+    '자취 / 생필품': 'images/default-living.png',
+    '전공 / 문구': 'images/default-study.png',
+    '기타 물품': 'images/default-etc.png'
+};
+
+const fallbackImage =
+    defaultImages[product.category] || 'images/default-etc.png';
+const imgEl = document.getElementById('product-img');
+if (product.imageUrl && product.imageUrl !== 'none') {
+    imgEl.src = product.imageUrl;
+
+    // 링크 깨졌을 때 기본 이미지
+    imgEl.onerror = () => {
+        imgEl.src = fallbackImage;
+    };
+
+} else {
+    // 이미지 없을 때 기본 이미지
+    imgEl.src = fallbackImage;
+}
 
                 // 카테고리 태그 및 색상 설정
                 const categoryEl = document.getElementById('product-category');
