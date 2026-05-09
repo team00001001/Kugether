@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <link rel="stylesheet" href="mobile.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 참여 공구 | KU GONGGU</title>
@@ -190,6 +191,8 @@
 
         /* 버튼 스타일 */
         .enter-btn {
+            background-color: var(--ku-crimson);
+            color: white;
             text-decoration: none;
             padding: 12px 20px;
             border-radius: 12px;
@@ -197,14 +200,10 @@
             font-weight: 700;
             transition: background 0.2s;
             white-space: nowrap;
-            /* 전달해주신 색상 적용 */
-            color: #FFB300 !important; 
-            border: 1px solid transparent !important; 
-            background: rgba(255, 179, 0, 0.05) !important; 
         }
 
         .enter-btn:hover {
-            background: rgba(255, 179, 0, 0.2) !important;
+            background-color: #72112e;
         }
 
         /* 참여 중인 공구가 없을 때 */
@@ -295,8 +294,9 @@
             }
 
             try {
-                // 백엔드 서버에서 상품 데이터 불러오기
-                const response = await fetch('http://localhost:3000/products'); 
+                // (선택 사항) 만약 mypage.html처럼 json server를 사용 중이라면 
+                // 아래 URL을 'http://localhost:3000/products'로 변경하셔도 됩니다.
+                const response = await fetch('products.json'); 
                 const allProducts = await response.json();
 
                 // 내가 참여한 상품만 필터링
