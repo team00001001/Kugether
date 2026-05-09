@@ -929,10 +929,41 @@ async function deleteProduct(id) {
 
 //나중에 참여자 데이터베이스 필요함
 async function leaveGroup(id) {
-    if(confirm("참여를 취소하시겠습니까?")) {
-        // 서버 인원수 -1 처리 로직 필요
+    if (!confirm("참여를 취소하시겠습니까?")) {
+        return;
+    }
+
+    const userId = localStorage.getItem('userId');
+
+    try {
+        const response = await fetch('http://localhost:3000/participants/cancel', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId: id,
+                userId: userId
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || '참여 취소 실패');
+            return;
+        }
+
+        let joinedGroups = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
+        joinedGroups = joinedGroups.filter(item => String(item) !== String(id));
+        localStorage.setItem('joinedGroups', JSON.stringify(joinedGroups));
+
         alert("참여가 취소되었습니다.");
         location.reload();
+
+    } catch (error) {
+        console.error(error);
+        alert("서버 연결 실패");
     }
 }
 
