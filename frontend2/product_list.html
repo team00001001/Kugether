@@ -273,7 +273,7 @@
 
 <section class="search-hero">
     <div class="search-box-wrapper">
-        <input type="text" id="main-search" placeholder="어떤 물품을 찾고 계신가요? (ex. 아이패드)">
+        <input type="text" id="main-search" placeholder="어떤 물품을 찾고 계신가요?">
     </div>
     
     <div class="category-filter-row" id="category-buttons">
@@ -281,31 +281,38 @@
         <button class="filter-btn btn-living" onclick="filterCategory('자취 / 생필품')">🧴 자취 / 생필품</button>
         <button class="filter-btn btn-study" onclick="filterCategory('전공 / 문구')">📚 전공 / 문구</button>
         <button class="filter-btn btn-etc" onclick="filterCategory('기타 물품')">📦 기타 물품</button>
+        <button class="filter-btn" onclick="clearCategory()" style="background-color: #eee;">🏠 전체</button>
+        <!-- 추가하느라.. -->
     </div>
 </section>
 
+<main class="container">
+    <!-- 검색 결과 문구 영역 -->
+    <div id="resultText" class="result-info" style="display: none; margin-bottom: 20px"></div>
+    
+    <!-- 3. 공구방 카드 리스트 영역 -->
+    <div id="roomGrid" class="product-grid"></div>
+
+    <!-- 4. 더보기 버튼 영역 -->
+    <div id="loadMoreArea" style="text-align: center; margin-top: 40px; display: none;">
+        <button id="loadMoreBtn" style="padding: 12px 40px; border-radius: 30px; border: 1px solid #ccc; background: white; cursor: pointer; font-weight: 700; transition: all 0.2s;">
+            더보기 ▾
+        </button>
+    </div>
+</main>
+
 <script>
-    // 페이지 로드 시 URL을 확인하여 카테고리 버튼 숨기기 처리
-    document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('category')) {
-            const btnArea = document.getElementById('category-buttons');
-            if (btnArea) btnArea.style.display = 'none';
-        }
-    });
+    // [함수] 카테고리 및 검색 해제 (전체보기)
+    function clearCategory() {
+        location.href = 'product_list.html';
+    }
 
-    // 헤더 불러오기 및 렌더링
-    fetch('header.html')
-        .then(res => {
-            if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
-            return res.text();
-        })
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
-            updateHeader(); 
-        })
-        .catch(err => console.error(err));
+    // [함수] 특정 카테고리로 필터링 이동
+    function filterCategory(categoryName) {
+        location.href = `product_list.html?category=${encodeURIComponent(categoryName)}`;
+    }
 
+    // [함수] 로그인 상태에 따른 헤더 버튼 제어
     function updateHeader() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const authElements = document.querySelectorAll('.auth-only');
@@ -320,24 +327,49 @@
         }
     }
 
-    // 카테고리 이동 함수
-    function filterCategory(categoryName) {
-        location.href = `product_list.html?category=${encodeURIComponent(categoryName)}`;
-    }
+    // [로직] 페이지 초기 로드 처리
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 헤더 불러오기
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+                return res.text();
+            })
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                updateHeader(); 
+            })
+            .catch(err => console.error('헤더 로딩 에러:', err));
 
-    // 검색창 엔터키 처리
+        // 2. URL 파라미터에 따른 검색창 Placeholder 변경
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        const searchInput = document.getElementById('main-search');
+
+        if (category && searchInput) {
+            searchInput.placeholder = `"${category}" 내에서 검색...`;
+        }
+    });
+
+    // [로직] 검색창 엔터키 (카테고리 정보 유지)
     const searchInput = document.getElementById('main-search');
     if(searchInput) {
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const keyword = searchInput.value.trim();
-                if (!keyword) return;
-                location.href = `product_list.html?search=${encodeURIComponent(keyword)}`;
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentCat = urlParams.get('category');
+
+                let targetUrl = `product_list.html?search=${encodeURIComponent(keyword)}`;
+                if (currentCat) {
+                    targetUrl += `&category=${encodeURIComponent(currentCat)}`;
+                }
+                location.href = targetUrl;
             }
         });
     }
 
-    // 로그아웃 처리
+    // [로직] 로그아웃 버튼 클릭 처리
     document.addEventListener('click', function(e) {
         const logoutBtn = e.target.closest('#logout-btn');
         if(logoutBtn) {
@@ -348,12 +380,7 @@
     });
 </script>
 
-<main class="container">
-    <div id="resultText" class="result-info" style="display: none;"></div>
-    <div id="roomGrid" class="product-grid">
-        </div>
-</main>
-
+<!-- 5. 모든 비즈니스 로직이 담긴 외부 JS 파일 연결 -->
 <script src="script.js"></script>
 
 </body>
