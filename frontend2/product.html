@@ -533,32 +533,60 @@
 
 
            
-        function joinGroupBuy() {
+       async function joinGroupBuy() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
-    if (!isLoggedIn) {
-        alert("로그인이 필요한 서비스입니다. 로그인 페이지로 이동합니다.");
-        location.href = "login.html";
+    const userId = localStorage.getItem('userId');
+
+    if (!isLoggedIn || !userId) {
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = 'login.html';
         return;
     }
 
-    if (confirm("정말로 이 공동구매에 참여하시겠습니까?\n참여 후 취소는 어려울 수 있습니다.")) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
 
-        // 현재 상품 id 가져오기
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentId = urlParams.get('id');
+    if (!productId) {
+        alert('상품 ID가 없습니다.');
+        return;
+    }
 
-        // 최근 참여 내역 저장
+    if (!confirm('정말로 이 공동구매에 참여하시겠습니까?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/participants/join', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                userId
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || '참여 실패');
+            return;
+        }
+
         let joinedGroups = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
 
-        if (currentId && !joinedGroups.includes(currentId)) {
-            joinedGroups.push(currentId);
+        if (!joinedGroups.includes(productId)) {
+            joinedGroups.push(productId);
             localStorage.setItem('joinedGroups', JSON.stringify(joinedGroups));
         }
 
-        alert("참여가 완료되었습니다! 호스트와의 채팅방으로 이동합니다.");
+        alert('참여가 완료되었습니다.');
+        location.reload();
 
-        location.href = `chat.html?id=${currentId}`;
+    } catch (error) {
+        console.error(error);
+        alert('서버 연결 실패');
     }
 }
         // ==========================================

@@ -1,4 +1,5 @@
 require('dotenv').config();
+const participantRoutes = require('./routes/participantRoutes');
 const db = require('./db');
 const express = require('express');
 const cors = require('cors');
@@ -11,7 +12,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use('/participants', participantRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
 app.use('/api', authRoutes);
