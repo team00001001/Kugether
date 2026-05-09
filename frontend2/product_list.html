@@ -4,13 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KU GONGGU - 검색 결과</title>
-    <!-- Pretendard 폰트 적용 (이미지 내 폰트와 가장 유사) -->
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --main-burgundy: #8A1538; /* 고대 버건디 */
-            --bg-light-gray: #F8F9FA; /* 검색창 영역 배경색 */
+            --main-burgundy: #8A1538; 
+            --bg-light-gray: #F8F9FA; 
             --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+            /* 카테고리 버튼 색상 */
+            --color-food: #FFF3E0;
+            --color-living: #E3F2FD;
+            --color-study: #E8F5E9;
+            --color-etc: #F3E5F5;
+            
+            /* 헤더용 변수 추가 */
+            --ku-crimson: #8A1538;
+            --text-dark: #222222;
         }
 
         body {
@@ -21,15 +30,84 @@
             line-height: 1.6;
         }
 
-        /* 1. 공통 헤더가 들어갈 영역 */
-        #header-placeholder {
+        /* ==========================================
+           ✅ 마이페이지와 완벽히 동일한 헤더 CSS 추가
+           ========================================== */
+        header {
+            background-color: var(--ku-crimson);
+            backdrop-filter: blur(8px);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
 
-        /* 2. 대형 검색창 섹션 (메인 화면 스타일 계승) */
+        .nav-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a.menu-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        nav a.menu-link:hover {
+            color: var(--text-dark);
+        }
+
+        .btn-login-nav {
+            background: var(--ku-crimson);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(138, 21, 56, 0.3);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        .btn-login-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(138, 21, 56, 0.4);
+        }
+        /* ========================================== */
+
+        /* 대형 검색창 섹션 */
         .search-hero {
             background-color: var(--bg-light-gray);
-            padding: 120px 60px;
+            /* 고정 헤더 70px를 고려하여 상단 패딩 늘림 */
+            padding: 120px 60px 80px; 
             text-align: center;
         }
 
@@ -44,7 +122,7 @@
             padding: 22px 35px;
             font-size: 18px;
             border: none;
-            border-radius: 40px; /* 메인의 부드러운 둥근 처리 */
+            border-radius: 40px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             outline: none;
             box-sizing: border-box;
@@ -55,11 +133,45 @@
             box-shadow: 0 4px 25px rgba(138, 21, 56, 0.15);
         }
 
-        /* 3. 메인 콘텐츠 컨테이너 */
+        /* 카테고리 필터 버튼 영역 */
+        .category-filter-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap; 
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500; 
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+        }
+
+        .btn-food { background-color: var(--color-food); }
+        .btn-living { background-color: var(--color-living); }
+        .btn-study { background-color: var(--color-study); }
+        .btn-etc { background-color: var(--color-etc); }
+
+        /* 메인 콘텐츠 컨테이너 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 20px;
+            padding: 40px 20px;
         }
 
         .result-info {
@@ -73,17 +185,17 @@
             color: var(--main-burgundy);
         }
 
-        /* 4. 상품 그리드 레이아웃 */
+        /* 상품 그리드 레이아웃 */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
         }
 
-        /* 5. 상품 카드 디자인 (이미지 하단 카테고리 카드 느낌) */
+        /* 상품 카드 디자인 */
         .product-card {
             background: #fff;
-            border-radius: 24px; /* 메인의 둥근 카드 스타일 */
+            border-radius: 24px; 
             border: 1px solid #f0f0f0;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -156,39 +268,46 @@
     </style>
 </head>
 <body>
-<!-- 1. 공통 헤더가 삽입될 위치 (이게 빠져있어서 안 떴을 거예요!) -->
+
 <div id="header-placeholder"></div>
 
-<!-- 2. 대형 검색창 (메인과 통일) -->
 <section class="search-hero">
     <div class="search-box-wrapper">
         <input type="text" id="main-search" placeholder="어떤 물품을 찾고 계신가요? (ex. 아이패드)">
     </div>
+    
+    <div class="category-filter-row" id="category-buttons">
+        <button class="filter-btn btn-food" onclick="filterCategory('식재료 / 배달')">🍊 식재료 / 배달</button>
+        <button class="filter-btn btn-living" onclick="filterCategory('자취 / 생필품')">🧴 자취 / 생필품</button>
+        <button class="filter-btn btn-study" onclick="filterCategory('전공 / 문구')">📚 전공 / 문구</button>
+        <button class="filter-btn btn-etc" onclick="filterCategory('기타 물품')">📦 기타 물품</button>
+    </div>
 </section>
-<!--잠시 비워두기-->
+
 <script>
-    // 1. 페이지 로드 시 헤더 가져오기
+    // 페이지 로드 시 URL을 확인하여 카테고리 버튼 숨기기 처리
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('category')) {
+            const btnArea = document.getElementById('category-buttons');
+            if (btnArea) btnArea.style.display = 'none';
+        }
+    });
+
+    // 헤더 불러오기 및 렌더링
     fetch('header.html')
         .then(res => {
-            if (!res.ok) throw new Error('header.html을 찾을 수 없습니다.');
+            if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
             return res.text();
         })
         .then(data => {
-            // 헤더 삽입
-            const placeholder = document.getElementById('header-placeholder');
-            if (placeholder) {
-                placeholder.innerHTML = data;
-                // 삽입 직후 버튼 상태 업데이트
-                updateHeader();
-            }
+            document.getElementById('header-placeholder').innerHTML = data;
+            updateHeader(); 
         })
         .catch(err => console.error(err));
 
-    // 2. 로그인 상태에 따라 버튼 가리기/보여주기
     function updateHeader() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        
-        // 헤더 안의 요소들과 플로팅 버튼(auth-only) 모두 찾기
         const authElements = document.querySelectorAll('.auth-only');
         const guestElements = document.querySelectorAll('.guest-only');
 
@@ -201,30 +320,40 @@
         }
     }
 
-    // 3. 로그아웃 기능 (이벤트 위임)
+    // 카테고리 이동 함수
+    function filterCategory(categoryName) {
+        location.href = `product_list.html?category=${encodeURIComponent(categoryName)}`;
+    }
+
+    // 검색창 엔터키 처리
+    const searchInput = document.getElementById('main-search');
+    if(searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const keyword = searchInput.value.trim();
+                if (!keyword) return;
+                location.href = `product_list.html?search=${encodeURIComponent(keyword)}`;
+            }
+        });
+    }
+
+    // 로그아웃 처리
     document.addEventListener('click', function(e) {
-        // 클릭된 요소가 logout-btn이거나 그 자식 요소일 경우 처리
         const logoutBtn = e.target.closest('#logout-btn');
         if(logoutBtn) {
             localStorage.removeItem('isLoggedIn');
             alert('로그아웃 되었습니다.');
-            location.href = 'main_beforelogin.html'; 
+            location.href = 'main_login.html'; 
         }
     });
 </script>
 
-<!-- 메인 콘텐츠 영역 (이 부분을 수정해주세요!) -->
 <main class="container">
-    <!-- 검색 결과 텍스트가 표시될 곳 -->
     <div id="resultText" class="result-info" style="display: none;"></div>
-    
-    <!-- 카드가 나열될 그리드 상자 (class="product-grid" 적용 완료) -->
     <div id="roomGrid" class="product-grid">
-        <!-- 자바스크립트가 여기에 카드를 채워 넣습니다 -->
-    </div>
+        </div>
 </main>
 
-<!-- 파일 맨 아래에 추가 -->
 <script src="script.js"></script>
 
 </body>
