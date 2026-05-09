@@ -318,13 +318,14 @@
     }
 
     const userData = {
-        email: `${emailId}@${domain}`,
+        emailId: emailId,
+        emailDomain: domain,
         nickname: document.getElementById('nickname').value,
         password: document.getElementById('password').value
     };
 
     try {
-        const response = await fetch('http://localhost:3000/users', {
+        const response = await fetch('http://localhost:3000/api/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
