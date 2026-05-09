@@ -11,7 +11,8 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/auth');
 
 const app = express();
-
+const chatRoutes = require('./routes/chatRoutes');
+app.use('/chats', chatRoutes);
 app.use(cors());
 app.use(express.json());
 app.use('/participants', participantRoutes);
