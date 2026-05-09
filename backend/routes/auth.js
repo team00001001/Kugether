@@ -10,26 +10,37 @@ const authCodes = {};
 router.post('/send-auth-email', async (req, res) => {
     const { email } = req.body;
     
-    // 6자리 랜덤 인증번호 생성 (100000 ~ 999999)
-    const authCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // 이메일 전송 세팅
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER, // .env에서 가져옴
-            pass: process.env.EMAIL_PASS  // .env에서 가져옴
-        }
-    });
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: '[대학생 공동구매] 회원가입 인증번호입니다.',
-        text: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다.`
-    };
-
     try {
+        // 💡 1. DB에 이메일이 이미 존재하는지 문지기가 먼저 검사!
+        const [rows] = await pool.promise().query(
+            'SELECT * FROM users WHERE email = ?',
+            [email]
+        );
+
+        // 이미 가입된 데이터가 있다면 여기서 컷! (409 에러 프론트로 전송)
+        if (rows.length > 0) {
+            return res.status(409).json({ message: '이미 등록된 이메일입니다.' });
+        }
+
+        // 💡 2. 여기까지 무사히 통과했다면? 원래대로 메일 전송 시작!
+        const authCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: '[대학생 공동구매] 회원가입 인증번호입니다.',
+            text: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다. 3분 안에 입력해주세요!`
+        };
+
+        // 이메일 슝~ 전송
         await transporter.sendMail(mailOptions);
         
         // 메모리에 '이메일: 인증번호' 형태로 3분간 저장
@@ -39,12 +50,13 @@ router.post('/send-auth-email', async (req, res) => {
         }, 3 * 60 * 1000);
 
         res.status(200).json({ message: '인증번호가 전송되었습니다. 이메일을 확인해주세요!' });
+
     } catch (error) {
-        console.error('이메일 전송 에러:', error);
+        // 💡 3. 위에서 발생한 DB 에러나 이메일 전송 에러를 여기서 한 번에 다 잡음! (Missing catch 해결)
+        console.error('인증번호 처리 에러:', error);
         res.status(500).json({ message: '메일 전송에 실패했습니다.' });
     }
 });
-
 // 🚀 2. 인증번호 확인 API
 router.post('/verify-auth-code', (req, res) => {
     const { email, code } = req.body;
