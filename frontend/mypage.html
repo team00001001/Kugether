@@ -17,7 +17,8 @@
 
     <section class="profile-card">
       <div>
-        <h1>홍길동</h1>
+        <h1 id="nickname">홍길동</h1>
+        <p id="user-email">email@example.com</p>
         <p class="school-badge">학교 인증 완료</p>
       </div>
 
@@ -26,6 +27,21 @@
         <strong>92점</strong>
       </div>
     </section>
+
+    <script>
+      const userData = localStorage.getItem('loggedInUser');
+      const nicknameEl = document.getElementById('nickname');
+      const emailEl = document.getElementById('user-email');
+
+      if (!userData) {
+        nicknameEl.textContent = '로그인이 필요합니다.';
+        emailEl.textContent = '로그인 후 마이페이지를 이용해주세요.';
+      } else {
+        const user = JSON.parse(userData);
+        nicknameEl.textContent = user.nickname || '사용자';
+        emailEl.textContent = user.email || '';
+      }
+    </script>
 
     <section class="list-section">
       <h2>참여한 공동구매</h2>

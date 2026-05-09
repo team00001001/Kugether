@@ -182,9 +182,9 @@
 <div class="container">
     <div class="sidebar">
         <div class="card profile-card">
-            <div class="profile-circle">믿</div>
-            <div class="user-name">믿구</div>
-            <div class="user-handle">@mit_ggu_kr</div>
+            <div class="profile-circle" id="profile-circle">?</div>
+            <div class="user-name" id="user-name">사용자</div>
+            <div class="user-handle" id="user-handle">@username</div>
             
             <div class="crimson-index-section">
                 <div class="index-header">
@@ -276,16 +276,40 @@
         }
     }
 
+    function updateProfileCard() {
+        const nickname = localStorage.getItem('userNickname');
+        const email = localStorage.getItem('userEmail');
+        const profileCircle = document.getElementById('profile-circle');
+        const userName = document.getElementById('user-name');
+        const userHandle = document.getElementById('user-handle');
+
+        if (!nickname || !email) {
+            userName.textContent = '로그인이 필요합니다.';
+            userHandle.textContent = '@guest';
+            profileCircle.textContent = 'G';
+            return;
+        }
+
+        userName.textContent = nickname;
+        const emailId = email.split('@')[0] || email;
+        userHandle.textContent = '@' + emailId;
+        profileCircle.textContent = nickname[0] ? nickname[0].toUpperCase() : emailId[0].toUpperCase();
+    }
+
     // 3. 로그아웃 기능 (버튼 클릭 감시)
     document.addEventListener('click', function(e) {
         if(e.target && e.target.id === 'logout-btn') {
-            localStorage.removeItem('isLoggedIn'); 
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userNickname');
+            localStorage.removeItem('userEmail');
             alert('로그아웃 되었습니다.');
             
             // 메인 초기화면으로 이동 (파일명이 다를 경우 수정)
             location.href = 'main_login.html'; 
         }
     });
+
+    updateProfileCard();
 </script>
 
 </body>
