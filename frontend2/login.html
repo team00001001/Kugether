@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 - 대학생 공동구매</title>
     <style>
-        /* 기본 스타일 및 웹 폰트 적용 */
+        /* 보내주신 디자인 그대로 유지 */
         @import url('https://cdn.jsdelivr.net/gh/joungkyun/font-d2coding/d2coding.css');
 
         * {
@@ -14,7 +14,6 @@
             padding: 0;
         }
 
-        /* 💡 Light Crimson 테마 배경: 아주 연한 붉은빛(분홍빛) 그라데이션 */
         body {
             font-family: 'D2Coding', 'Malgun Gothic', sans-serif;
             background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
@@ -25,22 +24,20 @@
             height: 100vh;
         }
 
-        /* 로그인 박스 상단 라인 수정 */
         .login-container {
-            /* 기존 속성들은 그대로 두고 border-top 색상만 변경 */
             background-color: #ffffff;
             padding: 40px 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(138, 21, 56, 0.08); /* 그림자 톤도 맞춰서 수정 */
+            box-shadow: 0 8px 24px rgba(138, 21, 56, 0.08);
             width: 100%;
             max-width: 400px;
-            border-top: 4px solid #8a1538; /* 더 깊고 진한 크림슨 레드 */
+            border-top: 4px solid #8a1538;
         }
 
         h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #8a1538; /* 크림슨 텍스트 */
+            color: #8a1538;
             letter-spacing: 1px;
         }
 
@@ -56,7 +53,6 @@
             color: #555555;
         }
 
-        /* 밝은 테마 입력창 스타일 */
         input[type="text"],
         input[type="password"] {
             width: 100%;
@@ -77,11 +73,10 @@
             background-color: #ffffff;
         }
 
-        /* 기본 버튼 (로그인) */
         .btn {
             width: 100%;
             padding: 12px;
-            background-color: #8a1538; /* 밝고 강렬한 크림슨 */
+            background-color: #8a1538;
             color: white;
             border: none;
             border-radius: 6px;
@@ -100,7 +95,6 @@
             transform: scale(0.98);
         }
 
-        /* 서브 버튼 (회원가입) */
         .btn-signup {
             background-color: #ffffff;
             border: 1px solid #8a1538;
@@ -109,10 +103,9 @@
         }
 
         .btn-signup:hover {
-            background-color: #fdf0f3; /* 마우스 오버 시 아주 연한 빨간색 배경 */
+            background-color: #fdf0f3;
         }
 
-        /* 하단 옵션 (로그인 유지, 비밀번호 찾기) */
         .options {
             display: flex;
             justify-content: space-between;
@@ -147,22 +140,21 @@
 
     <div class="login-container">
         <h2>LOGIN</h2>
-        <form action="#" method="POST">
+        <form id="login-form">
             <div class="form-group">
                 <label for="user-id">학교 이메일</label>
-                <input type="text" id="user-id" placeholder="이메일 아이디 입력" required>
+                <input type="text" id="user-id" placeholder="이메일 입력 (@korea.ac.kr 제외)" required>
             </div>
 
             <div class="form-group">
                 <label for="user-pw">비밀번호</label>
                 <input type="password" id="user-pw" placeholder="비밀번호 입력" required>
             </div>
-            <button type="button" class="btn" onclick="fakeLoginAction()">로그인</button>
             
-            
+            <!-- ✅ onclick 함수명을 아래 script와 동일하게 loginToServer()로 수정했습니다. -->
+            <button type="button" class="btn" onclick="loginToServer()">로그인</button>
         </form>
 
-        <!-- 회원가입 페이지 연결 -->
         <button type="button" class="btn btn-signup" onclick="location.href='signup.html'">회원가입</button>
 
         <div class="options">
@@ -172,13 +164,50 @@
     </div>
 
     <script>
-        function fakeLoginAction() {
-            // 1. 로그인 성공 증표 저장
-            localStorage.setItem('isLoggedIn', 'true');
-            // 2. 메인 화면으로 이동
-            location.href = 'main_login.html'; 
+        async function loginToServer() {
+            const emailId = document.getElementById('user-id').value;
+            const password = document.getElementById('user-pw').value;
+            
+            // 회원가입 시 저장된 이메일 형식에 맞춰 @korea.ac.kr를 붙입니다.
+            const fullEmail = `${emailId}@korea.ac.kr`; 
+
+            if (!emailId || !password) {
+                alert("아이디와 비밀번호를 입력해주세요.");
+                return;
+            }
+
+            try {
+                // 🚀 백엔드 서버(auth.js)와 통신
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: fullEmail, 
+                        password: password 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(`${data.nickname}님 환영합니다!`);
+                    
+                    // ⭐ [중요] 나중에 공구 페이지에서 작성자/참여자 구분을 위해 로컬스토리지 저장
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userNickname', data.nickname); // 내 닉네임 저장
+                    localStorage.setItem('userEmail', fullEmail);       // 내 고유 ID 저장
+                    
+                    // 메인 페이지로 이동
+                    location.href = 'main_login.html'; 
+                } else {
+                    // 서버에서 보낸 에러 메시지 (비번 틀림 등)
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error("서버 통신 에러:", error);
+                alert("서버와 연결할 수 없습니다. 백엔드(server.js)가 켜져 있는지 확인하세요!");
+            }
         }
     </script>
-
 </body>
 </html>
