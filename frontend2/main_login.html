@@ -509,24 +509,39 @@
         })
         .catch(err => console.error(err));
 
-    function updateHeader() {
-        // localStorage에서 값을 가져오되, 값이 없으면 기본적으로 'false'로 간주합니다.
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        
-        // 헤더 안의 버튼 뭉치들 찾기
-        const authButtons = document.querySelectorAll('.auth-only');
-        const guestButtons = document.querySelectorAll('.guest-only');
+    // 1. 헤더 업데이트 (로그인/로그아웃 버튼 스위칭)
+function updateHeader() {
+    // 기준 통일: 'isLoggedIn' 키 하나만 사용
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    const authButtons = document.querySelectorAll('.auth-only');
+    const guestButtons = document.querySelectorAll('.guest-only');
 
-        if (isLoggedIn) {
-            // [로그인 상태]
-            authButtons.forEach(btn => btn.style.display = 'inline-block');
-            guestButtons.forEach(btn => btn.style.display = 'none');
-        } else {
-            // [로그인 전 상태] - 이 부분이 확실해야 처음부터 로그인 버튼이 보입니다.
-            authButtons.forEach(btn => btn.style.display = 'none');
-            guestButtons.forEach(btn => btn.style.display = 'inline-block');
-        }
+    if (isLoggedIn) {
+        authButtons.forEach(btn => btn.style.display = 'inline-block');
+        guestButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        authButtons.forEach(btn => btn.style.display = 'none');
+        guestButtons.forEach(btn => btn.style.display = 'inline-block');
     }
+}
+
+// 2. 접근 권한 체크 (클릭 차단용)
+function checkAccess(targetUrl) {
+    // 위와 동일하게 'isLoggedIn'으로 체크
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (!isLoggedIn) {
+        alert("로그인이 필요한 서비스입니다! 로그인 페이지로 갈까요?");
+        location.href = "login.html"; 
+        return false;
+    }
+
+    if (targetUrl) {
+        location.href = targetUrl;
+    }
+    return true;
+}
 
     // 3. 로그아웃 기능 (버튼 클릭 감시)
     document.addEventListener('click', function(e) {
@@ -561,19 +576,19 @@
         <!-- 카테고리 (파스텔 & 이모지) -->
         <div class="section-title">👀 카테고리 둘러보기</div>
         <section class="cat-grid">
-            <div class="cat-card cat-1" onclick="filterCategory('식재료 / 배달')">
+            <div class="cat-card cat-1" onclick="if(checkAccess()) filterCategory('식재료 / 배달')">
                 <span class="cat-icon">🍊</span>
                 <div class="cat-title">식재료 / 배달</div>
             </div>
-            <div class="cat-card cat-2" onclick="filterCategory('자취 / 생필품')">
+            <div class="cat-card cat-2" onclick="if(checkAccess())filterCategory('자취 / 생필품')">
                 <span class="cat-icon">🧴</span>
                 <div class="cat-title">자취 / 생필품</div>
             </div>
-            <div class="cat-card cat-3" onclick="filterCategory('전공 / 문구')">
+            <div class="cat-card cat-3" onclick="if(checkAccess()) filterCategory('전공 / 문구')">
                 <span class="cat-icon">📚</span>
                 <div class="cat-title">전공 / 문구</div>
             </div>
-            <div class="cat-card cat-4" onclick="filterCategory('기타 물품')">
+            <div class="cat-card cat-4" onclick="if(checkAccess())filterCategory('기타 물품')">
                 <span class="cat-icon">📦</span>
                 <div class="cat-title">기타 물품</div>
             </div>
@@ -633,7 +648,7 @@
                 );
 
                 const cardHTML = `
-                    <div class="room-item" onclick="location.href='product.html?id=${product.id}'">
+                    <div class="room-item" onclick="if(checkAccess()) location.href='product.html?id=${product.id}'">
                         <div class="room-content">
                             <div class="tag-group">
                                 <span class="room-tag tag-study">${product.category}</span>
