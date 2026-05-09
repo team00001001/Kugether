@@ -678,9 +678,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!response.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
 
-        // 3. 공통 데이터 렌더링 (제목, 가격, 인원 등)
-        renderProductInfo(product);
 
+        // 3. 공통 데이터 렌더링 (제목, 가격, 인원 등)
+        renderProductInfo(product)
+    
         // 4. 권한별 버튼 및 리스트 생성
         const infoArea = document.querySelector('.product-info');
         const detailArea = document.querySelector('.details-section');
@@ -703,8 +704,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // --- UI 렌더링 함수들 ---
-
+//1. 공통 데이터 렌더링 함수
+// 1. 공통 데이터 렌더링 함수 (기본 정보 + 인증 섹션 호출)
 function renderProductInfo(product) {
+    // [기존 로직]
     document.getElementById('product-title').innerText = product.title;
     document.getElementById('product-price').innerHTML = `${Number(product.price).toLocaleString()}원 <span>(${product.targetCount}명 기준)</span>`;
     document.getElementById('status-count-text').innerHTML = `현재 <strong>${product.currentCount}명</strong> / 목표 ${product.targetCount}명`;
@@ -715,6 +718,100 @@ function renderProductInfo(product) {
     document.getElementById('progress-percent').innerText = `${percent}%`;
     
     if (product.imageUrl) document.getElementById('product-img').src = product.imageUrl;
+
+    // ---------------------------------------------------------
+    // 👉 여기서 인증 섹션 함수를 호출합니다!
+    // ---------------------------------------------------------
+    renderCompletionSection(product); 
+}
+
+// 2. 공구 완료 인증 섹션 함수
+function renderCompletionSection(product) {
+    const detailArea = document.querySelector('.details-section');
+    if (!detailArea) return;
+
+    // --- [추가] 참여 여부 및 권한 체크 ---
+    const currentUserId = localStorage.getItem('userId');
+    const joinedGroups = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
+    
+    const isJoined = joinedGroups.includes(String(product.id)); // 내가 참여했는가?
+    const isHost = String(product.user_id) === String(currentUserId); // 내가 방장인가?
+
+    // 참여자도 아니고 방장도 아니면 아예 화면에 그리지 않고 종료!
+    if (!isJoined && !isHost) return; 
+
+    // --- [기존] 기한 체크 로직 ---
+    const deadlineDate = new Date(product.deadline);
+    const now = new Date();
+    const isExpired = now > deadlineDate; 
+
+    const completionHtml = `
+        <div class="completion-card" style="margin-top:20px; border: 2px solid #ce152d; padding:20px; border-radius:10px; background-color: #fff;">
+            <h4 style="color:#ce152d; margin-top:0;">✅ 최종 공구 완료 인증</h4>
+            <p style="font-size:13px; color:#666;">
+                인원수가 4명 이상인 경우, <strong>과반수 이상</strong>이 완료를 누르면 공구 성공으로 인정됩니다!
+            </p>
+            
+            <div id="confirmed-status" style="margin: 10px 0; font-weight: bold; font-size: 1.1rem;">
+                현재 확인 현황: <span id="confirmed-count" style="color:#ce152d;">${tempConfirmedCount}</span> / ${product.currentCount}명
+            </div>
+            
+            ${isExpired ? 
+                // 👉 수정포인트: targetCount가 아니라 currentCount를 넘겨야 실제 참여 인원 기준으로 계산됩니다!
+                `<button id="complete-btn" class="join-btn" onclick="confirmCompletion('${product.id}', ${product.currentCount})">거래 완료 확인</button>` : 
+                
+                `<button id="complete-btn" class="join-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>기한 마감 후 인증 가능</button>
+                 <p style="font-size:11px; color:#ce152d; margin-top:5px;">⏳ 마감 기한(${product.deadline})이 지나야 버튼이 활성화됩니다.</p>`
+            }
+        </div>
+    `;
+    
+    detailArea.insertAdjacentHTML('beforeend', completionHtml);
+}
+
+// 3. 거래 완료 확인 버튼 클릭 시 실행되는 함수 (나중에 수정)
+let tempConfirmedCount = 0; // DB가 없으므로 임시로 카운트하는 변수
+
+async function confirmCompletion(productId, totalCurrentCount) {
+    if (!confirm("실제로 물건을 수령하셨나요? 확인 후에는 취소가 불가능합니다.")) return;
+
+    // [임시 프론트 로직] 카운트 증가
+    tempConfirmedCount++;
+    document.getElementById('confirmed-count').innerText = tempConfirmedCount;
+    document.getElementById('complete-btn').disabled = true;
+    document.getElementById('complete-btn').innerText = "확인 완료";
+
+    // 👉 과반수 성공 조건 계산
+    // 4명 이상일 때는 과반수(절반 초과), 그 미만은 전원 동의 시 성공
+    let successThreshold;
+    if (totalCurrentCount >= 4) {
+        successThreshold = Math.floor(totalCurrentCount / 2) + 1; // 과반수
+    } else {
+        successThreshold = totalCurrentCount; // 3명 이하는 전원 동의
+    }
+
+    if (tempConfirmedCount >= successThreshold) {
+        alert(`🎉 과반수 이상(${tempConfirmedCount}명)이 확인하여 공구가 성공했습니다!`);
+        
+        // ---------------------------------------------------------
+        // 🚀 [주석: 나중에 데이터베이스 연결할 부분]
+        // ---------------------------------------------------------
+        /*
+        // 1. 서버에 이 유저의 완료 상태를 PATCH 요청
+        // await fetch(`/api/products/${productId}/confirm`, { method: 'PATCH', ... });
+
+        // 2. 서버에서 해당 공구가 성공했는지 판단 후 응답을 주면
+        // 3. 성공 시 마이페이지에 +1 하기 위한 API 호출
+        // await fetch('/api/users/update-success', {
+        //     method: 'POST',
+        //     body: JSON.stringify({ userId: localStorage.getItem('userId'), productId: productId })
+        // });
+        
+        console.log("마이페이지에 성공 횟수 반영 요청됨");
+        */
+    } else {
+        alert(`확인되었습니다. (성공까지 ${successThreshold - tempConfirmedCount}명 남음)`);
+    }
 }
 
 // [방장 전용 화면]
@@ -778,9 +875,11 @@ async function deleteProduct(id) {
         // fetch(`/api/products/${id}`, { method: 'DELETE' }) ...
         alert("삭제되었습니다.");
         location.href = 'main_login.html';
+        //여기 나중에 진짜 삭제됭ㅇ
     }
 }
 
+//나중에 참여자 데이터베이스 필요함
 async function leaveGroup(id) {
     if(confirm("참여를 취소하시겠습니까?")) {
         // 서버 인원수 -1 처리 로직 필요
