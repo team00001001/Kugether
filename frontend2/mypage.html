@@ -304,12 +304,14 @@
     updateProfileCard();
     const userId = localStorage.getItem('userId');
 
-fetch(`http://localhost:3000/products/my/${userId}`)
+// 전체 상품을 불러온 뒤, 내 userId와 일치하는 상품만 걸러내어 개수 세기
+fetch('http://localhost:3000/products')
     .then(res => res.json())
-    .then(products => {
-        document.getElementById('my-post-count').innerText = `${products.length} 건`;
+    .then(allProducts => {
+        const myProducts = allProducts.filter(p => p.user_id == userId);
+        document.getElementById('my-post-count').innerText = `${myProducts.length} 건`;
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error('내 공고 개수 로드 실패:', err));
 
 const joinedGroups = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
 document.getElementById('joined-count').innerText = `${joinedGroups.length} 건`;
