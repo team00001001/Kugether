@@ -2,6 +2,62 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const pool = require('../db');
+const nodemailer = require('nodemailer');
+
+const authCodes = {};
+
+// 🚀 1. 인증번호 전송 API
+router.post('/send-auth-email', async (req, res) => {
+    const { email } = req.body;
+    
+    // 6자리 랜덤 인증번호 생성 (100000 ~ 999999)
+    const authCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 이메일 전송 세팅
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER, // .env에서 가져옴
+            pass: process.env.EMAIL_PASS  // .env에서 가져옴
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: '[대학생 공동구매] 회원가입 인증번호입니다.',
+        text: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        
+        // 메모리에 '이메일: 인증번호' 형태로 3분간 저장
+        authCodes[email] = authCode;
+        setTimeout(() => {
+            delete authCodes[email]; // 3분 뒤에 인증번호 삭제 (만료)
+        }, 3 * 60 * 1000);
+
+        res.status(200).json({ message: '인증번호가 전송되었습니다. 이메일을 확인해주세요!' });
+    } catch (error) {
+        console.error('이메일 전송 에러:', error);
+        res.status(500).json({ message: '메일 전송에 실패했습니다.' });
+    }
+});
+
+// 🚀 2. 인증번호 확인 API
+router.post('/verify-auth-code', (req, res) => {
+    const { email, code } = req.body;
+
+    // 저장된 인증번호와 입력한 번호가 같은지 확인
+    if (authCodes[email] && authCodes[email] === code) {
+        // 성공하면 삭제해서 재사용 방지
+        delete authCodes[email];
+        res.status(200).json({ message: '이메일 인증이 완료되었습니다!' });
+    } else {
+        res.status(400).json({ message: '인증번호가 틀렸거나 만료되었습니다.' });
+    }
+});
 
 // 회원가입 API
 router.post('/signup', async (req, res) => {
