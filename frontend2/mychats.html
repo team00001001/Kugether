@@ -296,7 +296,8 @@
             try {
                 // (선택 사항) 만약 mypage.html처럼 json server를 사용 중이라면 
                 // 아래 URL을 'http://localhost:3000/products'로 변경하셔도 됩니다.
-                const response = await fetch('products.json'); 
+                // 백엔드 서버의 /products API로 요청을 보냅니다.
+                const response = await fetch('http://localhost:3000/products'); 
                 const allProducts = await response.json();
 
                 // 내가 참여한 상품만 필터링
@@ -323,7 +324,7 @@
                                 <span>📍 ${product.location}</span>
                             </div>
                         </div>
-                        <a href="chat.html?id=${product.id}" class="enter-btn">채팅방 입장</a>
+                        <a href="direct_chattings.html?id=${product.id}" class="enter-btn">채팅방 입장</a>
                     `;
                     listContainer.appendChild(card);
                 });
