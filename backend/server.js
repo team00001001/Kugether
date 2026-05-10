@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -22,7 +21,9 @@ const io = new Server(server, {
         methods: ['GET', 'POST']
     }
 });
+const notificationRoutes = require('./routes/notificationRoutes');
 
+app.use('/notifications', notificationRoutes);
 app.use(cors());
 app.use(express.json());
 

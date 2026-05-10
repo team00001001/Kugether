@@ -318,38 +318,22 @@
                 location.href = 'main_login.html'; 
             }
         });
+let notifications = [];
 
-        // 2. 가상 알림 데이터 (추후 백엔드 API로 대체)
-        let dummyNotifications = [
-            {
-                id: 1,
-                type: 'chat', // chat, success, notice
-                title: '[햇반 24개입] 채팅방',
-                desc: '새로운 메시지가 도착했습니다: "오늘 오후 6시에 정경대 후문에서 뵐게요!"',
-                time: '10분 전',
-                isRead: false,
-                link: 'direct_chattings.html?id=1' // 해당 공구 채팅방으로 이동
-            },
-            {
-                id: 2,
-                type: 'success',
-                title: '공동구매 모집 완료!',
-                desc: '참여하신 [제로콜라 1박스] 공구의 목표 인원이 모두 모였습니다. 채팅방에서 수령 일정을 확인하세요.',
-                time: '1시간 전',
-                isRead: false,
-                link: 'product.html?id=2' // 해당 상품 상세로 이동
-            },
-            {
-                id: 3,
-                type: 'notice',
-                title: 'KU GONGGU 업데이트 안내',
-                desc: '안전한 거래를 위해 크림슨 지수 시스템이 업데이트 되었습니다.',
-                time: '1일 전',
-                isRead: true,
-                link: '#'
-            }
-        ];
+async function loadNotifications() {
+    const userId = localStorage.getItem('userId');
 
+    if (!userId) return;
+
+    try {
+        const response = await fetch(`http://localhost:3000/notifications/${userId}`);
+        notifications = await response.json();
+
+        renderNotifications();
+    } catch (error) {
+        console.error('알림 불러오기 실패:', error);
+    }
+}
         // 3. 알림 화면 렌더링 함수
         function renderNotifications() {
             const listContainer = document.getElementById('noti-list');
@@ -357,13 +341,13 @@
             
             listContainer.innerHTML = ''; // 초기화
 
-            if (dummyNotifications.length === 0) {
-                emptyState.style.display = 'block';
+if (notifications.length === 0) {
+                    emptyState.style.display = 'block';
                 return;
             }
 
-            dummyNotifications.forEach(noti => {
-                // 타입별 아이콘 설정
+notifications.forEach(noti => {
+                    // 타입별 아이콘 설정
                 let iconClass = '';
                 let iconEmoji = '';
                 
@@ -371,29 +355,44 @@
                 else if (noti.type === 'success') { iconClass = 'icon-success'; iconEmoji = '🎉'; }
                 else { iconClass = 'icon-notice'; iconEmoji = '📢'; }
 
-                const notiHTML = `
-                    <div class="noti-item ${noti.isRead ? '' : 'unread'}" onclick="readAndGo(${noti.id}, '${noti.link}')">
-                        <div class="noti-icon ${iconClass}">${iconEmoji}</div>
-                        <div class="noti-content">
-                            <div class="noti-header">
-                                <span class="noti-title">${noti.title}</span>
-                                <span class="noti-time">${noti.time}</span>
-                            </div>
-                            <div class="noti-desc">${noti.desc}</div>
-                            ${noti.isRead ? '' : '<div class="noti-dot"></div>'}
-                        </div>
-                    </div>
-                `;
+               const notiHTML = `
+    <div class="noti-item ${noti.is_read ? '' : 'unread'}"
+         onclick="readAndGo(${noti.id}, '#')">
+
+        <div class="noti-icon ${iconClass}">
+            ${iconEmoji}
+        </div>
+
+        <div class="noti-content">
+            <div class="noti-header">
+                <span class="noti-title">${noti.title}</span>
+
+                <span class="noti-time">
+                    ${new Date(noti.created_at).toLocaleString()}
+                </span>
+            </div>
+
+            <div class="noti-desc">
+                ${noti.message}
+            </div>
+
+            ${noti.is_read ? '' : '<div class="noti-dot"></div>'}
+        </div>
+    </div>
+`;
                 listContainer.insertAdjacentHTML('beforeend', notiHTML);
             });
         }
 
         // 4. 클릭 시 읽음 처리 후 이동
         function readAndGo(id, link) {
+            fetch(`http://localhost:3000/notifications/${id}/read`, {
+    method: 'PATCH'
+});
             // 해당 ID의 알림을 읽음 처리
-            dummyNotifications = dummyNotifications.map(n => 
-                n.id === id ? { ...n, isRead: true } : n
-            );
+            notifications = notifications.map(n => {
+                return n.id === id ? { ...n, isRead: true } : n;
+            });
             
             // UI 다시 그리기 (혹은 페이지 바로 이동)
             renderNotifications();
@@ -404,7 +403,7 @@
 
         // 5. 모두 읽음 처리
         function markAllAsRead() {
-            dummyNotifications = dummyNotifications.map(n => ({ ...n, isRead: true }));
+            notifications = notifications.map(n => ({ ...n, isRead: true }));
             renderNotifications();
             
             // 헤더의 빨간 점도 없애주는 로직 (header.html이 불러와진 후)
@@ -413,8 +412,7 @@
         }
 
         // 페이지 로드 시 렌더링 실행
-        document.addEventListener('DOMContentLoaded', renderNotifications);
-
+document.addEventListener('DOMContentLoaded', loadNotifications);
     </script>
 </body>
 </html>
