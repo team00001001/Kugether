@@ -222,11 +222,6 @@
             </div>
 
             <div class="input-group">
-                <label for="chatUrl" class="required">오픈 채팅방 링크</label>
-                <input type="url" id="chatUrl" placeholder="예) https://open.kakao..." required>
-            </div>
-
-            <div class="input-group">
                 <label for="description" class="required">상세 설명</label>
                 <textarea id="description" placeholder="어떤 상품인지, 왜 같이 사고 싶은지 자세히 적어주세요!" required></textarea>
             </div>
@@ -234,7 +229,7 @@
             <button type="submit" class="submit-btn">수정 완료하기</button>
         </form>
     </main>
-   
+
     <script>
         // 1. URL에서 상품 ID 가져오기 (예: edit.html?id=3)
         const urlParams = new URLSearchParams(window.location.search);
@@ -267,7 +262,6 @@
                 document.getElementById('price').value = product.price;
                 document.getElementById('location').value = product.location;
                 document.getElementById('imageUrl').value = product.imageUrl || '';
-                document.getElementById('chatUrl').value = product.chatUrl || '';
                 document.getElementById('description').value = product.description;
 
                 // 카테고리 매핑 (한글 -> value 값으로)
@@ -320,7 +314,6 @@
                 duration: `${periodValue}${periodUnit}`, // 다시 "3일" 포맷으로 합치기
                 location: document.getElementById('location').value,
                 imageUrl: document.getElementById('imageUrl').value,
-                chatUrl: document.getElementById('chatUrl').value,
                 description: document.getElementById('description').value,
                 user_id: localStorage.getItem('userId') // 권한 재확인용
             };
