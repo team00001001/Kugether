@@ -318,12 +318,26 @@ fetch('http://localhost:3000/products')
         document.getElementById('my-post-count').innerText = `${myProducts.length} 건`;
     })
     .catch(err => console.error('내 공고 개수 로드 실패:', err));
-fetch(`http://localhost:3000/chats/my/${userId}`)
-    .then(res => res.json())
-    .then(chats => {
-        document.getElementById('joined-count').innerText = `${chats.length} 건`;
-    })
-    .catch(err => console.error('참여 공구 개수 로드 실패:', err));
+// 참여 중 건수 (참여한 공구 + 내가 올린 공고)
+Promise.all([
+    fetch(`http://localhost:3000/chats/my/${userId}`).then(res => res.json()),
+    fetch('http://localhost:3000/products').then(res => res.json())
+]).then(([chats, allProducts]) => {
+    const myCreatedProducts = allProducts.filter(p => String(p.user_id) === String(userId));
+    const joinedProductIds = chats.map(c => String(c.product_id));
+
+    // 내가 참여한 공구 수에다가
+    let uniqueCount = chats.length;
+    
+    // 내가 올린 공구 중 아직 참여 목록에 없는 것만 더하기
+    myCreatedProducts.forEach(p => {
+        if (!joinedProductIds.includes(String(p.id))) {
+            uniqueCount++;
+        }
+    });
+    
+    document.getElementById('joined-count').innerText = `${uniqueCount} 건`;
+}).catch(err => console.error('참여 공구 개수 로드 실패:', err));
 
 fetch('http://localhost:3000/products')
     .then(res => res.json())
@@ -339,31 +353,45 @@ fetch('http://localhost:3000/products')
 
 async function loadRecentParticipations() {
     const grid = document.getElementById('recent-participation-grid');
-
     grid.innerHTML = '';
 
     try {
-        const response = await fetch(
-            `http://localhost:3000/chats/my/${userId}`
-        );
+        // 내가 참여한 목록과 전체 목록을 동시에 불러옵니다
+        const [chatsRes, productsRes] = await Promise.all([
+            fetch(`http://localhost:3000/chats/my/${userId}`),
+            fetch('http://localhost:3000/products')
+        ]);
 
-        const joinedProducts = await response.json();
+        let joinedProducts = await chatsRes.json();
+        const allProducts = await productsRes.json();
+        
+        // 내가 직접 올린 공고 필터링
+        const myCreatedProducts = allProducts.filter(p => String(p.user_id) === String(userId));
+        const joinedProductIds = joinedProducts.map(p => String(p.product_id));
+        
+        // 내가 올린 공고를 참여 목록에 병합 (중복 방지)
+        myCreatedProducts.forEach(myProduct => {
+            if (!joinedProductIds.includes(String(myProduct.id))) {
+                joinedProducts.push({
+                    ...myProduct,
+                    product_id: myProduct.id // id 통일
+                });
+            }
+        });
+
+        // 최신순으로 정렬
+        joinedProducts.sort((a, b) => b.product_id - a.product_id);
 
         if (joinedProducts.length === 0) {
-            grid.innerHTML =
-                '<p style="color:#888;">최근 참여 내역이 없습니다.</p>';
+            grid.innerHTML = '<p style="color:#888;">최근 참여 내역이 없습니다.</p>';
             return;
         }
 
+        // 최대 2개까지만 화면에 보여주기
         joinedProducts.slice(0, 2).forEach(product => {
-            const isClosed =
-                product.currentCount >= product.targetCount;
-
-            const badgeClass =
-                isClosed ? 'success' : 'recruiting';
-
-            const badgeText =
-                isClosed ? '배송 완료' : '모집중';
+            const isClosed = product.currentCount >= product.targetCount;
+            const badgeClass = isClosed ? 'success' : 'recruiting';
+            const badgeText = isClosed ? '배송 완료' : '모집중';
 
             grid.insertAdjacentHTML('beforeend', `
                 <div class="gonggu-card"
@@ -391,9 +419,7 @@ async function loadRecentParticipations() {
 
     } catch (error) {
         console.error(error);
-
-        grid.innerHTML =
-            '<p style="color:#888;">참여 내역을 불러오지 못했습니다.</p>';
+        grid.innerHTML = '<p style="color:#888;">참여 내역을 불러오지 못했습니다.</p>';
     }
 }
 

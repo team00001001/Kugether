@@ -250,17 +250,38 @@
             const listContainer = document.getElementById('product-list');
             const emptyView = document.getElementById('empty-view');
             const countBadge = document.getElementById('count-badge');
-const userId = localStorage.getItem('userId');
+            const userId = localStorage.getItem('userId');
 
-if (!userId) {
-    alert('로그인이 필요합니다.');
-    location.href = 'login.html';
-    return;
-}
+            if (!userId) {
+                alert('로그인이 필요합니다.');
+                location.href = 'login.html';
+                return;
+            }
 
-try {
-    const response = await fetch(`http://localhost:3000/chats/my/${userId}`);
-    const joinedProducts = await response.json();
+            try {
+                // 1. 내가 '참여한' 공고 리스트 가져오기
+                const response = await fetch(`http://localhost:3000/chats/my/${userId}`);
+                let joinedProducts = await response.json();
+
+                // 2. 전체 상품 가져와서 내가 '직접 올린' 공고 필터링하기
+                const productResponse = await fetch('http://localhost:3000/products');
+                const allProducts = await productResponse.json();
+                const myCreatedProducts = allProducts.filter(p => String(p.user_id) === String(userId));
+
+                // 3. 두 목록 병합 (중복 방지)
+                const joinedProductIds = joinedProducts.map(p => String(p.product_id));
+                myCreatedProducts.forEach(myProduct => {
+                    if (!joinedProductIds.includes(String(myProduct.id))) {
+                        joinedProducts.push({
+                            ...myProduct,
+                            product_id: myProduct.id // 아래 화면 그리기 로직에서 통일해서 쓰기 위함
+                        });
+                    }
+                });
+
+                // 최신 글이 위로 오도록 정렬
+                joinedProducts.sort((a, b) => b.product_id - a.product_id);
+
                 countBadge.innerText = joinedProducts.length;
 
                 if (joinedProducts.length === 0) {
@@ -268,7 +289,7 @@ try {
                     return;
                 }
 
-                // 5. 화면에 리스트 그리기 (기존 코드와 동일)
+                // 4. 화면에 리스트 그리기
                 joinedProducts.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
@@ -276,6 +297,12 @@ try {
                     const isCompleted = product.currentCount >= product.targetCount;
                     const statusClass = isCompleted ? 'status-completed' : 'status-recruiting';
                     const statusText = isCompleted ? '모집완료' : '모집중';
+
+                    // 💡 방장(내가 올린 글)일 경우 '참여 취소' 버튼 대신 안내 텍스트 표시
+                    const isHost = String(product.user_id) === String(userId);
+                    const cancelBtnHtml = isHost 
+                        ? `<span style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 5px; padding: 10px 0;">내가 쓴 공고</span>` 
+                        : `<button class="btn-manage btn-cancel" onclick="cancelJoin(${product.product_id})">참여 취소</button>`;
 
                     card.innerHTML = `
                         <img src="${product.imageUrl || 'https://via.placeholder.com/100'}" alt="상품" class="product-img">
@@ -289,7 +316,7 @@ try {
                         </div>
                         <div class="manage-btns">
                             <a href="direct_chattings.html?id=${product.product_id}" class="btn-manage btn-chat">채팅방</a>
-                            <button class="btn-manage btn-cancel" onclick="cancelJoin(${product.product_id})">참여 취소</button>
+                            ${cancelBtnHtml}
                         </div>
                     `;
                     listContainer.appendChild(card);
@@ -313,46 +340,45 @@ try {
 
         // 참여 취소 로직
         async function cancelJoin(id) {
-    if (!confirm("정말로 이 공구 참여를 취소하시겠습니까?")) {
-        return;
-    }
+            if (!confirm("정말로 이 공구 참여를 취소하시겠습니까?")) {
+                return;
+            }
 
-    const userId = localStorage.getItem('userId');
+            const userId = localStorage.getItem('userId');
 
-    if (!userId) {
-        alert('로그인이 필요합니다.');
-        location.href = 'login.html';
-        return;
-    }
+            if (!userId) {
+                alert('로그인이 필요합니다.');
+                location.href = 'login.html';
+                return;
+            }
 
-    try {
-        const response = await fetch('http://localhost:3000/participants/cancel', {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                productId: id,
-                userId: userId
-            })
-        });
+            try {
+                const response = await fetch('http://localhost:3000/participants/cancel', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: id,
+                        userId: userId
+                    })
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (!response.ok) {
-            alert(result.message || '참여 취소 실패');
-            return;
+                if (!response.ok) {
+                    alert(result.message || '참여 취소 실패');
+                    return;
+                }
+
+                alert("참여가 취소되었습니다.");
+                location.reload();
+
+            } catch (error) {
+                console.error(error);
+                alert("서버 연결 실패");
+            }
         }
-
-
-        alert("참여가 취소되었습니다.");
-        location.reload();
-
-    } catch (error) {
-        console.error(error);
-        alert("서버 연결 실패");
-    }
-}
     </script>
 </body>
 </html>
