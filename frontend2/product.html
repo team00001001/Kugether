@@ -425,6 +425,147 @@
             letter-spacing: -0.1px;
         }
 
+        /* 배송 조회 섹션 전체 카드 (공구 상세 내용과 간격 띄우기) */
+        .delivery-section {
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        /* 배송 조회 입력 폼 스타일 (겉 박스보다 작게 가운데 정렬) */
+        .tracking-input-container {
+            display: flex;
+            gap: 10px;
+            margin: 0 auto 25px auto;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            width: 85%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+
+        .carrier-select, .tracking-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .carrier-select {
+            width: 30%;
+        }
+
+        .tracking-input {
+            flex-grow: 1;
+        }
+
+        .track-btn {
+            padding: 10px 20px;
+            background-color: #8b0029; /* 크림슨 컬러 포인트 */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            white-space: nowrap; /* 버튼 글씨 줄바꿈 방지 */
+        }
+
+        .track-btn:hover {
+            background-color: #6a001f;
+        }
+
+        /* 배송 현황 타임라인 스타일 */
+        .tracking-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delivery-badge {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .delivery-info {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* 세로 타임라인 그리기 */
+        .timeline-container {
+            padding: 10px 20px;
+        }
+
+        .timeline {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 15px;
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 45px;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 11px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #bdbdbd;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #e0e0e0;
+        }
+
+        /* 가장 최근(마지막) 배송 상태는 색상을 다르게 강조 */
+        .timeline-item.active .timeline-dot {
+            background-color: #8b0029;
+            box-shadow: 0 0 0 2px #f4d3db;
+        }
+
+        .timeline-item.active .timeline-content strong {
+            color: #8b0029;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #757575;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .timeline-content {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -491,6 +632,35 @@
             <h2 class="content-title">공구 상세 내용</h2>
             <div class="content-body" id="product-description">
                 데이터를 불러오는 중입니다...
+            </div>
+        </section>
+
+        <section class="delivery-section card">
+            <h2 class="content-title">📦 배송 현황 조회</h2>
+            
+            <div class="tracking-input-container">
+                <select id="carrier-id" class="carrier-select">
+                    <option value="">택배사 선택</option>
+                    <option value="04">CJ대한통운</option>
+                    <option value="01">우체국택배</option>
+                    <option value="05">한진택배</option>
+                    <option value="08">롯데택배</option>
+                    <option value="06">로젠택배</option>
+                </select>
+                <input type="text" id="tracking-number" class="tracking-input" placeholder="- 제외 송장번호 입력">
+                <button class="track-btn" onclick="fetchTrackingInfo()">조회하기</button>
+            </div>
+
+            <div id="tracking-result" class="tracking-result-container" style="display: none;">
+                <div class="tracking-header">
+                    <span id="delivery-status-badge" class="delivery-badge">조회 완료</span>
+                    <span id="delivery-info-text" class="delivery-info"></span>
+                </div>
+                
+                <div class="timeline-container">
+                    <ul class="timeline" id="timeline-list">
+                        </ul>
+                </div>
             </div>
         </section>
     </div>
@@ -1021,6 +1191,77 @@ async function markStatus(participantId, userId, status) {
         console.error('상태 업데이트 에러:', error);
         alert("서버 연결에 실패했습니다.");
     }
+}
+
+async function fetchTrackingInfo() {
+    const carrierId = document.getElementById('carrier-id').value;
+    const trackingNumber = document.getElementById('tracking-number').value.replace(/[^0-9]/g, ''); // 숫자만 추출
+
+    if (!carrierId) {
+        alert('택배사를 선택해주세요.');
+        return;
+    }
+    if (!trackingNumber) {
+        alert('운송장 번호를 입력해주세요.');
+        return;
+    }
+
+    const carrierName = document.getElementById('carrier-id').options[document.getElementById('carrier-id').selectedIndex].text;
+
+    try {
+        // [백엔드 연동 시 주석 해제할 부분]
+        // Express 서버로 요청을 보냅니다 (예: /api/delivery?carrier=04&trackId=1234)
+        // const response = await fetch(`/api/delivery?carrier=${carrierId}&trackId=${trackingNumber}`);
+        // const data = await response.json();
+        
+        // 프론트엔드 UI 테스트용 모크(Mock) 데이터 (스윗트래커 API 응답 형태를 간소화함)
+        const mockData = [
+            { time: "2026-05-09 14:32", location: "동남권HUB", status: "집하완료", details: "보내시는 고객님으로부터 상품을 인수받았습니다." },
+            { time: "2026-05-09 22:15", location: "동남권HUB", status: "간선상차", details: "배송지로 상품이 이동중입니다." },
+            { time: "2026-05-10 07:40", location: "성북구대리점", status: "간선하차", details: "고객님의 동네로 상품이 도착했습니다." },
+            { time: "2026-05-10 10:10", location: "성북구대리점", status: "배송출발", details: "배송기사님이 배송을 시작했습니다. (14시~16시 도착 예정)" }
+        ];
+
+        renderTimeline(carrierName, trackingNumber, mockData);
+
+    } catch (error) {
+        console.error('배송 조회 에러:', error);
+        alert('배송 정보를 불러오는 데 실패했습니다.');
+    }
+}
+
+function renderTimeline(carrierName, trackingNumber, dataList) {
+    const resultContainer = document.getElementById('tracking-result');
+    const infoText = document.getElementById('delivery-info-text');
+    const timelineList = document.getElementById('timeline-list');
+
+    // 상단 정보 업데이트
+    infoText.innerText = `${carrierName} [${trackingNumber}]`;
+    timelineList.innerHTML = ''; // 기존 내역 초기화
+
+    // 데이터가 역순(최신이 먼저)으로 오는지, 정순으로 오는지에 따라 배열 순서를 맞춰줍니다.
+    // 여기서는 정순(과거->최신) 배열이라고 가정하고 화면에 그립니다.
+    dataList.forEach((item, index) => {
+        const isLastItem = (index === dataList.length - 1); // 가장 마지막 단계인지 확인
+        
+        const li = document.createElement('li');
+        li.className = `timeline-item ${isLastItem ? 'active' : ''}`;
+        
+        li.innerHTML = `
+            <div class="timeline-dot"></div>
+            <span class="timeline-time">${item.time}</span>
+            <div class="timeline-content">
+                <strong>[${item.status}]</strong> ${item.location}<br>
+                <span style="font-size: 13px; color: #666; margin-top: 4px; display: inline-block;">${item.details}</span>
+            </div>
+        `;
+        
+        // 최신 내역이 위로 올라오게 하려면 prepend, 아래로 내려가게 하려면 append 사용
+        timelineList.prepend(li); 
+    });
+
+    // 결과 컨테이너 보여주기
+    resultContainer.style.display = 'block';
 }
 </script>
 </body>
