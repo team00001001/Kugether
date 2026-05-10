@@ -161,6 +161,11 @@
         .section-title { font-size: 1rem; font-weight: 700; margin: 30px 0 15px; display: flex; justify-content: space-between; }
         
         .gonggu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .jjim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
         .gonggu-card {
             background: white; padding: 20px; border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative;
@@ -223,12 +228,18 @@
     </div>
 </div>
 
-        <div class="section-title">최근 참여 내역 <span style="font-size: 0.8rem; color: #aaa; font-weight: normal; cursor: pointer;">전체보기 〉</span></div>
+        <div class="section-title">최근 참여 내역 
+<span onclick="location.href='joined_products.html'" style="font-size: 0.8rem; color: #aaa; font-weight: normal; cursor: pointer;">
+    전체보기 〉
+</span></div>
         
         <div class="gonggu-grid" id="recent-participation-grid">
 </div>
 
-        <div class="section-title">방금 찜한 공구 <span style="font-size: 0.8rem; color: #aaa; font-weight: normal; cursor: pointer;">더보기 〉</span></div>
+        <div class="section-title">방금 찜한 공구 
+<span onclick="location.href='liked_products.html'" style="font-size: 0.8rem; color: #aaa; font-weight: normal; cursor: pointer;">
+    더보기 〉
+</span></div>
       <div class="jjim-grid" id="liked-products-grid">
 </div>
 
@@ -387,7 +398,15 @@ async function loadRecentParticipations() {
 }
 
 loadRecentParticipations();
+async function loadLikedProducts() {
+    const grid = document.getElementById('liked-products-grid');
 
+    grid.innerHTML = `
+        <p style="color:#888;">
+            찜한 공구 기능은 준비 중입니다.
+        </p>
+    `;
+}
 loadLikedProducts();
 </script>
 
