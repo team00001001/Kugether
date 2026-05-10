@@ -206,23 +206,43 @@ router.get('/', async (req, res) => {
 
 // 방장이 참여자의 상태(노쇼/확인)를 업데이트하는 API
 router.patch('/status', async (req, res) => {
-    const { participantId, userId, status } = req.body; 
+    // 💡 req.body에서 productId를 추가로 받아옵니다.
+    const { participantId, userId, status, productId } = req.body; 
+
+    // productId가 누락되었을 경우를 대비한 방어 로직 (선택 사항)
+    if (!productId && status === 'noshow') {
+        return res.status(400).json({ message: '노쇼 처리 시 productId가 필요합니다.' });
+    }
 
     const conn = await pool.promise().getConnection();
     try {
         await conn.beginTransaction();
 
-        // 1. 참여자 상태 업데이트 (success 대신 confirmed/noshow 저장)
-        await conn.query(
-            `UPDATE product_participants SET status = ? WHERE id = ?`,
-            [status, participantId]
-        );
-
-        // 2. 유저 신뢰도 점수 업데이트 (노쇼면 -15점, 성공(confirmed)이면 +3점)
-        let scoreChange = status === 'noshow' ? -15 : 3;
-        
-        // 공통 함수 사용 (자동으로 100/-100 제한 걸림)
-        await updateTrustScore(userId, scoreChange, conn);
+        if (status === 'noshow') {
+            // 1. 상태를 노쇼로 변경
+            await conn.query(
+                `UPDATE product_participants SET status = 'noshow' WHERE id = ?`, 
+                [participantId]
+            );
+            
+            // 2. 신뢰도 10점 차감 (기존에 만들어둔 공통 함수 활용)
+            await updateTrustScore(userId, -10, conn);
+            
+            // 3. [추가된 로직] 공구방 현재 인원 1명 빼기 (빈자리 만들기 = 강퇴 효과)
+            await conn.query(
+                `UPDATE products SET currentCount = GREATEST(currentCount - 1, 0) WHERE id = ?`, 
+                [productId]
+            );
+        } else {
+            // 노쇼가 아닐 때 (예: 'confirmed' 등)의 기존 로직 유지
+            await conn.query(
+                `UPDATE product_participants SET status = ? WHERE id = ?`,
+                [status, participantId]
+            );
+            
+            // 성공(confirmed)이면 +3점 부여 (기존 로직 유지)
+            await updateTrustScore(userId, 3, conn);
+        }
 
         await conn.commit();
         res.json({ message: '상태 업데이트 및 점수 반영 완료' });
