@@ -121,7 +121,22 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(138, 21, 56, 0.4);
         }
+.detail-no-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(120, 120, 120, 0.45);
+    backdrop-filter: blur(3px);
 
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    z-index: 3;
+}
         .container {
             max-width: 940px; 
             margin: 0 auto;
@@ -575,10 +590,13 @@
     <div class="container">
         <section class="product-hero card">
             <div class="product-image-container">
-                <span>이미지 준비중</span>
-                <img src="" alt="상품 이미지" class="product-image" id="product-img">
-            </div>
-            
+    <span>이미지 준비중</span>
+    <img src="" alt="상품 이미지" class="product-image" id="product-img">
+
+    <div class="detail-no-image-overlay" id="detail-no-image-overlay">
+        등록된 사진이 없습니다
+    </div>
+</div>
             <div class="product-info">
                 <div class="badge-group">
                     <span class="category-badge tag-hot" id="badge-hot" style="display:none;">🔥 마감임박</span>
@@ -797,20 +815,27 @@
 const fallbackImage =
     defaultImages[product.category] || 'images/default-etc.png';
 const imgEl = document.getElementById('product-img');
-if (product.imageUrl && product.imageUrl !== 'none') {
-    imgEl.src = product.imageUrl;
+const overlayEl = document.getElementById('detail-no-image-overlay');
 
-    // 링크 깨졌을 때 기본 이미지
+const hasValidImage =
+    product.imageUrl &&
+    product.imageUrl !== 'none' &&
+    product.imageUrl.trim() !== '' &&
+    !product.imageUrl.includes('example.com');
+
+if (hasValidImage) {
+    imgEl.src = product.imageUrl;
+    overlayEl.style.display = 'none';
+
     imgEl.onerror = () => {
         imgEl.src = fallbackImage;
+        overlayEl.style.display = 'flex';
     };
-
 } else {
-    // 이미지 없을 때 기본 이미지
     imgEl.src = fallbackImage;
+    overlayEl.style.display = 'flex';
 }
-
-                // 카테고리 태그 및 색상 설정
+            // 카테고리 태그 및 색상 설정
                 const categoryEl = document.getElementById('product-category');
                 categoryEl.innerText = product.category;
                 categoryEl.className = 'category-badge'; // 기본 클래스 초기화
