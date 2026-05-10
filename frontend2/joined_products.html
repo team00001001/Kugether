@@ -251,21 +251,29 @@
             const emptyView = document.getElementById('empty-view');
             const countBadge = document.getElementById('count-badge');
 
-            // 2. 참여한 상품 ID 목록 가져오기 (localStorage)
+            // 2. 참여한 상품 ID 및 현재 로그인한 유저 ID 가져오기
             const joinedIds = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
+            const userId = localStorage.getItem('userId'); // ✅ 추가: 내 유저 ID 가져오기
 
+            // ❌ 기존에 있던 이 부분은 삭제해주세요! (내가 쓴 글이 있을 수 있으므로 무조건 데이터 확인 필요)
+            /*
             if (joinedIds.length === 0) {
                 emptyView.style.display = 'block';
                 return;
             }
+            */
 
             try {
                 // 3. 전체 상품 데이터 불러오기
                 const response = await fetch('http://localhost:3000/products');
                 const allProducts = await response.json();
 
-                // 4. 내가 참여한 상품만 필터링
-                const joinedProducts = allProducts.filter(p => joinedIds.includes(p.id.toString()) || joinedIds.includes(p.id));
+                // 4. 내가 참여한 상품 + ✅ 내가 작성한 상품 필터링 (p.user_id == userId 추가)
+                const joinedProducts = allProducts.filter(p => 
+                    joinedIds.includes(p.id.toString()) || 
+                    joinedIds.includes(p.id) || 
+                    p.user_id == userId
+                );
                 
                 countBadge.innerText = joinedProducts.length;
 
@@ -274,7 +282,7 @@
                     return;
                 }
 
-                // 5. 화면에 리스트 그리기
+                // 5. 화면에 리스트 그리기 (기존 코드와 동일)
                 joinedProducts.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
