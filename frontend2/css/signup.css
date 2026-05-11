@@ -1,0 +1,154 @@
+@import url('https://cdn.jsdelivr.net/gh/joungkyun/font-d2coding/d2coding.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* 💡 Light Crimson 테마 배경 적용 (background-color -> background 로 수정) */
+body {
+    font-family: 'D2Coding', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
+    color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 로그인 페이지와 동일한 박스 테마 적용 (그림자 및 상단 테두리) */
+.signup-container {
+    background-color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(138, 21, 56, 0.08);
+    border-top: 4px solid #8a1538;
+    width: 100%;
+    max-width: 400px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #8a1538; /* 크림슨 텍스트로 통일 */
+    letter-spacing: 1px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555555;
+}
+
+/* 로그인 페이지와 동일한 입력창 스타일 적용 */
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 12px;
+    background-color: #fafafa;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'D2Coding', 'Malgun Gothic', sans-serif;
+    color: #333333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #8a1538;
+    box-shadow: 0 0 5px rgba(138, 21, 56, 0.2);
+    background-color: #ffffff;
+}
+
+.email-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.email-input-group input {
+    flex: 1;
+}
+
+.email-input-group span {
+    color: #555;
+    font-weight: bold;
+}
+
+.email-input-group select {
+    flex: 1;
+}
+
+/* 버튼 스타일 통일 */
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #8a1538;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:hover {
+    background-color: #6b0f2a;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    margin-top: 5px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* 인증번호 입력란 숨김 처리용 클래스 */
+.hidden {
+    display: none;
+}
+
+.verification-group {
+    display: flex;
+    gap: 10px;
+}
+
+.verification-group input {
+    flex: 2;
+}
+
+.verification-group button {
+    flex: 1;
+    margin-top: 0; /* 그룹 내 버튼 정렬 맞춤 */
+}
+
+.msg {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.msg.error {
+    color: #dc3545;
+}
+
+.msg.success {
+    color: #28a745;
+}
