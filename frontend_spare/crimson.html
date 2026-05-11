@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KU GONGGU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="crimson.css">
+</head>
+<body>
+
+    <div id="header-placeholder"></div>
+
+    <main class="content-container">
+        <section class="crimson-card">
+            <div class="trend-badge" id="trend-badge">🌱 활동 시작</div>
+            
+            <h1 class="main-title">
+                학우님의 활동으로 쌓인<br>
+                <span id="title-span">크림슨 지수</span>를 확인하세요.
+            </h1>
+            
+            <p class="sub-desc">공정하고 매너 있는 공동구매 문화를 위해 참여도와 신뢰도를 점수로 산출합니다.</p>
+
+            <div class="index-visual">
+                <div class="emoji-box" id="main-emoji">🐱</div>
+                <div class="score-info">
+                    <h4 id="main-grade">아기 고양이</h4>
+                    <div class="score-num" id="main-score">10<span>pts</span></div>
+                    <div class="gauge-bar-bg"><div id="gauge-fill" class="gauge-bar-fill"></div></div>
+                    <p class="next-msg" id="next-message">다음 등급까지 남은 점수를 확인하세요!</p>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">🐾 지수 등급 진화표</h3>
+            <div class="grade-list" id="grade-list">
+                <div class="grade-item" data-idx="0"><span class="emoji">❄️</span><span class="name">잠든<br>그림자</span></div>
+                <div class="grade-item" data-idx="1"><span class="emoji">🦅</span><span class="name">길 잃은<br>독수리</span></div>
+                <div class="grade-item" data-idx="2"><span class="emoji">🐥</span><span class="name">방황하는<br>삐약이</span></div>
+                <div class="grade-item" data-idx="3"><span class="emoji">🐱</span><span class="name">아기<br>고양이</span></div>
+                <div class="grade-item" data-idx="4"><span class="emoji">🐯</span><span class="name">늠름한<br>호랑이</span></div>
+                <div class="grade-item" data-idx="5"><span class="emoji">👑</span><span class="name">왕관 쓴<br>호랑이</span></div>
+                <div class="grade-item" data-idx="6"><span class="emoji">🏛️</span><span class="name">안암동<br>지배자</span></div>
+            </div>
+
+            <div class="criteria-section">
+                <h3 class="criteria-title">✨ 칭찬해요 (점수가 쑥쑥!)</h3>
+                <div class="criteria-grid">
+                    <div class="criteria-item"><span class="label">참여자 확인</span><span class="point plus">+3 pts</span></div>
+                    <div class="criteria-item"><span class="label">방장 거래성공</span><span class="point plus">+10 pts</span></div>
+                    <div class="criteria-item"><span class="label">참여자 거래성공</span><span class="point plus">+2 pts</span></div>
+                </div>
+
+                <h3 class="criteria-title mt-30">🚨 주의해요 (점수가 뚝뚝!)</h3>
+                <div class="criteria-grid">
+                    <div class="criteria-item warning-item"><span class="label warning-label">참여자 노쇼</span><span class="point warning-point">-10 pts</span></div>
+                    <div class="criteria-item warning-item"><span class="label warning-label">방장 신고</span><span class="point warning-point">-15 pts</span></div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <script>
+        // [수동 테스트 점수]
+        const trustScore = 10; 
+
+        function updateUI(score) {
+            const badge = document.getElementById('trend-badge');
+            const titleSpan = document.getElementById('title-span');
+            const mainEmoji = document.getElementById('main-emoji');
+            const mainGrade = document.getElementById('main-grade');
+            const mainScore = document.getElementById('main-score');
+            const gaugeFill = document.getElementById('gauge-fill');
+            const nextMsg = document.getElementById('next-message');
+            const gradeItems = document.querySelectorAll('.grade-item');
+
+            mainScore.innerHTML = `${score}<span>pts</span>`;
+
+            let info = { name: "", emoji: "", goal: "", idx: 0, status: "" };
+
+            // [7단계 로직 + 멘트 + 점수 계산]
+            if (score >= 86) {
+                info = { name: "안암동 지배자", emoji: "🏛️", goal: "축하합니다! 최고 등급을 달성하셨습니다. 🔥", idx: 6, status: "👑 신뢰 보증됨" };
+            } else if (score >= 61) {
+                info = { name: "왕관 쓴 호랑이", emoji: "👑", goal: `조금만 더! 안암동 지배자까지 ${86 - score}점 남았어요.`, idx: 5, status: "✨ 매우 안전" };
+            } else if (score >= 31) {
+                info = { name: "늠름한 호랑이", emoji: "🐯", goal: `왕관 쓴 호랑이까지 ${61 - score}점 남았어요. 힘내세요!`, idx: 4, status: "✅ 신뢰 안전" };
+            } else if (score >= 0) {
+                info = { name: "아기 고양이", emoji: "🐱", goal: `늠름한 호랑이까지 ${31 - score}점 남았어요. 활동을 시작해봐요!`, idx: 3, status: "🌱 활동 시작" };
+            } else if (score >= -30) {
+                info = { name: "방황하는 삐약이", emoji: "🐥", goal: `매너 거래가 필요합니다! 아기 고양이까지 ${0 - score}점 남았어요.`, idx: 2, status: "⚠️ 매너 주의" };
+            } else if (score >= -70) {
+                info = { name: "길 잃은 독수리", emoji: "🦅", goal: `주의하세요! 방황하는 삐약이까지 ${-30 - score}점 남았어요.`, idx: 1, status: "🚨 이용 경고" };
+            } else {
+                info = { name: "잠든 그림자", emoji: "❄️", goal: `위험합니다! 길 잃은 독수리까지 ${-70 - score}점 남았어요.`, idx: 0, status: "⛔ 영구 제한 주의" };
+            }
+
+            mainEmoji.innerText = info.emoji;
+            mainGrade.innerText = info.name;
+            nextMsg.innerText = info.goal;
+            badge.innerText = info.status;
+
+            gradeItems.forEach((item, i) => {
+                item.classList.remove('active', 'pos', 'neg');
+                if (i === info.idx) {
+                    item.classList.add('active', score >= 0 ? 'pos' : 'neg');
+                }
+            });
+
+            if (score >= 0) {
+                gaugeFill.className = "gauge-bar-fill fill-positive";
+                gaugeFill.style.width = score + "%";
+                mainScore.style.color = "var(--ku-crimson)";
+                titleSpan.style.color = "var(--ku-crimson)";
+                badge.style.background = "#FFF0F3"; badge.style.color = "var(--ku-crimson)";
+            } else {
+                gaugeFill.className = "gauge-bar-fill fill-negative";
+                gaugeFill.style.width = Math.abs(score) + "%";
+                mainScore.style.color = "var(--ku-blue)";
+                titleSpan.style.color = "var(--ku-blue)";
+                badge.style.background = "#EBF5FF"; badge.style.color = "var(--ku-blue)";
+            }
+        }
+
+        updateUI(trustScore);
+
+        // [네 원본 fetch 로직 복구]
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+                return res.text();
+            })
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                updateHeader();
+            })
+            .catch(err => console.error(err));
+
+        function updateHeader() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const authElements = document.querySelectorAll('.auth-only');
+            const guestElements = document.querySelectorAll('.guest-only');
+            if (isLoggedIn) {
+                authElements.forEach(el => el.style.display = 'flex');
+                guestElements.forEach(el => el.style.display = 'none');
+            } else {
+                authElements.forEach(el => el.style.display = 'none');
+                guestElements.forEach(el => el.style.display = 'block');
+            }
+        }
+        document.addEventListener('click', function(e) {
+        const logoutBtn = e.target.closest('#logout-btn');
+        if(logoutBtn) {
+            localStorage.removeItem('isLoggedIn');
+            alert('로그아웃 되었습니다.');
+            location.href = 'main_login.html'; 
+        }
+    });
+    </script>
+</body>
+</html>
