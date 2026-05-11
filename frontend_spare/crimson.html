@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KU GONGGU</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/crimson.css">
+    <link rel="stylesheet" href="crimson.css">
 </head>
 <body>
 
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">지수 등급 진화표</h3>
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">🐾 지수 등급 진화표</h3>
             <div class="grade-list" id="grade-list">
                 <div class="grade-item" data-idx="0"><span class="emoji">❄️</span><span class="name">잠든<br>그림자</span></div>
                 <div class="grade-item" data-idx="1"><span class="emoji">🦅</span><span class="name">길 잃은<br>독수리</span></div>
@@ -43,13 +43,21 @@
                 <div class="grade-item" data-idx="6"><span class="emoji">🏛️</span><span class="name">안암동<br>지배자</span></div>
             </div>
 
-            <div class="criteria-grid">
-                <div class="criteria-item"><span class="label">참여자 확인</span><span class="point plus">+3 pts</span></div>
-                <div class="criteria-item"><span class="label">방장 거래성공</span><span class="point plus">+10 pts</span></div>
-                <div class="criteria-item"><span class="label">참여자 거래성공</span><span class="point plus">+2 pts</span></div>
-                <div class="criteria-item" style="background: #FFF5F5; border-color: #FFE0E0;"><span class="label" style="color: #E53E3E;">참여자 노쇼</span><span class="point" style="color: #E53E3E;">-10 pts</span></div>
-                <div class="criteria-item" style="background: #FFF5F5; border-color: #FFE0E0;"><span class="label" style="color: #E53E3E;">방장 신고</span><span class="point" style="color: #E53E3E;">-15 pts</span></div>
+            <div class="criteria-section">
+                <h3 class="criteria-title">✨ 칭찬해요 (점수가 쑥쑥!)</h3>
+                <div class="criteria-grid">
+                    <div class="criteria-item"><span class="label">참여자 확인</span><span class="point plus">+3 pts</span></div>
+                    <div class="criteria-item"><span class="label">방장 거래성공</span><span class="point plus">+10 pts</span></div>
+                    <div class="criteria-item"><span class="label">참여자 거래성공</span><span class="point plus">+2 pts</span></div>
+                </div>
+
+                <h3 class="criteria-title mt-30">🚨 주의해요 (점수가 뚝뚝!)</h3>
+                <div class="criteria-grid">
+                    <div class="criteria-item warning-item"><span class="label warning-label">참여자 노쇼</span><span class="point warning-point">-10 pts</span></div>
+                    <div class="criteria-item warning-item"><span class="label warning-label">방장 신고</span><span class="point warning-point">-15 pts</span></div>
+                </div>
             </div>
+            
         </section>
     </main>
 
