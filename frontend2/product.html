@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 상세 | KU GONGGU</title>
 
-    <!-- 스타일 시트 연결 -->
     <link rel="stylesheet" href="product.css" media="(min-width: 769px)">
     <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,7 +15,6 @@
     <div id="header-placeholder"></div>
 
     <div class="container">
-        <!-- 1. 상품 상단 히어로 섹션 -->
         <section class="product-hero card">
             <div class="product-image-container">
                 <img src="" alt="상품 이미지" class="product-image" id="product-img">
@@ -55,14 +53,12 @@
                     </div>
                 </div>
 
-                <!-- 참여 버튼 영역 (JS에서 동적으로 변경됨) -->
                 <div id="action-button-area">
                     <button class="join-btn" onclick="joinGroupBuy()">이 공구에 참여하기</button>
                 </div>
             </div>
         </section>
 
-        <!-- 2. 상세 설명 섹션 (수령 장소, 마감 일시 포함) -->
         <section class="details-section card">
             <div class="host-info-card">
                 <div class="host-avatar">호</div>
@@ -82,13 +78,10 @@
                 데이터를 불러오는 중입니다...
             </div>
             
-            <!-- 방장 전용 참여자 관리 리스트가 들어갈 자리 -->
             <div id="member-management-area"></div>
-            <!-- 거래 완료 인증 섹션이 들어갈 자리 -->
             <div id="completion-section-area"></div>
         </section>
 
-        <!-- 3. 배송 현황 섹션 -->
         <section class="delivery-section card">
             <h2 class="content-title">📦 배송 현황 조회</h2>
             <div class="tracking-input-container">
@@ -163,7 +156,19 @@
         function renderProductBasicInfo(product) {
             document.getElementById('product-title').innerText = product.title;
             document.getElementById('host-name').innerText = product.writer || '익명 학우';
-            document.getElementById('product-category').innerText = product.category;
+            
+            // 카테고리 배지 업데이트 (이모티콘 및 컬러 적용)
+            const categoryMap = {
+                '식재료 / 배달': { emoji: '🍊', className: 'tag-food' },
+                '자취 / 생필품': { emoji: '🧴', className: 'tag-living' },
+                '전공 / 문구': { emoji: '📚', className: 'tag-study' },
+                '기타 물품': { emoji: '📦', className: 'tag-etc' }
+            };
+            const catInfo = categoryMap[product.category] || { emoji: '📦', className: 'tag-etc' };
+            const catBadge = document.getElementById('product-category');
+            catBadge.innerText = `${catInfo.emoji} ${product.category}`;
+            catBadge.className = `category-badge ${catInfo.className}`;
+
             document.getElementById('product-price').innerHTML = `${Number(product.price).toLocaleString()}원 <span>(${product.targetCount}명 기준)</span>`;
             document.getElementById('status-count-text').innerHTML = `현재 <strong>${product.currentCount}명</strong> / 목표 ${product.targetCount}명`;
 
@@ -172,17 +177,44 @@
             document.getElementById('progress-fill').style.width = `${percent}%`;
             document.getElementById('progress-percent').innerText = `${percent}%`;
 
-            // 이미지 처리
+            // 이미지 처리 (기본 이미지 매핑)
+            const defaultImages = {
+                '식재료 / 배달': 'images/default-food.png',
+                '자취 / 생필품': 'images/default-living.png',
+                '전공 / 문구': 'images/default-study.png',
+                '기타 물품': 'images/default-etc.png'
+            };
+
             const imgEl = document.getElementById('product-img');
-            if (product.imageUrl && product.imageUrl !== 'none') {
+            
+            // 1. 방어 로직: DB에서 넘어온 값이 문자열 "null", "undefined", 공백인지 깐깐하게 체크
+            const isValidImageUrl = product.imageUrl && 
+                                  product.imageUrl !== 'none' && 
+                                  product.imageUrl !== 'null' && 
+                                  product.imageUrl !== 'undefined' && 
+                                  product.imageUrl.trim() !== '';
+
+            if (isValidImageUrl) {
                 imgEl.src = product.imageUrl;
+                document.getElementById('detail-no-image-overlay').style.display = 'none';
+                
+                // 2. 방어 로직: URL은 정상인 것 같아서 시도했는데, 막상 이미지가 깨져있을 경우 (onerror)
+                imgEl.onerror = function() {
+                    imgEl.src = defaultImages[product.category] || defaultImages['기타 물품'];
+                    // 무한 루프 방지를 위해 onerror 핸들러 초기화
+                    imgEl.onerror = null; 
+                };
+            } else {
+                imgEl.src = defaultImages[product.category] || defaultImages['기타 물품'];
                 document.getElementById('detail-no-image-overlay').style.display = 'none';
             }
 
             // [핵심] 수령 장소 및 마감 일시는 여기서 무조건 렌더링 (누구에게나 보임)
             const staticDate = formatStatic(product.duration);
+            
+            // CSS에서 분리한 클래스를 사용하여 렌더링
             const descHtml = `
-                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ce152d;">
+                <div class="product-meta-info">
                     📍 <strong>수령 장소</strong>: ${product.location}<br>
                     ⏰ <strong>마감 일시</strong>: ${staticDate}
                 </div>
@@ -455,7 +487,6 @@
             } catch (e) {}
         }
         
-        // (기타 배송조회 API 함수들은 기존과 동일하므로 생략하지 않고 포함하여 복붙 시 작동하도록 함)
         async function autoFetchTrackingInfo(cId, tNum) {
             const res = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${cId}&trackId=${tNum}`);
             const data = await res.json();
