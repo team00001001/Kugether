@@ -63,6 +63,25 @@ router.patch('/:id/read', (req, res) => {
   });
 });
 
+// 💡 [새로 추가된 부분] 알림 삭제 처리 (프론트엔드의 DELETE 요청을 받음)
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+        DELETE FROM notifications
+        WHERE id = ?
+    `;
+
+  db.query(sql, [id], (err) => {
+    if (err) {
+      console.error('알림 삭제 에러:', err);
+      return res.status(500).json({ message: '알림 삭제 실패' });
+    }
+
+    res.json({ message: '알림 삭제 완료' });
+  });
+});
+
 // 테스트용 알림 생성
 router.post('/', (req, res) => {
   const { user_id, title, message, type } = req.body;
