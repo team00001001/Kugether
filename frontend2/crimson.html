@@ -6,57 +6,207 @@
     <title>KU GONGGU</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* [기존 스타일 유지 - 절대 수정 금지] */
         :root {
             --ku-crimson: #8A1538;
             --text-dark: #222222;
             --bg-color: #F7F8FA;
             --border-light: #EAECEF;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
-
-        body {
-            background-color: var(--bg-color);
-            padding-top: 70px; /* 헤더 고정 높이만큼 여백 */
-        }
-
-        /* 헤더 디자인 (외부 파일을 불러와도 CSS는 부모에 있어야 적용됨) */
+        body { background-color: var(--bg-color); padding-top: 70px; }
         header {
-            background-color: var(--ku-crimson);
-            height: 70px;
-            display: flex;
-            align-items: center;
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            background-color: var(--ku-crimson); height: 70px; display: flex;
+            align-items: center; position: fixed; top: 0; left: 0; width: 100%;
+            z-index: 1000; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
-
         .nav-inner {
             width: 100%; max-width: 1200px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
         }
-
         .logo { color: white; font-size: 1.6rem; font-weight: 800; text-decoration: none; }
-
         nav { display: flex; gap: 30px; align-items: center; }
-
         nav a.menu-link { color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
-
         .btn-login-nav {
             background: var(--ku-crimson); color: white !important;
             padding: 10px 24px; border-radius: 30px; font-weight: 700;
             border: 2px solid white; cursor: pointer;
         }
+
+        /* [크림슨 지수 - 보내준 이미지 톤앤매너 커스텀] */
+        .content-container {
+            max-width: 1100px; /* 메인 이미지 넓이와 맞춤 */
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .crimson-card {
+            background: white;
+            border-radius: 40px; /* 이미지처럼 아주 둥글게 */
+            padding: 50px 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 왼쪽 정렬 스타일 */
+            position: relative;
+        }
+
+        .trend-badge {
+            background: #FFF0F3;
+            color: var(--ku-crimson);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .main-title span { color: var(--ku-crimson); }
+
+        .sub-desc {
+            color: #888;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* 지수 비주얼 영역 */
+        .index-visual {
+            width: 100%;
+            background: #F7F8FA; /* 카테고리 박스 배경색 활용 */
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .emoji-box {
+            font-size: 4rem;
+            background: white;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .score-info { flex: 1; }
+        
+        .score-info h4 { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; }
+        .score-num { font-size: 2.5rem; font-weight: 900; color: var(--ku-crimson); }
+        .score-num span { font-size: 1rem; color: #aaa; margin-left: 5px; }
+
+        .gauge-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #EAECEF;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .gauge-bar-fill {
+            height: 100%;
+            background: var(--ku-crimson);
+            width: 75%; /* (현재점수+100)/200 공식 */
+            border-radius: 10px;
+        }
+
+        /* 기준 안내 (카테고리 박스 스타일) */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            width: 100%;
+        }
+
+        .criteria-item {
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .criteria-item .label { font-size: 0.85rem; color: #888; font-weight: 600; }
+        .criteria-item .point { font-size: 1.1rem; font-weight: 800; color: var(--ku-crimson); }
+        .criteria-item .point.plus { color: #2D6A4F; }
+
+        @media (max-width: 768px) {
+            .index-visual { flex-direction: column; text-align: center; }
+            .crimson-card { padding: 40px 24px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- 헤더가 들어갈 빈 바구니 -->
     <div id="header-placeholder"></div>
 
+    <main class="content-container">
+        <section class="crimson-card">
+            <div class="trend-badge">🔥 나의 신뢰 지수</div>
+            
+            <h1 class="main-title">
+                학우님의 활동으로 쌓인<br>
+                <span>크림슨 지수</span>를 확인하세요.
+            </h1>
+            
+            <p class="sub-desc">
+                공정하고 매너 있는 공동구매 문화를 위해<br>
+                참여도와 신뢰도를 점수로 산출합니다.
+            </p>
+
+            <div class="index-visual">
+                <div class="emoji-box">🐯</div>
+                <div class="score-info">
+                    <h4>늠름한 호랑이</h4>
+                    <div class="score-num">50<span>pts</span></div>
+                    <div class="gauge-bar-bg">
+                        <div class="gauge-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="criteria-grid">
+                <div class="criteria-item">
+                    <span class="label">참여자 확인</span>
+                    <span class="point plus">+3 pts</span>
+                </div>
+                <div class="criteria-item">
+                    <span class="label">방장 거래인증</span>
+                    <span class="point plus">+10 pts</span>
+                </div>
+                <div class="criteria-item">
+                    <span class="label">참여자 매너</span>
+                    <span class="point plus">+5 pts</span>
+                </div>
+                <div class="criteria-item" style="background: #FFF5F5; border-color: #FFE0E0;">
+                    <span class="label" style="color: #E53E3E;">노쇼 / 신고</span>
+                    <span class="point" style="color: #E53E3E;">-15 pts</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
     <script>
-        // 1. 헤더 불러오기 (fetch)
+        // [기존 스크립트 그대로 유지]
         fetch('header.html')
             .then(res => {
                 if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
@@ -64,11 +214,10 @@
             })
             .then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
-                updateHeader(); // 불러온 직후 로그인 상태 체크
+                updateHeader();
             })
             .catch(err => console.error(err));
 
-        // 2. 로그인 상태 업데이트 함수
         function updateHeader() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const authElements = document.querySelectorAll('.auth-only');
@@ -83,10 +232,9 @@
             }
         }
 
-        // 3. 로그아웃 (이벤트 위임)
         document.addEventListener('click', function(e) {
             if(e.target && e.target.id === 'logout-btn') {
-                localStorage.clear(); // 모든 정보 삭제
+                localStorage.clear();
                 alert('로그아웃 되었습니다.');
                 location.href = 'main_login.html'; 
             }
