@@ -91,11 +91,18 @@ router.post('/join', async (req, res) => {
                     productInfo &&
                     String(productInfo.user_id) !== String(userId)
                 ) {
+                    const [[rejoinUser]] = await conn.query(
+                        `
+    SELECT nickname
+    FROM users
+    WHERE id = ?
+    `,
+                        [userId]
+                    );
                     createNotification(
                         productInfo.user_id,
                         '참여자가 다시 들어왔습니다',
-                        `"${productInfo.title}" 공구에 참여자가 다시 들어왔습니다.`,
-                        'success'
+                        `"${productInfo.title}" 공구에 <b>${rejoinUser.nickname}</b>님이 다시 참여했습니다.`,'success'
                     );
                 }
 
@@ -137,10 +144,19 @@ router.post('/join', async (req, res) => {
             String(productInfo.user_id) !== String(userId)
         ) {
             console.log('알림 생성 시도:', productInfo.user_id, productInfo.title);
+            const [[joinedUser]] = await conn.query(
+                `
+    SELECT nickname
+    FROM users
+    WHERE id = ?
+    `,
+                [userId]
+            );
             createNotification(
                 productInfo.user_id,
                 '새 참여자가 생겼습니다',
-                `"${productInfo.title}" 공구에 새로운 참여자가 들어왔습니다.`,
+
+`"${productInfo.title}" 공구에 <b>${joinedUser.nickname}</b>님이 참여했습니다.`,
                 'success'
             );
         }
@@ -218,10 +234,19 @@ router.patch('/cancel', async (req, res) => {
             productInfo &&
             String(productInfo.user_id) !== String(userId)
         ) {
+            const [[cancelUser]] = await conn.query(
+                `
+    SELECT nickname
+    FROM users
+    WHERE id = ?
+    `,
+                [userId]
+            );
             createNotification(
                 productInfo.user_id,
                 '참여자가 나갔습니다',
-                `"${productInfo.title}" 공구에서 참여자가 나갔습니다.`,
+
+`"${productInfo.title}" 공구에서 <b>${cancelUser.nickname}</b>님이 나갔습니다.`,
                 'notice'
             );
         }
