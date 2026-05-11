@@ -289,6 +289,15 @@
                     return;
                 }
 
+                // 💡 기본 이미지 매핑 정보 (product.html과 동일)
+                const categoryMap = {
+                    '식재료 / 배달': { emoji: '🍊', className: 'tag-food', defaultImg: 'images/default-food.png' },
+                    '자취 / 생필품': { emoji: '🧴', className: 'tag-living', defaultImg: 'images/default-living.png' },
+                    '전공 / 문구': { emoji: '📚', className: 'tag-study', defaultImg: 'images/default-study.png' },
+                    '기타 물품': { emoji: '📦', className: 'tag-etc', defaultImg: 'images/default-etc.png' }
+                };
+                const defaultEtcImg = 'images/default-etc.png'; // 대체용 기타 이미지
+
                 // 4. 화면에 리스트 그리기
                 joinedProducts.forEach(product => {
                     const card = document.createElement('div');
@@ -304,8 +313,12 @@
                         ? `<span style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 5px; padding: 10px 0;">내가 쓴 공고</span>` 
                         : `<button class="btn-manage btn-cancel" onclick="cancelJoin(${product.product_id})">참여 취소</button>`;
 
+                    // 💡 카테고리별 기본 이미지 및 방어 로직 적용
+                    const catInfo = categoryMap[product.category] || { defaultImg: defaultEtcImg };
+                    const displayImg = catInfo.defaultImg;
+
                     card.innerHTML = `
-                        <img src="${product.imageUrl || 'https://via.placeholder.com/100'}" alt="상품" class="product-img">
+                        <img src="${displayImg}" alt="상품" class="product-img" onerror="this.onerror=null; this.src='${defaultEtcImg}';">
                         <div class="product-info">
                             <span class="status-badge ${statusClass}">${statusText}</span>
                             <div class="product-name" onclick="location.href='product.html?id=${product.product_id}'">${product.title}</div>
