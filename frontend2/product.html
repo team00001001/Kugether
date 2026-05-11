@@ -693,6 +693,15 @@
             const carriers = { '04': 'CJ대한통운', '01': '우체국택배', '05': '한진택배', '08': '롯데택배', '06': '로젠택배' };
             return carriers[code] || '알 수 없는 택배사';
         }
+
+        document.addEventListener('click', function(e) {
+        const logoutBtn = e.target.closest('#logout-btn');
+        if(logoutBtn) {
+            localStorage.removeItem('isLoggedIn');
+            alert('로그아웃 되었습니다.');
+            location.href = 'main_login.html'; 
+        }
+    });
     </script>
 </body>
 </html>
