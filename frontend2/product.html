@@ -10,8 +10,10 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/product.css">
+    <link rel="stylesheet" href="../css_mobile/product_mobile.css" media="(max-width: 768px)">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -36,7 +38,8 @@
                 <div class="price-box">
                     <div class="n-pay-row">
                         <span class="n-pay-label">공구 참여가 (인당)</span>
-                        <div class="n-pay-price" id="product-price">0원 <span id="product-target-count">(0명 기준)</span></div>
+                        <div class="n-pay-price" id="product-price">0원 <span id="product-target-count">(0명 기준)</span>
+                        </div>
                     </div>
                 </div>
 
@@ -80,7 +83,7 @@
             <div class="content-body" id="product-description">
                 데이터를 불러오는 중입니다...
             </div>
-            
+
             <div id="member-management-area"></div>
             <div id="completion-section-area"></div>
         </section>
@@ -140,14 +143,14 @@
                 ]);
 
                 if (!pRes.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
-                
+
                 const product = await pRes.json();
                 product.members = mRes.ok ? await mRes.json() : [];
 
                 // 3. UI 렌더링 시작
                 renderProductBasicInfo(product);
                 renderUserSpecificUI(product);
-                
+
                 // 🚀 배송 현황 초기화 호출 (원래 있던 자리에 유지)
                 initDeliveryTracking(productId, currentUserId);
 
@@ -161,7 +164,7 @@
         function renderProductBasicInfo(product) {
             document.getElementById('product-title').innerText = product.title;
             document.getElementById('host-name').innerText = product.writer || '익명 학우';
-            
+
             // 카테고리 배지 업데이트 (이모티콘 및 컬러 적용)
             const categoryMap = {
                 '식재료 / 배달': { emoji: '🍊', className: 'tag-food' },
@@ -191,20 +194,20 @@
             };
 
             const imgEl = document.getElementById('product-img');
-            
-            const isValidImageUrl = product.imageUrl && 
-                                product.imageUrl !== 'none' && 
-                                product.imageUrl !== 'null' && 
-                                product.imageUrl !== 'undefined' && 
-                                product.imageUrl.trim() !== '';
+
+            const isValidImageUrl = product.imageUrl &&
+                product.imageUrl !== 'none' &&
+                product.imageUrl !== 'null' &&
+                product.imageUrl !== 'undefined' &&
+                product.imageUrl.trim() !== '';
 
             if (isValidImageUrl) {
                 imgEl.src = product.imageUrl;
                 document.getElementById('detail-no-image-overlay').style.display = 'none';
-                
-                imgEl.onerror = function() {
+
+                imgEl.onerror = function () {
                     imgEl.src = defaultImages[product.category] || defaultImages['기타 물품'];
-                    imgEl.onerror = null; 
+                    imgEl.onerror = null;
                 };
             } else {
                 imgEl.src = defaultImages[product.category] || defaultImages['기타 물품'];
@@ -212,7 +215,7 @@
             }
 
             const staticDate = formatStatic(product.duration);
-            
+
             const descHtml = `
                 <div class="product-meta-info">
                     📍 <strong>수령 장소</strong>: ${product.location}<br>
@@ -287,11 +290,11 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f5f5f5;">
                             <span><strong>${m.nickname}</strong> 학우</span>
                             <div>
-                                ${isConfirmed ? 
-                                    '<span style="color:#28a745; font-weight:bold;">✅ 확인 완료</span>' : 
-                                    `<button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'confirmed')" style="color:#007bff; border:1px solid #007bff; background:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">확인</button>
+                                ${isConfirmed ?
+                            '<span style="color:#28a745; font-weight:bold;">✅ 확인 완료</span>' :
+                            `<button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'confirmed')" style="color:#007bff; border:1px solid #007bff; background:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">확인</button>
                                     <button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'noshow')" style="color:#dc3545; border:1px solid #dc3545; background:none; padding:4px 8px; border-radius:4px; margin-left:5px; cursor:pointer; font-size:13px; font-weight:bold;">노쇼</button>`
-                                }
+                        }
                             </div>
                         </div>
                     `;
@@ -318,15 +321,15 @@
 
             let btnHtml = '';
             if (isHost) {
-        if (hasUncheckedMembers) {
-            btnHtml = `<button class="join-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>⚠️ 참여자 관리 리스트 처리를 완료해주세요</button>`;
-        } else if (guestReceivedCount < 1) {
-            btnHtml = `<button class="join-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>⚠️ 수령 확인을 한 참여자가 최소 1명 필요합니다</button>`;
-        } else {
-            // 모든 조건이 만족될 때만 버튼 활성화 (신고 건수는 백엔드에서 최종 체크)
-            // 모든 조건(명단 처리 완료 + 참여자 수령 1명 이상) 만족 시 버튼 활성화
-            btnHtml = `<button class="join-btn" onclick="hostCloseProduct('${product.id}')">공구 최종 완료 및 방 닫기</button>`;
-        }
+                if (hasUncheckedMembers) {
+                    btnHtml = `<button class="join-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>⚠️ 참여자 관리 리스트 처리를 완료해주세요</button>`;
+                } else if (guestReceivedCount < 1) {
+                    btnHtml = `<button class="join-btn" style="background-color: #ccc; cursor: not-allowed;" disabled>⚠️ 수령 확인을 한 참여자가 최소 1명 필요합니다</button>`;
+                } else {
+                    // 모든 조건이 만족될 때만 버튼 활성화 (신고 건수는 백엔드에서 최종 체크)
+                    // 모든 조건(명단 처리 완료 + 참여자 수령 1명 이상) 만족 시 버튼 활성화
+                    btnHtml = `<button class="join-btn" onclick="hostCloseProduct('${product.id}')">공구 최종 완료 및 방 닫기</button>`;
+                }
             } else if (myParticipantInfo) {
                 if (myParticipantInfo.status === 'noshow') {
                     btnHtml = `<button class="join-btn" style="background-color: #ccc;" disabled>방장에 의해 노쇼 처리되었습니다</button>`;
@@ -347,14 +350,14 @@
             ${btnHtml}
         </div>
     `;
-}
+        }
 
         // --- 액션 함수들 ---
         async function markStatus(pId, uId, status) {
-            const confirmMsg = status === 'noshow' 
-                ? "정말로 이 학우를 '노쇼' 처리하시겠습니까?\n(인원수가 줄어들며, 해당 학우는 방에서 나가집니다.)" 
+            const confirmMsg = status === 'noshow'
+                ? "정말로 이 학우를 '노쇼' 처리하시겠습니까?\n(인원수가 줄어들며, 해당 학우는 방에서 나가집니다.)"
                 : "해당 학우가 물건을 전달받은 것을 확인하셨습니까?";
-            
+
             if (!confirm(confirmMsg)) return;
 
             try {
@@ -395,7 +398,7 @@
         }
 
         async function joinGroupBuy() {
-            if (!isLoggedIn) { alert('로그인이 필요합니다.'); location.href='login.html'; return; }
+            if (!isLoggedIn) { alert('로그인이 필요합니다.'); location.href = 'login.html'; return; }
             const productId = new URLSearchParams(window.location.search).get('id');
             if (!confirm('이 공동구매에 참여하시겠습니까?')) return;
 
@@ -441,7 +444,7 @@
                 }
 
                 alert("참여가 취소되었습니다.");
-                
+
                 let joined = JSON.parse(localStorage.getItem('joinedGroups') || '[]');
                 joined = joined.filter(id => id !== productId);
                 localStorage.setItem('joinedGroups', JSON.stringify(joined));
@@ -455,10 +458,10 @@
         }
 
         async function reportHost() {
-            if (!isLoggedIn) { 
-                alert('로그인이 필요한 서비스입니다.'); 
-                location.href = 'login.html'; 
-                return; 
+            if (!isLoggedIn) {
+                alert('로그인이 필요한 서비스입니다.');
+                location.href = 'login.html';
+                return;
             }
 
             const productId = new URLSearchParams(window.location.search).get('id');
@@ -478,7 +481,7 @@
 
                 if (res.ok) {
                     alert("신고가 정상적으로 접수되었습니다. 운영진 확인 후 조치될 예정입니다.");
-                    location.reload(); 
+                    location.reload();
                 } else {
                     const err = await res.json();
                     alert(err.message || "신고 접수에 실패했습니다.");
@@ -495,7 +498,7 @@
                 location.href = 'main_login.html';
             }
         }
-        
+
         async function hostCloseProduct(productId) {
             if (!confirm("모든 거래가 완료되었나요? 공구방을 최종 폐쇄합니다.")) return;
             const res = await fetch(`${API_BASE_URL}/products/close`, {
@@ -529,7 +532,7 @@
                 alert("서버 연결 실패");
             }
         }
-        
+
         // --- 기타 유틸리티 ---
         function loadHeader() {
             fetch('header.html').then(res => res.text()).then(data => {
@@ -578,7 +581,7 @@
         // =========================================================
         // 🚀 배송 현황 조회 통합 기능 모음 (수정 및 복구 완료)
         // =========================================================
-        
+
         // 1. 페이지 로드 시 배송 섹션을 초기화하는 함수
         async function initDeliveryTracking(productId, userId) {
             if (!productId || !userId) {
@@ -616,7 +619,7 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}`);
                 const data = await response.json();
-                
+
                 if (data.status === false || data.code) {
                     console.log('운송장은 등록되었으나 아직 이동 내역이 없습니다.');
                     return;
@@ -627,10 +630,10 @@
                     time: detail.timeString,
                     location: detail.where,
                     status: detail.kind,
-                    details: detail.telno ? `연락처: ${detail.telno}` : '' 
+                    details: detail.telno ? `연락처: ${detail.telno}` : ''
                 }));
 
-                const carrierName = getCarrierName(carrierId); 
+                const carrierName = getCarrierName(carrierId);
                 renderTimeline(carrierName, trackingNumber, formattedData);
             } catch (error) {
                 console.error('자동 배송 조회 에러:', error);
@@ -640,10 +643,10 @@
         // 4. 방장이 송장번호를 수동으로 입력하고 '조회하기' 버튼을 눌렀을 때의 함수
         async function fetchTrackingInfo() {
             const carrierId = document.getElementById('carrier-id').value;
-            const trackingNumber = document.getElementById('tracking-number').value.replace(/[^0-9]/g, ''); 
-            
+            const trackingNumber = document.getElementById('tracking-number').value.replace(/[^0-9]/g, '');
+
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id'); 
+            const productId = urlParams.get('id');
 
             if (!carrierId || !trackingNumber || !productId) {
                 alert('택배사, 운송장 번호, 또는 상품 정보를 확인할 수 없습니다.');
@@ -660,17 +663,17 @@
                 });
 
                 const saveResult = await saveResponse.json();
-                
+
                 if (!saveResponse.ok) {
                     alert('DB 저장에 실패했습니다: ' + saveResult.message);
-                    return; 
+                    return;
                 }
 
                 document.querySelector('.tracking-input-container').style.display = 'none';
 
                 const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}`);
                 const data = await response.json();
-                
+
                 if (data.status === false || data.code) {
                     alert(data.msg || '조회할 수 없는 운송장 번호이거나 잘못된 택배사입니다.');
                     return;
@@ -684,9 +687,9 @@
 
                 const formattedData = trackingDetails.map(detail => ({
                     time: detail.timeString,
-                    location: detail.where,  
-                    status: detail.kind,     
-                    details: detail.telno ? `영업소/기사님 연락처: ${detail.telno}` : '' 
+                    location: detail.where,
+                    status: detail.kind,
+                    details: detail.telno ? `영업소/기사님 연락처: ${detail.telno}` : ''
                 }));
 
                 renderTimeline(carrierName, trackingNumber, formattedData);
@@ -703,10 +706,10 @@
             const timelineList = document.getElementById('timeline-list');
 
             infoText.innerText = `${carrierName} [${trackingNumber}]`;
-            timelineList.innerHTML = ''; 
+            timelineList.innerHTML = '';
 
             dataList.forEach((item, index) => {
-                const isLastItem = (index === dataList.length - 1); 
+                const isLastItem = (index === dataList.length - 1);
                 const li = document.createElement('li');
                 li.className = `timeline-item ${isLastItem ? 'active' : ''}`;
                 li.innerHTML = `
@@ -717,7 +720,7 @@
                         <span style="font-size: 13px; color: #666; margin-top: 4px; display: inline-block;">${item.details}</span>
                     </div>
                 `;
-                timelineList.prepend(li); 
+                timelineList.prepend(li);
             });
 
             resultContainer.style.display = 'block';
@@ -729,14 +732,15 @@
             return carriers[code] || '알 수 없는 택배사';
         }
 
-        document.addEventListener('click', function(e) {
-        const logoutBtn = e.target.closest('#logout-btn');
-        if(logoutBtn) {
-            localStorage.removeItem('isLoggedIn');
-            alert('로그아웃 되었습니다.');
-            location.href = 'main_login.html'; 
-        }
-    });
+        document.addEventListener('click', function (e) {
+            const logoutBtn = e.target.closest('#logout-btn');
+            if (logoutBtn) {
+                localStorage.removeItem('isLoggedIn');
+                alert('로그아웃 되었습니다.');
+                location.href = 'main_login.html';
+            }
+        });
     </script>
 </body>
+
 </html>

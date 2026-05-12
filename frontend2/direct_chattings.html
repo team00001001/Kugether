@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅방 | KU GONGGU</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/direct_chattings.css">
-    <link rel="stylesheet" href="./mobile.css">
+
+    <link rel="stylesheet" href="./css/direct_chattings.css">
+    <link rel="stylesheet" href="../css_mobile/direct_chattings_mobile.css?v=3">
 </head>
+
 <body>
 
     <header>
         <a href="javascript:history.back()" class="back-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
@@ -25,7 +30,7 @@
             <span>채팅방에 입장하셨습니다. 매너 있는 대화를 나눠주세요!</span>
         </div>
 
-   
+
 
     </div>
 
@@ -35,41 +40,41 @@
     </div>
 
     <script>
-     const urlParams = new URLSearchParams(window.location.search);
-const productId = urlParams.get('id');
-const userId = localStorage.getItem('userId');
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const userId = localStorage.getItem('userId');
 
-const roomTitle = document.getElementById('room-title');
-const chatContainer = document.getElementById('chat-container');
-const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
+        const roomTitle = document.getElementById('room-title');
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
 
-async function loadProductTitle() {
-    try {
-        const response = await fetch(`http://localhost:3000/products/${productId}`);
-        const product = await response.json();
-        roomTitle.innerText = `${product.title} 채팅방`;
-    } catch (error) {
-        roomTitle.innerText = '공구 채팅방';
-    }
-}
+        async function loadProductTitle() {
+            try {
+                const response = await fetch(`http://localhost:3000/products/${productId}`);
+                const product = await response.json();
+                roomTitle.innerText = `${product.title} 채팅방`;
+            } catch (error) {
+                roomTitle.innerText = '공구 채팅방';
+            }
+        }
 
-function formatTime(dateString) {
-    const date = new Date(dateString);
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
-}
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
 
-function scrollToBottom() {
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-function renderMessage(msg) {
-    const isMine = String(msg.user_id) === String(userId);
-    const firstLetter = msg.nickname ? msg.nickname[0] : '익';
+        function renderMessage(msg) {
+            const isMine = String(msg.user_id) === String(userId);
+            const firstLetter = msg.nickname ? msg.nickname[0] : '익';
 
-    return `
+            return `
         <div class="msg-row ${isMine ? 'msg-sent' : 'msg-received'}">
             ${isMine ? '' : `<div class="profile-pic">${firstLetter}</div>`}
             <div class="msg-content">
@@ -81,62 +86,63 @@ function renderMessage(msg) {
             </div>
         </div>
     `;
-}
+        }
 
-async function loadMessages() {
-    const response = await fetch(`http://localhost:3000/chats/${productId}`);
-    const messages = await response.json();
+        async function loadMessages() {
+            const response = await fetch(`http://localhost:3000/chats/${productId}`);
+            const messages = await response.json();
 
-    chatContainer.innerHTML = `
+            chatContainer.innerHTML = `
         <div class="msg-system">
             <span>채팅방에 입장하셨습니다. 매너 있는 대화를 나눠주세요!</span>
         </div>
     `;
 
-    messages.forEach(msg => {
-        chatContainer.insertAdjacentHTML('beforeend', renderMessage(msg));
-    });
+            messages.forEach(msg => {
+                chatContainer.insertAdjacentHTML('beforeend', renderMessage(msg));
+            });
 
-    scrollToBottom();
-}
+            scrollToBottom();
+        }
 
-async function sendMessage() {
-    const message = messageInput.value.trim();
+        async function sendMessage() {
+            const message = messageInput.value.trim();
 
-    if (!userId) {
-        alert('로그인이 필요합니다.');
-        location.href = 'login.html';
-        return;
-    }
+            if (!userId) {
+                alert('로그인이 필요합니다.');
+                location.href = 'login.html';
+                return;
+            }
 
-    if (!message) return;
+            if (!message) return;
 
-    const response = await fetch('http://localhost:3000/chats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, userId, message })
-    });
+            const response = await fetch('http://localhost:3000/chats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, userId, message })
+            });
 
-    if (!response.ok) {
-        alert('메시지 전송 실패');
-        return;
-    }
+            if (!response.ok) {
+                alert('메시지 전송 실패');
+                return;
+            }
 
-    messageInput.value = '';
-    loadMessages();
-}
+            messageInput.value = '';
+            loadMessages();
+        }
 
-sendBtn.addEventListener('click', sendMessage);
+        sendBtn.addEventListener('click', sendMessage);
 
-messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
 
-loadProductTitle();
-loadMessages();
-setInterval(loadMessages, 3000);
+        loadProductTitle();
+        loadMessages();
+        setInterval(loadMessages, 3000);
     </script>
 </body>
+
 </html>
