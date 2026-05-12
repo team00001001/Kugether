@@ -164,23 +164,36 @@
     updateProfileCard();
     const userId = localStorage.getItem('userId');
 
-    // 유저 정보를 불러와 크림슨 지수 업데이트 (API 엔드포인트가 있다면 연동)
     async function fetchUserTrustScore() {
-        try {
-            // 백엔드에서 사용자 정보를 가져온다고 가정 (실제 API 주소에 맞게 수정 가능)
-            const res = await fetch(`http://localhost:3000/users/${userId}`);
-            if (res.ok) {
-                const user = await res.json();
-                updateCrimsonIndexUI(user.trust_score || 0);
-            } else {
-                updateCrimsonIndexUI(86); // 실패 시 임시 기본값 86 (테스트 시 -30 등으로 바꿔보세요)
-            }
-        } catch (e) {
-            updateCrimsonIndexUI(86); // 임시 양수 테스트
-            // updateCrimsonIndexUI(-20); // 음수 테스트를 원하시면 이 줄의 주석을 해제하세요
-        }
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        console.error("로그인된 사용자 ID를 찾을 수 없습니다.");
+        return;
     }
-    fetchUserTrustScore();
+
+    try {
+        // 1. 주소 확인: 포트번호(3000)와 경로(/participants)가 정확해야 합니다.
+        const res = await fetch(`http://localhost:3000/participants/trust-score/${userId}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            console.log("서버에서 받은 데이터:", data); // 데이터가 잘 오는지 콘솔로 확인
+
+            // 2. 서버 데이터(trust_score)를 UI 업데이트 함수에 전달
+            // 백엔드에서 res.json({ trust_score: ... })으로 보냈으므로 똑같이 써야 합니다.
+            updateCrimsonIndexUI(data.trust_score || 0);
+        } else {
+            console.warn("점수를 불러오지 못했습니다. 기본값을 표시합니다.");
+            updateCrimsonIndexUI(0);
+        }
+    } catch (e) {
+        console.error("네트워크 에러 발생:", e);
+        updateCrimsonIndexUI(0);
+    }
+}
+
+// 3. 페이지가 로드될 때 실행되도록 호출
+fetchUserTrustScore();
 
     // 올린 공고 수 카운트
     fetch('http://localhost:3000/products')

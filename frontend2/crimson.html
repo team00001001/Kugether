@@ -55,8 +55,27 @@
     </main>
 
     <script>
-        // [수동 테스트 점수]
-        const trustScore = 10; 
+        let trustScore = 0; 
+
+async function loadTrustScore() {
+    const userId = localStorage.getItem('userId'); 
+    if (!userId) return;
+
+    try {
+        // 서버 설정에 맞춘 경로 (/participants)
+        const response = await fetch(`http://localhost:3000/participants/trust-score/${userId}`);
+        const data = await response.json();
+        
+        // 서버에서 받아온 실제 점수로 UI 업데이트 함수 호출
+        updateUI(data.trust_score); 
+    } catch (error) {
+        console.error("점수 로드 실패:", error);
+        updateUI(0); 
+    }
+}
+
+// 페이지 로드 시 실행
+loadTrustScore();
 
         function updateUI(score) {
             const badge = document.getElementById('trend-badge');
@@ -103,20 +122,20 @@
 
             if (score >= 0) {
                 gaugeFill.className = "gauge-bar-fill fill-positive";
-                gaugeFill.style.width = score + "%";
+                gaugeFill.style.width = Math.min(score, 100) + "%";
                 mainScore.style.color = "var(--ku-crimson)";
                 titleSpan.style.color = "var(--ku-crimson)";
                 badge.style.background = "#FFF0F3"; badge.style.color = "var(--ku-crimson)";
             } else {
                 gaugeFill.className = "gauge-bar-fill fill-negative";
-                gaugeFill.style.width = Math.abs(score) + "%";
+                gaugeFill.style.width = Math.min(Math.abs(score), 100) + "%";
                 mainScore.style.color = "var(--ku-blue)";
                 titleSpan.style.color = "var(--ku-blue)";
                 badge.style.background = "#EBF5FF"; badge.style.color = "var(--ku-blue)";
             }
         }
 
-        updateUI(trustScore);
+        //updateUI(trustScore);
 
         // [네 원본 fetch 로직 복구]
         fetch('header.html')
