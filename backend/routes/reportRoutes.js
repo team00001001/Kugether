@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
+const createNotification = require('../utils/createNotification');
 
 // 크림슨 지수 계산 공통 함수 (파일이 달라서 여기도 선언해줍니다)
 async function updateTrustScore(userId, delta, conn) {
@@ -56,6 +57,9 @@ router.post('/', async (req, res) => {
         }
 
         await conn.commit();
+
+        createNotification(reporterId, '신고 처리 완료', '신고 처리가 완료되었습니다.', 'notice');
+
         res.json({ success: true, message: '신고가 접수되었습니다.' });
     } catch (err) {
         await conn.rollback();

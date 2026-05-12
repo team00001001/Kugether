@@ -6,7 +6,7 @@
     <title>KU GONGGU - 성공 공구 내역</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/success_products.css">
-    <link rel="stylesheet" href="../css_mobile/success_products_mobile.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="css_mobile/success_products_mobile.css" media="(max-width: 768px)">
 </head>
 <body>
 
@@ -28,12 +28,26 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1. 헤더 불러오기
+            // 1. 헤더 불러오기 (로그아웃 기능 포함)
             fetch('header.html')
                 .then(res => res.text())
                 .then(data => {
+                    // HTML 삽입
                     document.getElementById('header-placeholder').innerHTML = data;
                     updateHeader();
+
+                    // 💡 헤더가 삽입된 직후, 로그아웃 버튼을 찾아 기능을 연결합니다.
+                    const logoutBtn = document.getElementById('logout-btn');
+                    if (logoutBtn) {
+                        logoutBtn.onclick = function() {
+                            if (confirm('로그아웃 하시겠습니까?')) {
+                                localStorage.removeItem('userId');
+                                localStorage.removeItem('isLoggedIn');
+                                alert('로그아웃 되었습니다.');
+                                location.href = 'main_login.html';
+                            }
+                        };
+                    }
                 });
 
             const listContainer = document.getElementById('product-list');
@@ -50,8 +64,8 @@
             try {
                 // 2. 백엔드에서 데이터 불러오기 (참여 내역 + 전체 공구)
                 const [chatsRes, productsRes] = await Promise.all([
-                    fetch(`http://localhost:3000/chats/my/${myId}`),
-                    fetch('http://localhost:3000/products')
+                    fetch(`https://campusgonggu-production.up.railway.app/chats/my/${myId}`),
+                    fetch('https://campusgonggu-production.up.railway.app/products')
                 ]);
 
                 const chats = await chatsRes.json();
