@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const pool = require('../db');
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const axios = require('axios');
 
 const authCodes = {};
 
@@ -25,11 +24,13 @@ router.post('/send-auth-email', async (req, res) => {
 
         const authCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        await resend.emails.send({
-            from: 'Campus Gonggu <onboarding@resend.dev>',
-            to: email,
+        await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: 'Campus Gonggu', email: 'gongguyong0@gmail.com' },
+            to: [{ email }],
             subject: '[대학생 공동구매] 회원가입 인증번호입니다.',
-            text: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다. 3분 안에 입력해주세요!`
+            textContent: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다. 3분 안에 입력해주세요!`
+        }, {
+            headers: { 'api-key': process.env.BREVO_API_KEY }
         });
         
         // 메모리에 '이메일: 인증번호' 형태로 3분간 저장
