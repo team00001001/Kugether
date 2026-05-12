@@ -270,7 +270,7 @@ router.get('/', async (req, res) => {
             message: 'productId가 필요합니다.'
         });
     }
-
+//여기 주의
     try {
         const [rows] = await pool.promise().query(
             `
@@ -280,6 +280,7 @@ router.get('/', async (req, res) => {
                 pp.user_id,
                 pp.status,
                 pp.created_at,
+                pp.is_received,  
                 u.nickname,
                 u.email,
                 u.trust_score
@@ -394,48 +395,99 @@ router.patch('/receive', async (req, res) => {
         `, [productId]);
         const received = receivedRow.cnt;
 
-        // 4. 과반수 계산
-        let threshold = total >= 4 ? Math.floor(total / 2) + 1 : total;
-        let isSuccess = false;
+
 
         // 5. 조건 충족 시 점수 보상 지급
-        if (received >= threshold) {
-            isSuccess = true;
-
-            const [[product]] = await conn.query(`
-                SELECT user_id, trust_rewarded FROM products WHERE id = ?
+        if (received >= 1) {
+            await conn.query(`
+                UPDATE products
+                SET status = 'finished'
+                WHERE id = ?
             `, [productId]);
-
-            // 중복 지급 방지
-            if (product && product.trust_rewarded === 0) {
-                // 방장 점수 부여 (+10)
-                await updateTrustScore(product.user_id, 10, conn);
-
-                // 유효 참여자들 점수 부여 (+2)
-                await conn.query(`
-                    UPDATE users
-                    SET trust_score = LEAST(100, trust_score + 2)
-                    WHERE id IN (
-                        SELECT user_id FROM product_participants
-                        WHERE product_id = ? AND status IN ('confirmed', 'completed')
-                    )
-                `, [productId]);
-
-                // 보상 완료 마킹
-                await conn.query(`
-                    UPDATE products
-                    SET status = 'completed', trust_rewarded = 1
-                    WHERE id = ?
-                `, [productId]);
-            }
         }
 
         await conn.commit();
-        res.json({ success: true, received, threshold, isSuccess });
+        res.json({ success: true, received, total });
     } catch (err) {
         await conn.rollback();
         console.error(err);
         res.status(500).json({ message: '수령 확인 처리 실패' });
+    } finally {
+        conn.release();
+    }
+});
+
+router.patch('/close-final', async (req, res) => {
+    const { productId } = req.body;
+    const conn = await pool.promise().getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        // 1. 전체 유효 참여자 수 조회 (기준을 잡기 위해)
+    const [[memberRow]] = await conn.query(`
+        SELECT COUNT(*) AS cnt FROM product_participants 
+        WHERE product_id = ? AND status IN ('confirmed', 'completed')
+    `, [productId]);
+    const totalMembers = memberRow.cnt;
+
+        // 2. 현재 접수된 신고 수 조회
+    const [[reportRow]] = await conn.query(`
+        SELECT COUNT(*) AS cnt FROM reports WHERE product_id = ?
+    `, [productId]);
+    const reportCount = reportRow.cnt;
+
+    // 3. (Dynamic Threshold)
+    let isBlocked = false;
+    if (totalMembers < 3) {
+    // 참여자 3명 미만일 때: 1명만 신고해도 차단
+        if (reportCount >= 1) isBlocked = true;
+    } else {
+        // 참여자 3명 이상일 때: 2명 이상 신고해야 차단
+        if (reportCount >= 2) isBlocked = true;
+    } //기준 신고 페너맅 기준 똑같이 적용
+
+    if (isBlocked) {
+        await conn.rollback();
+        return res.status(400).json({ 
+            message: `접수된 신고(${reportCount}건)로 인해 공구를 종료할 수 없습니다. 운영진에게 문의하세요.` 
+    });
+}
+
+        // 2. 공구 및 보상 정보 조회 (원래 코드 변수명 유지)
+        const [[product]] = await conn.query(`
+            SELECT user_id, trust_rewarded, status FROM products WHERE id = ? FOR UPDATE
+        `, [productId]);
+
+        // 3. 💰 최종 보상 지급 (중복 지급 방지)
+        if (product && product.trust_rewarded === 0) {
+            // 방장 점수 부여 (+10)
+            await updateTrustScore(product.user_id, 10, conn);
+
+            // 유효 참여자들 점수 부여 (+2)
+            await conn.query(`
+                UPDATE users
+                SET trust_score = LEAST(100, trust_score + 2)
+                WHERE id IN (
+                    SELECT user_id FROM product_participants
+                    WHERE product_id = ? AND status IN ('confirmed', 'completed')
+                )
+            `, [productId]);
+
+            // ✅ 최종 마킹: status를 success로, 보상 완료 표시
+            await conn.query(`
+                UPDATE products
+                SET status = 'success', trust_rewarded = 1
+                WHERE id = ?
+            `, [productId]);
+        }
+
+        await conn.commit();
+        res.json({ success: true, message: "공구가 최종 성공 처리되었습니다." });
+    } catch (err) {
+        await conn.rollback();
+        console.error(err);
+        res.status(500).json({ message: '최종 종료 처리 실패' });
     } finally {
         conn.release();
     }
