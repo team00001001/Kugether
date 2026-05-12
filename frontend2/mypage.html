@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="./css/mypage.css">
 
     <link rel="stylesheet"
-          href="css_mobile/mypage_mobile.css"
-          media="(max-width: 768px)">
+        href="css_mobile/mypage_mobile.css"
+        media="(max-width: 768px)">
 </head>
 <body>
 
@@ -224,15 +224,24 @@ fetchUserTrustScore();
     }).catch(err => console.error('참여 공구 개수 로드 실패:', err));
 
     // 성공 공구 수 카운트
-    fetch('https://campusgonggu-production.up.railway.app/products')
-        .then(res => res.json())
-        .then(products => {
-            const successProducts = products.filter(
-                p => p.currentCount >= p.targetCount
-            );
-            document.getElementById('success-count').innerText = `${successProducts.length} 건`;
-        })
-        .catch(err => console.error(err));
+    Promise.all([
+        fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`).then(res => res.json()),
+        fetch('https://campusgonggu-production.up.railway.app/products').then(res => res.json())
+    ]).then(([chats, allProducts]) => {
+        // 1. 내가 참여한 공구 ID 목록
+        const joinedIds = chats.map(c => String(c.product_id));
+        // 2. 내가 방장인 공구 ID 목록
+        const myCreatedIds = allProducts.filter(p => String(p.user_id) === String(userId)).map(p => String(p.id));
+
+        // 3. 필터링: 내가 참여/방장이고, 백엔드에서 최종 'success' 처리된 공구만 카운트
+        const successProducts = allProducts.filter(p => {
+            const isMineOrJoined = joinedIds.includes(String(p.id)) || myCreatedIds.includes(String(p.id));
+            const isSuccess = p.status === 'success'; 
+            return isMineOrJoined && isSuccess;
+        });
+        
+        document.getElementById('success-count').innerText = `${successProducts.length} 건`;
+    }).catch(err => console.error('성공 공구 개수 로드 실패:', err));
 
     // 최근 참여 내역 로드
     async function loadRecentParticipations() {
