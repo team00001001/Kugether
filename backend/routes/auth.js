@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const pool = require('../db');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const authCodes = {};
 
@@ -22,31 +23,14 @@ router.post('/send-auth-email', async (req, res) => {
             return res.status(409).json({ message: '이미 등록된 이메일입니다.' });
         }
 
-        // 💡 2. 여기까지 무사히 통과했다면? 원래대로 메일 전송 시작!
-        // 환경 변수 체크: 메일 전송에 필요한 환경 변수가 설정되어 있는지 확인
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-            throw new Error('EMAIL_USER와 EMAIL_PASS 환경 변수가 설정되지 않았습니다. .env 파일을 확인해주세요.');
-        }
-
         const authCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
+        await resend.emails.send({
+            from: 'Campus Gonggu <onboarding@resend.dev>',
             to: email,
             subject: '[대학생 공동구매] 회원가입 인증번호입니다.',
             text: `안녕하세요! 회원가입 인증번호는 [${authCode}] 입니다. 3분 안에 입력해주세요!`
-        };
-
-        // 이메일 슝~ 전송
-        await transporter.sendMail(mailOptions);
+        });
         
         // 메모리에 '이메일: 인증번호' 형태로 3분간 저장
         authCodes[email] = authCode;
