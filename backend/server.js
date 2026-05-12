@@ -115,6 +115,94 @@ io.on('connection', (socket) => {
     });
 });
 
+// 서버 시작 시 필요한 컬럼 추가 (없을 경우에만)
+pool.promise().query(
+    `ALTER TABLE products ADD COLUMN IF NOT EXISTS closing_notified TINYINT(1) NOT NULL DEFAULT 0`
+).catch(err => console.error('closing_notified 컬럼 추가 실패:', err));
+
+pool.promise().query(
+    `ALTER TABLE products ADD COLUMN IF NOT EXISTS transaction_notified TINYINT(1) NOT NULL DEFAULT 0`
+).catch(err => console.error('transaction_notified 컬럼 추가 실패:', err));
+
+// 5분마다 공구 상태 체크
+setInterval(async () => {
+    try {
+        const now = Math.floor(Date.now() / 1000);
+        const oneHourLater = now + 3600;
+
+        // ① 마감 1시간 이내 공구 → "곧 마감됩니다" 알림
+        const [closingProducts] = await pool.promise().query(`
+            SELECT id, title, user_id
+            FROM products
+            WHERE duration > ?
+            AND duration <= ?
+            AND closing_notified = 0
+            AND status != 'success'
+        `, [now, oneHourLater]);
+
+        for (const product of closingProducts) {
+            const [participants] = await pool.promise().query(`
+                SELECT user_id FROM product_participants
+                WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')
+            `, [product.id]);
+
+            const msg = `"${product.title}" 공구가 곧 마감됩니다.`;
+            createNotification(product.user_id, '공구 마감 임박', msg, 'notice');
+            for (const p of participants) {
+                if (String(p.user_id) !== String(product.user_id)) {
+                    createNotification(p.user_id, '공구 마감 임박', msg, 'notice');
+                }
+            }
+
+            await pool.promise().query(
+                `UPDATE products SET closing_notified = 1 WHERE id = ?`,
+                [product.id]
+            );
+            console.log(`마감 임박 알림 전송: 공구 ID ${product.id} "${product.title}"`);
+        }
+
+        // ② 마감됐지만 거래 완료 미확인 공구 → "거래 완료 확인 필요" 알림
+        const [expiredProducts] = await pool.promise().query(`
+            SELECT id, title, user_id
+            FROM products
+            WHERE duration <= ?
+            AND status != 'success'
+            AND transaction_notified = 0
+        `, [now]);
+
+        for (const product of expiredProducts) {
+            const [participants] = await pool.promise().query(`
+                SELECT user_id FROM product_participants
+                WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')
+            `, [product.id]);
+
+            if (participants.length === 0) {
+                await pool.promise().query(
+                    `UPDATE products SET transaction_notified = 1 WHERE id = ?`,
+                    [product.id]
+                );
+                continue;
+            }
+
+            const msg = `공구 마감 후 거래 완료 확인이 필요합니다.`;
+            createNotification(product.user_id, '거래 완료 확인 필요', msg, 'notice');
+            for (const p of participants) {
+                if (String(p.user_id) !== String(product.user_id)) {
+                    createNotification(p.user_id, '거래 완료 확인 필요', msg, 'notice');
+                }
+            }
+
+            await pool.promise().query(
+                `UPDATE products SET transaction_notified = 1 WHERE id = ?`,
+                [product.id]
+            );
+            console.log(`거래 완료 확인 알림 전송: 공구 ID ${product.id} "${product.title}"`);
+        }
+    } catch (err) {
+        console.error('공구 스케줄러 오류:', err);
+    }
+}, 5 * 60 * 1000);
+
 server.listen(3000, '0.0.0.0', () => {
     console.log('서버 실행 중: http://localhost:3000');
 });

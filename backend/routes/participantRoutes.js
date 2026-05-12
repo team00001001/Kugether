@@ -106,6 +106,20 @@ router.post('/join', async (req, res) => {
                     );
                 }
 
+                const newCountReJoin = product.currentCount + 1;
+                if (newCountReJoin >= product.targetCount) {
+                    const [allParticipants] = await pool.promise().query(
+                        `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
+                        [productId]
+                    );
+                    createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success');
+                    allParticipants.forEach(p => {
+                        if (String(p.user_id) !== String(productInfo.user_id)) {
+                            createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success');
+                        }
+                    });
+                }
+
                 return res.status(200).json({ message: '공구 재참여 완료' });
             }
         }
@@ -159,6 +173,20 @@ router.post('/join', async (req, res) => {
 `"${productInfo.title}" 공구에 <b>${joinedUser.nickname}</b>님이 참여했습니다.`,
                 'success'
             );
+        }
+
+        const newCountJoin = product.currentCount + 1;
+        if (newCountJoin >= product.targetCount) {
+            const [allParticipants] = await pool.promise().query(
+                `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
+                [productId]
+            );
+            createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success');
+            allParticipants.forEach(p => {
+                if (String(p.user_id) !== String(productInfo.user_id)) {
+                    createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success');
+                }
+            });
         }
 
         res.status(201).json({ message: '공구 참여 완료' });
@@ -355,11 +383,10 @@ router.patch('/status', async (req, res) => {
                 );
             }
 
-            // 🔔 [알림 전송] 참여자에게 노쇼 알림
             createNotification(
-                userId, 
-                '노쇼 처리 안내', 
-                `"${productTitle}" 공구에서 방장에 의해 노쇼 처리되었습니다. 신뢰도가 10점 차감됩니다.`, 
+                userId,
+                '노쇼 처리 안내',
+                '노쇼 처리가 반영되었습니다.',
                 'notice'
             );
 
@@ -428,6 +455,17 @@ router.patch('/receive', async (req, res) => {
             SET is_received = 1, status = 'completed'
             WHERE product_id = ? AND user_id = ?
         `, [productId, userId]);
+
+        const [[recvUser]] = await conn.query(`SELECT nickname FROM users WHERE id = ?`, [userId]);
+        const [[recvProduct]] = await conn.query(`SELECT title, user_id FROM products WHERE id = ?`, [productId]);
+        if (recvProduct && String(recvProduct.user_id) !== String(userId)) {
+            createNotification(
+                recvProduct.user_id,
+                '거래 완료 확인',
+                `<b>${recvUser.nickname}</b>님이 거래 완료를 확인했습니다.`,
+                'success'
+            );
+        }
 
         // 3. 전체 유효 참여자 수
         const [[totalRow]] = await conn.query(`

@@ -31,6 +31,7 @@ function parseDuration(duration) {
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const createNotification = require('../utils/createNotification');
 
 // 1. 상품 목록 조회
 router.get('/', (req, res) => {
@@ -179,17 +180,40 @@ durationNum = parseDuration(duration);
                 });
             }
 
+            (async () => {
+                const [participants] = await db.promise().query(
+                    `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
+                    [productId]
+                );
+                participants.forEach(p => {
+                    createNotification(p.user_id, '공구 정보 수정', `"${title}" 공구의 공구 정보가 수정되었습니다.`, 'notice');
+                });
+            })().catch(e => console.error('수정 알림 실패:', e));
+
             res.json({ message: '상품 수정 성공' });
         }
     );
 });
-// 5. 상품 삭제 (promise 지원 안 할 경우를 대비해 일반 쿼리 권장)
-router.delete('/:id', (req, res) => {
+// 5. 상품 삭제
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    db.query('DELETE FROM products WHERE id = ?', [id], (err, result) => {
-        if (err) return res.status(500).json({ error: '삭제 실패' });
+    try {
+        const [[product]] = await db.promise().query(`SELECT title FROM products WHERE id = ?`, [id]);
+        if (product) {
+            const [participants] = await db.promise().query(
+                `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
+                [id]
+            );
+            participants.forEach(p => {
+                createNotification(p.user_id, '공구 삭제 안내', `참여 중인 "${product.title}" 공구가 삭제되었습니다.`, 'notice');
+            });
+        }
+        await db.promise().query(`DELETE FROM products WHERE id = ?`, [id]);
         res.json({ message: '삭제 완료' });
-    });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: '삭제 실패' });
+    }
 });
 
 // 6. 마감 기한 단축
