@@ -55,8 +55,10 @@
     display: flex !important;
     align-items: center;
     gap: 8px;
+
     margin: 0 !important;
     color: #111 !important;
+
     font-size: 25px !important;
     font-weight: 800 !important;
     line-height: 1.3 !important;
@@ -66,15 +68,17 @@
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
+
     min-width: 28px;
     height: 28px;
     padding: 0 9px;
+
     border-radius: 999px;
     background: #fff0f3;
     color: #9b003f !important;
+
     font-size: 15px;
     font-weight: 800;
-    flex-shrink: 0;
   }
 
   .product-list {
@@ -91,7 +95,7 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
 
     display: grid;
-    grid-template-columns: 82px 1fr;
+    grid-template-columns: 82px 1fr 62px;
     gap: 12px;
     align-items: center;
   }
@@ -110,37 +114,49 @@
 
   .status-badge {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     margin-bottom: 7px;
     padding: 5px 9px;
     border-radius: 999px;
+
     font-size: 11px;
     font-weight: 800;
   }
 
-  .status-success {
-    background: #e9f8ee;
-    color: #16864f;
+  .status-recruiting {
+    background: #fff0f3;
+    color: #9b003f;
+  }
+
+  .status-completed {
+    background: #eceff3;
+    color: #777;
   }
 
   .product-name {
     margin-bottom: 8px;
-    color: #111 !important;
+    color: #111;
     font-size: 17px;
     font-weight: 800;
     line-height: 1.35;
-    text-decoration: none !important;
+
     word-break: keep-all;
 
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    cursor: pointer;
   }
 
   .product-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 5px 9px;
+
     color: #666;
     font-size: 12px;
     line-height: 1.45;
@@ -151,32 +167,39 @@
   }
 
   .manage-btns {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .btn-manage {
-    height: 46px;
-    border-radius: 14px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 800;
+    width: 58px;
+    height: 38px;
+    border-radius: 12px;
 
     display: flex;
     align-items: center;
     justify-content: center;
-  }
 
-  .btn-detail {
-    background: #fff5f8;
-    color: #9b003f;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
   }
 
   .btn-chat {
     background: #fff8eb;
     color: #f59e0b;
+  }
+
+  .btn-edit {
+    background: #f5f8ff;
+    color: #2563eb;
+  }
+
+  .btn-danger,
+  .btn-delete {
+    background: #fff5f5;
+    color: #e53e3e;
   }
 
   .empty-state {
@@ -197,7 +220,7 @@
     word-break: keep-all;
   }
 
-  .btn-main {
+  .btn-write {
     width: 100%;
     height: 46px;
     border-radius: 14px;

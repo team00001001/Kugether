@@ -103,6 +103,7 @@ main {
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1em;
+    padding-right: 2.5rem;
 }
 
 .input-group textarea {
@@ -172,6 +173,11 @@ main {
     /* 모바일에서는 짧은 입력칸도 100%로 꽉 채워서 터치하기 편하게 변경 */
     .short-input input {
         width: 100%;
+    }
+
+    /* 모집 기간 row: 모바일에서 60% 제한 제거해서 두 입력칸이 충분한 너비 확보 */
+    .input-group > div {
+        width: 100% !important;
     }
 
     /* 버튼 크기와 폰트 사이즈 미세 조정 */

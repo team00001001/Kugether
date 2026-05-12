@@ -103,6 +103,7 @@ main {
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1em;
+    padding-right: 2.5rem;
 }
 
 .input-group textarea {
