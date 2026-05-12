@@ -64,6 +64,7 @@
                 </div>
             </div>
         </section>
+        
 
         <section class="details-section card">
             <div class="host-info-card">
@@ -266,6 +267,18 @@
                         </div>
                     </div>
                 `;
+            } else{
+                if(isClosed){
+                    actionArea.innerHTML = `
+                        <div style="padding: 15px; background-color: #dee2e6;border-radius: 8px; text-align: center; color: #666;">
+                            ⏳ 모집이 마감된 공구입니다.
+                        </div>
+                    `;
+                } else {
+                    actionArea.innerHTML = `
+                        <button class="join-btn" onclick="joinGroupBuy()">이 공구에 참여하기</button>
+                    `;
+                }
             }
 
             renderCompletionSection(product, isHost, myInfo);
