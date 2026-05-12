@@ -1,33 +1,33 @@
-// const getNow = () => Math.floor(Date.now() / 1000);
+const getNow = () => Math.floor(Date.now() / 1000);
 
-// function parseDuration(duration) {
-//     if (!duration) return null;
+function parseDuration(duration) {
+    if (!duration) return null;
 
-//     if (!isNaN(Number(duration))) {
-//         return Number(duration);
-//     }
+    if (!isNaN(Number(duration))) {
+        return Number(duration);
+    }
 
-//     const num = parseInt(duration);
-//     if (Number.isNaN(num)) return null;
+    const num = parseInt(duration);
+    if (Number.isNaN(num)) return null;
 
-//     if (duration.includes('분')) {
-//         return getNow() + num * 60;
-//     }
+    if (duration.includes('분')) {
+        return getNow() + num * 60;
+    }
 
-//     if (duration.includes('시간')) {
-//         return getNow() + num * 3600;
-//     }
+    if (duration.includes('시간')) {
+        return getNow() + num * 3600;
+    }
 
-//     if (duration.includes('일')) {
-//         return getNow() + num * 86400;
-//     }
+    if (duration.includes('일')) {
+        return getNow() + num * 86400;
+    }
 
-//     if (duration.includes('개월')) {
-//         return getNow() + num * 30 * 86400;
-//     }
+    if (duration.includes('개월')) {
+        return getNow() + num * 30 * 86400;
+    }
 
-//     return null;
-// }
+    return null;
+}
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
