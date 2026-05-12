@@ -79,10 +79,10 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
     const {
         title, category, targetCount, price, duration,
-        location, imageUrl, description, user_id
+        location, imageUrl, productUrl, description, user_id
     } = req.body;
 
-    
+
 let durationNum = null;
 
 if (
@@ -102,12 +102,12 @@ if (durationNum !== null && Number.isNaN(durationNum)) {
 
     const sql = `
         INSERT INTO products
-        (title, category, targetCount, price, duration, location, imageUrl, description, user_id)
-        VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)
+        (title, category, targetCount, price, duration, location, imageUrl, productUrl, description, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, 
-        [title, category, targetCount, price, durationNum, location, imageUrl, description, user_id], 
+    db.query(sql,
+        [title, category, targetCount, price, durationNum, location, imageUrl, productUrl, description, user_id],
         (err, result) => {
             if (err) {
                 console.error(err);
@@ -130,6 +130,7 @@ router.put('/:id', (req, res) => {
         duration,
         location,
         imageUrl,
+        productUrl,
         description
     } = req.body;
 
@@ -145,14 +146,15 @@ durationNum = parseDuration(duration);
     }
 
     const sql = `
-        UPDATE products 
+        UPDATE products
         SET title = ?,
             category = ?,
-            targetCount = ?,    
+            targetCount = ?,
             price = ?,
             duration = ?,
             location = ?,
             imageUrl = ?,
+            productUrl = ?,
             description = ?
         WHERE id = ?
     `;
@@ -167,6 +169,7 @@ durationNum = parseDuration(duration);
             durationNum,
             location,
             imageUrl,
+            productUrl,
             description,
             productId
         ],
