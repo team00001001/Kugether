@@ -28,7 +28,7 @@ body {
 
 /* ==========================================
 공통 헤더 CSS
-    ========================================== */
+========================================== */
 header {
     background-color: var(--ku-crimson);
     backdrop-filter: blur(8px);
@@ -99,8 +99,8 @@ nav a.menu-link:hover {
 }
 
 /* ==========================================
-    도움말 컨텐츠 영역
-    ========================================== */
+도움말 컨텐츠 영역
+========================================== */
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -160,10 +160,9 @@ nav a.menu-link:hover {
     color: var(--ku-crimson);
     margin-right: 12px;
     font-size: 1.2rem;
-    flex-shrink: 0; /* Q 마크는 공간을 불필요하게 차지하지 않도록 고정 */
+    flex-shrink: 0;
 }
 
-/* 두 번째 span(질문 텍스트)만 남은 공간을 모두 차지하도록 지정 */
 .faq-question span:nth-of-type(2) {
     flex: 1;
     text-align: left;
@@ -193,9 +192,11 @@ nav a.menu-link:hover {
     padding: 0 24px; /* 초기 패딩 0 */
 }
 
+/* 질문과 답변 사이 공백이 추가된 부분 */
 .faq-item.active .faq-answer {
-    max-height: 500px; /* 내용이 충분히 들어갈 만큼의 높이 */
-    padding: 0 24px 24px 24px;
+    max-height: 500px;
+    padding: 20px 24px 24px 24px; /* 위쪽에 20px 공백 추가 */
+    border-top: 1px solid var(--border-light); /* 경계선 추가로 시각적 분리감 제공 */
 }
 
 .faq-answer p {
