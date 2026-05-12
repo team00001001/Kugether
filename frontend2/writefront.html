@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공동구매 글 작성</title>
-    <!-- 나눔스퀘어라운드 폰트 불러오기 (무료/저작권 자유) -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquareRound@1.0/nanumsquareround.css">
     <link rel="stylesheet" href="css/writefront.css">
     <link rel="stylesheet" href="css_mobile/writefront_mobile.css" media="(max-width: 768px)">
@@ -24,7 +23,6 @@
 
     <main>
         <form class="write-form">
-            <!-- 드롭다운으로 돌아온 카테고리 -->
             <div class="input-group">
                 <label for="category" class="required">카테고리 선택</label>
                 <select id="category" name="category">
@@ -50,12 +48,9 @@
                 <input type="number" id="price" placeholder="예) 8500" required>
             </div>
 
-            <!-- 모집 기간 입력 -->
             <div class="input-group">
                 <label for="periodValue" class="required">모집 기간 (최대 1년)</label>
-                <!-- 전체 너비를 '모집 인원' 칸과 동일한 60%로 설정 -->
                 <div style="width: 60%; display: flex; gap: 0.5rem;">
-                    <!-- flex: 1을 주어 두 칸이 60% 공간 안에서 1:1로 똑같은 너비를 가지게 함 -->
                     <input type="number" id="periodValue" placeholder="예) 3" min="1" required style="flex: 1;">
                     <select id="periodUnit" style="flex: 1;">
                         <option value="minute">분 (Minute)</option>
@@ -69,6 +64,11 @@
             <div class="input-group">
                 <label for="location" class="required">수령/배분 장소</label>
                 <input type="text" id="location" placeholder="예) 정보관 1층 라운지" required>
+            </div>
+
+            <div class="input-group">
+                <label for="productUrl" class="required">상품 URL</label>
+                <input type="url" id="productUrl" placeholder="예) https://..." required>
             </div>
 
             <div class="input-group">
@@ -98,41 +98,39 @@
                 etc: '기타 물품'
             };
 
-        const pValue = Number(document.getElementById('periodValue').value); // 입력한 숫자
-        const pUnit = document.getElementById('periodUnit').value;           // 선택한 단위 (minute, hour, day, month)
+            const pValue = Number(document.getElementById('periodValue').value); // 입력한 숫자
+            const pUnit = document.getElementById('periodUnit').value;           // 선택한 단위 (minute, hour, day, month)
 
-        // 1. 현재 시각을 기준으로 Date 객체 생성
-        const expireDate = new Date(); 
+            // 1. 현재 시각을 기준으로 Date 객체 생성
+            const expireDate = new Date(); 
 
-        // 2. 단위에 따라 Date 객체의 시간 증가 
-        // (JS Date 객체가 윤년, 월별 일수 차이를 자동으로 계산해 줌)
-        if (pUnit === 'minute') {
-            expireDate.setMinutes(expireDate.getMinutes() + pValue);
-        } else if (pUnit === 'hour') {
-            expireDate.setHours(expireDate.getHours() + pValue);
-        } else if (pUnit === 'day') {
-            expireDate.setDate(expireDate.getDate() + pValue);
-        } else if (pUnit === 'month') {
-            expireDate.setMonth(expireDate.getMonth() + pValue);
-        }
+            // 2. 단위에 따라 Date 객체의 시간 증가 
+            // (JS Date 객체가 윤년, 월별 일수 차이를 자동으로 계산해 줌)
+            if (pUnit === 'minute') {
+                expireDate.setMinutes(expireDate.getMinutes() + pValue);
+            } else if (pUnit === 'hour') {
+                expireDate.setHours(expireDate.getHours() + pValue);
+            } else if (pUnit === 'day') {
+                expireDate.setDate(expireDate.getDate() + pValue);
+            } else if (pUnit === 'month') {
+                expireDate.setMonth(expireDate.getMonth() + pValue);
+            }
 
-        // 3. 최종 마감 시각 (초 단위 타임스탬프)
-        const expireAt = Math.floor(expireDate.getTime() / 1000);
+            // 3. 최종 마감 시각 (초 단위 타임스탬프)
+            const expireAt = Math.floor(expireDate.getTime() / 1000);
 
-        const productData = {
-    title: document.getElementById('productName').value,
-    category: categoryMap[document.getElementById('category').value],
-    targetCount: Number(document.getElementById('people').value),
-    price: Number(document.getElementById('price').value),
-    
-    // [수정 포인트!] 계산해둔 'expireAt'을 여기에 넣어야 합니다.
-    duration: expireAt, 
-    
-    location: document.getElementById('location').value,
-    imageUrl: document.getElementById('imageUrl').value,
-    description: document.getElementById('description').value,
-    user_id: localStorage.getItem('userId')
-};
+            const productData = {
+                title: document.getElementById('productName').value,
+                category: categoryMap[document.getElementById('category').value],
+                targetCount: Number(document.getElementById('people').value),
+                price: Number(document.getElementById('price').value),
+                duration: expireAt, 
+                location: document.getElementById('location').value,
+                productUrl: document.getElementById('productUrl').value, // 추가된 부분: 백엔드로 보낼 상품 URL
+                imageUrl: document.getElementById('imageUrl').value,
+                description: document.getElementById('description').value,
+                user_id: localStorage.getItem('userId')
+            };
 
             try {
                 const response = await fetch('https://campusgonggu-production.up.railway.app/products', {
