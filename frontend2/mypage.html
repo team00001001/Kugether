@@ -166,25 +166,34 @@
 
     async function fetchUserTrustScore() {
     const userId = localStorage.getItem('userId');
-    if (!userId) return;
+    if (!userId) {
+        console.error("로그인된 사용자 ID를 찾을 수 없습니다.");
+        return;
+    }
 
     try {
-        // 마이페이지에서도 동일한 경로 사용
+        // 1. 주소 확인: 포트번호(3000)와 경로(/participants)가 정확해야 합니다.
         const res = await fetch(`http://localhost:3000/participants/trust-score/${userId}`);
         
         if (res.ok) {
             const data = await res.json();
-            // 마이페이지 UI 업데이트 함수에 점수 전달
+            console.log("서버에서 받은 데이터:", data); // 데이터가 잘 오는지 콘솔로 확인
+
+            // 2. 서버 데이터(trust_score)를 UI 업데이트 함수에 전달
+            // 백엔드에서 res.json({ trust_score: ... })으로 보냈으므로 똑같이 써야 합니다.
             updateCrimsonIndexUI(data.trust_score || 0);
         } else {
+            console.warn("점수를 불러오지 못했습니다. 기본값을 표시합니다.");
             updateCrimsonIndexUI(0);
         }
     } catch (e) {
-        console.error("지수 로드 실패:", e);
+        console.error("네트워크 에러 발생:", e);
         updateCrimsonIndexUI(0);
     }
 }
-    fetchUserTrustScore();
+
+// 3. 페이지가 로드될 때 실행되도록 호출
+fetchUserTrustScore();
 
     // 올린 공고 수 카운트
     fetch('http://localhost:3000/products')
