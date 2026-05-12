@@ -129,6 +129,19 @@
                 guestButtons.forEach(btn => btn.style.display = 'inline-block');
             }
         }
+
+        // 💡 로그아웃 처리 로직 추가
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                // 1. 로컬 스토리지 데이터 삭제
+                localStorage.removeItem('userId');
+                localStorage.removeItem('isLoggedIn');
+                
+                // 2. 알림 및 페이지 이동
+                alert('로그아웃 되었습니다.');
+                location.href = 'main_login.html'; // 또는 메인 페이지 경로
+            }
+        }
     </script>
 </body>
 </html>
