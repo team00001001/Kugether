@@ -212,6 +212,24 @@ router.patch('/cancel', async (req, res) => {
     try {
         await conn.beginTransaction();
 
+        // [추가된 로직 시작] 마감된 공구인지 먼저 확인합니다.
+        const [[productInfoRow]] = await conn.query(
+            `SELECT duration, currentCount, targetCount FROM products WHERE id = ?`,
+            [productId]
+        );
+
+        if (productInfoRow) {
+            const now = Math.floor(Date.now() / 1000);
+            const isExpired = Number(productInfoRow.duration) <= now;
+            const isFull = productInfoRow.currentCount >= productInfoRow.targetCount;
+            
+            // 인원이 다 찼거나, 시간이 지났으면 취소 불가 에러 반환
+            if (isExpired || isFull) {
+                await conn.rollback();
+                return res.status(400).json({ message: '이미 마감된 공구는 참여를 취소할 수 없습니다.' });
+            }
+        }
+
         const [rows] = await conn.query(
             `
             SELECT *
