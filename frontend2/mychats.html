@@ -82,7 +82,7 @@ localStorage.removeItem('joinedGroups');
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/chats/my/${userId}`);
+        const response = await fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`);
         const myChats = await response.json();
 
         countBadge.innerText = myChats.length;

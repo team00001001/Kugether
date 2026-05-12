@@ -64,7 +64,7 @@
 
             try {
                 // 3. 백엔드에서 데이터 불러오기
-                const response = await fetch('http://localhost:3000/products'); 
+                const response = await fetch('https://campusgonggu-production.up.railway.app/products'); 
                 const allProducts = await response.json();
 
                 // 4. 내가 올린 글만 필터링 (백엔드에서 주는 user_id 필드와 비교)
@@ -143,7 +143,7 @@
         async function deleteProduct(id) {
             if(confirm("정말로 이 공고를 삭제하시겠습니까? 참여자들에게 알림이 전송됩니다.")) {
                 try {
-                    const response = await fetch(`http://localhost:3000/products/${id}`, {
+                    const response = await fetch(`https://campusgonggu-production.up.railway.app/products/${id}`, {
                         method: 'DELETE'
                     });
 

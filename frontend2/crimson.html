@@ -63,7 +63,7 @@ async function loadTrustScore() {
 
     try {
         // 서버 설정에 맞춘 경로 (/participants)
-        const response = await fetch(`http://localhost:3000/participants/trust-score/${userId}`);
+        const response = await fetch(`https://campusgonggu-production.up.railway.app/participants/trust-score/${userId}`);
         const data = await response.json();
         
         // 서버에서 받아온 실제 점수로 UI 업데이트 함수 호출
