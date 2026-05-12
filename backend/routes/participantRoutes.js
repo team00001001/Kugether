@@ -304,14 +304,36 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 방장이 참여자의 상태(노쇼/확인)를 업데이트하는 API
-// 방장이 참여자의 상태(노쇼/확인)를 업데이트하는 API
+// ==========================================
+// 1. 방장이 참여자의 상태(노쇼/확인)를 업데이트하는 API
+// ==========================================
 router.patch('/status', async (req, res) => {
     const { participantId, userId, status, productId } = req.body;
 
     const conn = await pool.promise().getConnection();
     try {
         await conn.beginTransaction();
+
+        // 🚨 알림에 사용할 공구 제목(title) 미리 가져오기
+        let targetProductId = productId;
+        if (!targetProductId) {
+            const [rows] = await conn.query(
+                `SELECT product_id FROM product_participants WHERE id = ?`,
+                [participantId]
+            );
+            if (rows.length > 0) {
+                targetProductId = rows[0].product_id;
+            }
+        }
+
+        let productTitle = "공구";
+        if (targetProductId) {
+            const [[pRow]] = await conn.query(
+                `SELECT title FROM products WHERE id = ?`, 
+                [targetProductId]
+            );
+            if (pRow) productTitle = pRow.title;
+        }
 
         if (status === 'noshow') {
             // 1. 상태를 노쇼로 변경
@@ -323,27 +345,23 @@ router.patch('/status', async (req, res) => {
             // 2. 신뢰도 10점 차감
             await updateTrustScore(userId, -10, conn);
 
-            // 3. ⭐️ 확실한 인원수 -1 감소 처리 ⭐️
-            let targetProductId = productId;
-            if (!targetProductId) {
-                const [rows] = await conn.query(
-                    `SELECT product_id FROM product_participants WHERE id = ?`,
-                    [participantId]
-                );
-                if (rows.length > 0) {
-                    targetProductId = rows[0].product_id;
-                }
-            }
-
+            // 3. 인원수 -1 감소 처리
             if (targetProductId) {
-                // GREATEST 대신 직관적인 조건문 쿼리 사용
                 await conn.query(
                     `UPDATE products 
-                     SET currentCount = currentCount - 1 
-                     WHERE id = ? AND currentCount > 0`,
+                    SET currentCount = currentCount - 1 
+                    WHERE id = ? AND currentCount > 0`,
                     [targetProductId]
                 );
             }
+
+            // 🔔 [알림 전송] 참여자에게 노쇼 알림
+            createNotification(
+                userId, 
+                '노쇼 처리 안내', 
+                `"${productTitle}" 공구에서 방장에 의해 노쇼 처리되었습니다. 신뢰도가 10점 차감됩니다.`, 
+                'notice'
+            );
 
         } else {
             // 확인(confirmed) 버튼 눌렀을 때
@@ -353,6 +371,14 @@ router.patch('/status', async (req, res) => {
             );
             // 성공 시 +3점 부여
             await updateTrustScore(userId, 3, conn);
+
+            // 🔔 [알림 전송] 참여자에게 확인 완료 알림
+            createNotification(
+                userId, 
+                '참여 확인 완료', 
+                `"${productTitle}" 공구 방장이 참여를 확인했습니다. 물건 수령 후 '수령 확인' 버튼을 눌러주세요.`, 
+                'success'
+            );
         }
 
         await conn.commit();
@@ -367,13 +393,166 @@ router.patch('/status', async (req, res) => {
     }
 });
 
-// [API] 참여자 -> 수령 완료 확인
+
+// ==========================================
+// 2. 참여자 -> 수령 완료 확인 및 자동 최종 완료 처리 API
+// ==========================================
 router.patch('/receive', async (req, res) => {
     const { productId, userId } = req.body;
     const conn = await pool.promise().getConnection();
 
     try {
         await conn.beginTransaction();
+
+        // 1. 백엔드에서도 방장 확인 여부(상태)를 한 번 더 검증
+        const [[member]] = await conn.query(`
+            SELECT status FROM product_participants WHERE product_id = ? AND user_id = ?
+        `, [productId, userId]);
+
+        if (!member) {
+            await conn.rollback();
+            return res.status(404).json({ message: '참여 정보를 찾을 수 없습니다.' });
+        }
+        if (member.status === 'joined') {
+            await conn.rollback();
+            return res.status(403).json({ message: '방장의 참여 확인 후 수령할 수 있습니다.' });
+        }
+        if (member.status === 'noshow' || member.status === 'cancelled') {
+            await conn.rollback();
+            return res.status(400).json({ message: '수령 가능한 상태가 아닙니다.' });
+        }
+
+        // 2. 참여자 본인 수령 완료 처리
+        await conn.query(`
+            UPDATE product_participants
+            SET is_received = 1, status = 'completed'
+            WHERE product_id = ? AND user_id = ?
+        `, [productId, userId]);
+
+        // 3. 전체 유효 참여자 수
+        const [[totalRow]] = await conn.query(`
+            SELECT COUNT(*) AS cnt FROM product_participants
+            WHERE product_id = ? AND status IN ('confirmed', 'completed')
+        `, [productId]);
+        const total = totalRow.cnt;
+
+        // 4. 수령 완료 누른 사람 수
+        const [[receivedRow]] = await conn.query(`
+            SELECT COUNT(*) AS cnt FROM product_participants
+            WHERE product_id = ? AND is_received = 1
+        `, [productId]);
+        const received = receivedRow.cnt;
+
+        // 5. 아직 방장이 처리하지 않은(joined) 대기 인원
+        const [[pendingRow]] = await conn.query(`
+            SELECT COUNT(*) AS cnt FROM product_participants
+            WHERE product_id = ? AND status = 'joined'
+        `, [productId]);
+        const pendingCount = pendingRow.cnt;
+
+        let isFinalSuccess = false;
+
+        // 6. 모든 유효 참여자가 수령했고 & 미처리 대기 인원도 없을 때만 성공 처리
+        if (total > 0 && received >= total && pendingCount === 0) {
+            
+            // 신고 건수 확인
+            const [[reportRow]] = await conn.query(`
+                SELECT COUNT(*) AS cnt FROM reports WHERE product_id = ?
+            `, [productId]);
+            const reportCount = reportRow.cnt;
+
+            let isBlocked = false;
+            if (total < 3 && reportCount >= 1) isBlocked = true;
+            if (total >= 3 && reportCount >= 2) isBlocked = true;
+
+            if (!isBlocked) {
+                // 🚨 알림을 위해 title 항목도 SELECT문에 추가
+                const [[product]] = await conn.query(`
+                    SELECT user_id, trust_rewarded, title FROM products WHERE id = ? FOR UPDATE
+                `, [productId]);
+
+                if (product && product.trust_rewarded === 0) {
+                    // 방장 점수 부여 (+10)
+                    await updateTrustScore(product.user_id, 10, conn);
+
+                    // 유효 참여자들 점수 부여 (+2)
+                    await conn.query(`
+                        UPDATE users
+                        SET trust_score = LEAST(100, trust_score + 2)
+                        WHERE id IN (
+                            SELECT user_id FROM product_participants
+                            WHERE product_id = ? AND status IN ('confirmed', 'completed')
+                        )
+                    `, [productId]);
+
+                    // 최종 마킹: status를 success로, 보상 완료 표시
+                    await conn.query(`
+                        UPDATE products
+                        SET status = 'success', trust_rewarded = 1
+                        WHERE id = ?
+                    `, [productId]);
+                    
+                    // 🔔 [알림 전송] 방장 및 모든 참여자에게 공구 성공 알림
+                    const notiTitle = '공구 최종 성공 🎉';
+                    const notiMsg = `"${product.title}" 공구가 모든 인원의 수령으로 성공적으로 마무리되었습니다! 신뢰도 보상이 지급되었습니다.`;
+
+                    // 방장에게 알림 전송
+                    createNotification(product.user_id, notiTitle, notiMsg, 'success');
+
+                    // 유효 참여자들에게 알림 전송
+                    const [validMembers] = await conn.query(`
+                        SELECT user_id FROM product_participants
+                        WHERE product_id = ? AND status IN ('confirmed', 'completed')
+                    `, [productId]);
+
+                    for (const member of validMembers) {
+                        // 방장이 참여자로 등록되어 있는 엣지 케이스 방지 (중복 전송 금지)
+                        if (String(member.user_id) !== String(product.user_id)) {
+                            createNotification(member.user_id, notiTitle, notiMsg, 'success');
+                        }
+                    }
+
+                    isFinalSuccess = true;
+                }
+            }
+        }
+
+        await conn.commit();
+        res.json({ success: true, received, total, isFinalSuccess });
+    } catch (err) {
+        await conn.rollback();
+        console.error(err);
+        res.status(500).json({ message: '수령 확인 처리 실패' });
+    } finally {
+        conn.release();
+    }
+});
+
+// [API] 참여자 -> 수령 완료 확인 및 자동 최종 완료 처리
+router.patch('/receive', async (req, res) => {
+    const { productId, userId } = req.body;
+    const conn = await pool.promise().getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        // 🚨 [추가 1] 백엔드에서도 방장 확인 여부(상태)를 한 번 더 검증
+        const [[member]] = await conn.query(`
+            SELECT status FROM product_participants WHERE product_id = ? AND user_id = ?
+        `, [productId, userId]);
+
+        if (!member) {
+            await conn.rollback();
+            return res.status(404).json({ message: '참여 정보를 찾을 수 없습니다.' });
+        }
+        if (member.status === 'joined') {
+            await conn.rollback();
+            return res.status(403).json({ message: '방장의 참여 확인 후 수령할 수 있습니다.' });
+        }
+        if (member.status === 'noshow' || member.status === 'cancelled') {
+            await conn.rollback();
+            return res.status(400).json({ message: '수령 가능한 상태가 아닙니다.' });
+        }
 
         // 1. 참여자 본인 수령 완료 처리
         await conn.query(`
@@ -382,7 +561,7 @@ router.patch('/receive', async (req, res) => {
             WHERE product_id = ? AND user_id = ?
         `, [productId, userId]);
 
-        // 2. 전체 유효 참여자 수
+        // 2. 전체 유효 참여자 수 (확인되었거나 수령완료한 사람들만)
         const [[totalRow]] = await conn.query(`
             SELECT COUNT(*) AS cnt FROM product_participants
             WHERE product_id = ? AND status IN ('confirmed', 'completed')
@@ -396,99 +575,65 @@ router.patch('/receive', async (req, res) => {
         `, [productId]);
         const received = receivedRow.cnt;
 
+        // 🚨 [추가 2] 아직 방장이 처리하지 않은(joined) 대기 인원이 있는지 확인
+        const [[pendingRow]] = await conn.query(`
+            SELECT COUNT(*) AS cnt FROM product_participants
+            WHERE product_id = ? AND status = 'joined'
+        `, [productId]);
+        const pendingCount = pendingRow.cnt;
 
+        let isFinalSuccess = false;
 
-        // 5. 조건 충족 시 점수 보상 지급
-        if (received >= 1) {
-            await conn.query(`
-                UPDATE products
-                SET status = 'finished'
-                WHERE id = ?
+        // 4. 모든 유효 참여자가 수령했고 & 미처리 대기 인원도 없을 때만 성공 처리
+        if (total > 0 && received >= total && pendingCount === 0) {
+            
+            // 신고 건수 확인
+            const [[reportRow]] = await conn.query(`
+                SELECT COUNT(*) AS cnt FROM reports WHERE product_id = ?
             `, [productId]);
+            const reportCount = reportRow.cnt;
+
+            let isBlocked = false;
+            if (total < 3 && reportCount >= 1) isBlocked = true;
+            if (total >= 3 && reportCount >= 2) isBlocked = true;
+
+            if (!isBlocked) {
+                const [[product]] = await conn.query(`
+                    SELECT user_id, trust_rewarded FROM products WHERE id = ? FOR UPDATE
+                `, [productId]);
+
+                if (product && product.trust_rewarded === 0) {
+                    // 방장 점수 부여 (+10)
+                    await updateTrustScore(product.user_id, 10, conn);
+
+                    // 유효 참여자들 점수 부여 (+2)
+                    await conn.query(`
+                        UPDATE users
+                        SET trust_score = LEAST(100, trust_score + 2)
+                        WHERE id IN (
+                            SELECT user_id FROM product_participants
+                            WHERE product_id = ? AND status IN ('confirmed', 'completed')
+                        )
+                    `, [productId]);
+
+                    // ✅ 최종 마킹: status를 success로, 보상 완료 표시
+                    await conn.query(`
+                        UPDATE products
+                        SET status = 'success', trust_rewarded = 1
+                        WHERE id = ?
+                    `, [productId]);
+                    
+                    isFinalSuccess = true;
+                }
+            }
         }
 
         await conn.commit();
-        res.json({ success: true, received, total });
+        res.json({ success: true, received, total, isFinalSuccess });
     } catch (err) {
         await conn.rollback();
         console.error(err);
         res.status(500).json({ message: '수령 확인 처리 실패' });
-    } finally {
-        conn.release();
-    }
-});
-
-router.patch('/close-final', async (req, res) => {
-    const { productId } = req.body;
-    const conn = await pool.promise().getConnection();
-
-    try {
-        await conn.beginTransaction();
-
-        // 1. 전체 유효 참여자 수 조회 (기준을 잡기 위해)
-    const [[memberRow]] = await conn.query(`
-        SELECT COUNT(*) AS cnt FROM product_participants 
-        WHERE product_id = ? AND status IN ('confirmed', 'completed')
-    `, [productId]);
-    const totalMembers = memberRow.cnt;
-
-        // 2. 현재 접수된 신고 수 조회
-    const [[reportRow]] = await conn.query(`
-        SELECT COUNT(*) AS cnt FROM reports WHERE product_id = ?
-    `, [productId]);
-    const reportCount = reportRow.cnt;
-
-    // 3. (Dynamic Threshold)
-    let isBlocked = false;
-    if (totalMembers < 3) {
-    // 참여자 3명 미만일 때: 1명만 신고해도 차단
-        if (reportCount >= 1) isBlocked = true;
-    } else {
-        // 참여자 3명 이상일 때: 2명 이상 신고해야 차단
-        if (reportCount >= 2) isBlocked = true;
-    } //기준 신고 페너맅 기준 똑같이 적용
-
-    if (isBlocked) {
-        await conn.rollback();
-        return res.status(400).json({ 
-            message: `접수된 신고(${reportCount}건)로 인해 공구를 종료할 수 없습니다. 운영진에게 문의하세요.` 
-    });
-}
-
-        // 2. 공구 및 보상 정보 조회 (원래 코드 변수명 유지)
-        const [[product]] = await conn.query(`
-            SELECT user_id, trust_rewarded, status FROM products WHERE id = ? FOR UPDATE
-        `, [productId]);
-
-        // 3. 💰 최종 보상 지급 (중복 지급 방지)
-        if (product && product.trust_rewarded === 0) {
-            // 방장 점수 부여 (+10)
-            await updateTrustScore(product.user_id, 10, conn);
-
-            // 유효 참여자들 점수 부여 (+2)
-            await conn.query(`
-                UPDATE users
-                SET trust_score = LEAST(100, trust_score + 2)
-                WHERE id IN (
-                    SELECT user_id FROM product_participants
-                    WHERE product_id = ? AND status IN ('confirmed', 'completed')
-                )
-            `, [productId]);
-
-            // ✅ 최종 마킹: status를 success로, 보상 완료 표시
-            await conn.query(`
-                UPDATE products
-                SET status = 'success', trust_rewarded = 1
-                WHERE id = ?
-            `, [productId]);
-        }
-
-        await conn.commit();
-        res.json({ success: true, message: "공구가 최종 성공 처리되었습니다." });
-    } catch (err) {
-        await conn.rollback();
-        console.error(err);
-        res.status(500).json({ message: '최종 종료 처리 실패' });
     } finally {
         conn.release();
     }
