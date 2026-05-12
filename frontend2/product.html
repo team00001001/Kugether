@@ -211,7 +211,8 @@
                 };
             } else {
                 imgEl.src = defaultImages[product.category] || defaultImages['기타 물품'];
-                document.getElementById('detail-no-image-overlay').style.display = 'none';
+                imgEl.style.display = 'block';
+                document.getElementById('detail-no-image-overlay').style.display = 'flex';
             }
 
             const staticDate = formatStatic(product.duration);

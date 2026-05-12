@@ -190,7 +190,7 @@ router.patch('/cancel', async (req, res) => {
             FROM product_participants
             WHERE product_id = ?
             AND user_id = ?
-            AND status = 'joined'
+            AND status NOT IN ('cancelled', 'noshow')
             `,
             [productId, userId]
         );
@@ -206,6 +206,7 @@ router.patch('/cancel', async (req, res) => {
             SET status = 'cancelled'
             WHERE product_id = ?
             AND user_id = ?
+            AND status NOT IN ('cancelled', 'noshow')
             `,
             [productId, userId]
         );

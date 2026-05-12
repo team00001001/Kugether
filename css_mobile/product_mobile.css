@@ -55,9 +55,11 @@
     display: none;
     align-items: center;
     justify-content: center;
-    color: #777;
+    color: white;
     font-size: 14px;
-    background: #f7f7f7;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
   }
 
   .product-info {
