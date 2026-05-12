@@ -7,6 +7,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/success_products.css">
     <link rel="stylesheet" href="../css_mobile/success_products_mobile.css" media="(max-width: 768px)">
+    <style>
+        /* 깔끔하고 정돈된 UI를 위한 성공 뱃지 스타일링 */
+        .status-success {
+            background-color: #F8E8EB; /* 파스텔 톤 배경 */
+            color: #8A1538; /* 포인트 버건디 텍스트 */
+            border: 1px solid #8A1538;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
 
@@ -74,10 +88,11 @@
                 const joinedIds = chats.map(c => String(c.product_id));
                 const myCreatedIds = allProducts.filter(p => String(p.user_id) === String(myId)).map(p => String(p.id));
 
-                // 3. 필터링: 내가 올렸거나 참여했으며, 목표 인원을 채운 공구
+                // 3. 필터링: 내가 올렸거나 참여했으며, 최종 성공 처리된 공구 (백엔드 상태 기준)
                 const successProducts = allProducts.filter(p => {
                     const isMineOrJoined = joinedIds.includes(String(p.id)) || myCreatedIds.includes(String(p.id));
-                    const isSuccess = p.currentCount >= p.targetCount;
+                    // 목표 인원(currentCount >= targetCount) 검사가 아닌 실제 success 상태 검사
+                    const isSuccess = p.status === 'success'; 
                     return isMineOrJoined && isSuccess;
                 }).sort((a, b) => b.id - a.id); // 최신순 정렬
                 
