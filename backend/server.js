@@ -116,13 +116,22 @@ io.on('connection', (socket) => {
 });
 
 // 서버 시작 시 필요한 컬럼 추가 (없을 경우에만)
-pool.promise().query(
-    `ALTER TABLE products ADD COLUMN IF NOT EXISTS closing_notified TINYINT(1) NOT NULL DEFAULT 0`
-).catch(err => console.error('closing_notified 컬럼 추가 실패:', err));
+async function addColumnIfNotExists(columnName) {
+    const [rows] = await pool.promise().query(
+        `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'products' AND COLUMN_NAME = ?`,
+        [columnName]
+    );
+    if (rows[0].cnt === 0) {
+        await pool.promise().query(
+            `ALTER TABLE products ADD COLUMN ${columnName} TINYINT(1) NOT NULL DEFAULT 0`
+        );
+        console.log(`${columnName} 컬럼 추가 완료`);
+    }
+}
 
-pool.promise().query(
-    `ALTER TABLE products ADD COLUMN IF NOT EXISTS transaction_notified TINYINT(1) NOT NULL DEFAULT 0`
-).catch(err => console.error('transaction_notified 컬럼 추가 실패:', err));
+addColumnIfNotExists('closing_notified').catch(err => console.error('closing_notified 컬럼 추가 실패:', err));
+addColumnIfNotExists('transaction_notified').catch(err => console.error('transaction_notified 컬럼 추가 실패:', err));
 
 // 5분마다 공구 상태 체크
 setInterval(async () => {
