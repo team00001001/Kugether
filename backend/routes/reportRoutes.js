@@ -14,53 +14,61 @@ async function updateTrustScore(userId, delta, conn) {
 
 // [API] 방장 신고 접수
 router.post('/', async (req, res) => {
-    const { reporterId, productId} = req.body;
+    const { reporterId, productId } = req.body;
     const conn = await pool.promise().getConnection();
 
     try {
         await conn.beginTransaction();
 
-        const [[product]] = await conn.query(`SELECT user_id FROM products WHERE id=?`, [productId]);
+        const [[product]] = await pool.promise().query(`SELECT user_id, title FROM products WHERE id=?`, [productId]);
         if (!product) {
             await conn.rollback();
             return res.status(404).json({ message: '상품 없음' });
         }
         const hostId = product.user_id;
+        const productTitle = product.title;
 
-        // 1. 신고 기록 추가 (UNIQUE 제약조건 덕분에 중복 신고는 catch로 빠짐)
+        // 1. 신고 기록 추가
         await conn.query(`
             INSERT INTO reports (reporter_id, reported_id, product_id)
             VALUES (?, ?, ?)
         `, [reporterId, hostId, productId]);
 
-        // 2. 참여자 수와 신고 수 조회
-        const [[countRow]] = await conn.query(`
-            SELECT COUNT(*) AS cnt FROM product_participants
-            WHERE product_id = ? AND status != 'cancelled'
-        `, [productId]);
-        
+        // 2. 총 신고 횟수 조회
         const [[reportRow]] = await conn.query(`
             SELECT COUNT(*) AS cnt FROM reports WHERE product_id = ?
         `, [productId]);
+        const reportCount = Number(reportRow.cnt);
 
-        const participantCount = countRow.cnt;
-        const reportCount = reportRow.cnt;
-        
-        // [수정된 부분] 페널티 적용을 위한 신고 누적 기준 (threshold) 설정
-        // - 기준 1: 참여자 수가 3명 미만(1~2명)일 때는 1명만 신고해도 바로 페널티 적용
-        // - 기준 2: 그 외(참여자가 3명 이상)일 때는 2명 이상이 신고해야 페널티 적용
-        const threshold = participantCount < 3 ? 1 : 2;
-
-        // 3. 신고 기준 충족 시 점수 차감 (상태 변경 코드 삭제 완료)
-        if (reportCount >= threshold) {
-            await updateTrustScore(hostId, -20, conn);
+        // 3. 첫 번째 신고일 때만 페널티
+        if (reportCount === 1) {
+            await updateTrustScore(hostId, -1, conn);
         }
 
         await conn.commit();
 
-        createNotification(reporterId, '신고 처리 완료', '신고 처리가 완료되었습니다.', 'notice');
+        // 4. 첫 번째 신고일 때만 방장 알림
+        if (reportCount === 1) {
+            createNotification(
+                hostId,
+                '공구 신고 접수 안내',
+                `개설하신 "${productTitle}" 공구에 신고가 접수되어 크림슨 지수가 20점 차감되었습니다. 억울한 상황이라면 운영진에게 문의해주세요.`,
+                'notice',
+                productId
+            );
+        }
+
+        // 5. 신고자 알림은 항상
+        createNotification(
+            reporterId,
+            '신고 처리 완료',
+            '신고 처리가 정상적으로 접수되었습니다.',
+            'notice',
+            productId
+        );
 
         res.json({ success: true, message: '신고가 접수되었습니다.' });
+
     } catch (err) {
         await conn.rollback();
         if (err.code === 'ER_DUP_ENTRY') {
@@ -72,5 +80,4 @@ router.post('/', async (req, res) => {
         conn.release();
     }
 });
-
 module.exports = router;
