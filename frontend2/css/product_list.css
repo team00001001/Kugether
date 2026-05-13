@@ -23,7 +23,7 @@ body {
 }
 
 /* ==========================================
-✅ 마이페이지와 완벽히 동일한 헤더 CSS 추가
+✅ 헤더 CSS
 ========================================== */
 header {
     background-color: var(--ku-crimson);
@@ -95,7 +95,7 @@ nav a.menu-link:hover {
 }
 
 /* ==========================================
-✅ 대형 검색창 섹션 (깔끔한 알약 디자인)
+✅ 대형 검색창 섹션 (완벽한 알약 디자인)
 ========================================== */
 .search-hero {
     background-color: var(--bg-light-gray);
@@ -104,23 +104,26 @@ nav a.menu-link:hover {
 }
 
 .search-box-wrapper {
+    width: 100%;
     max-width: 600px;
     margin: 0 auto;
     position: relative; 
 }
 
-/* 커스텀 둥근 검색창 스타일 (완전한 알약/반원 형태 극대화) */
+/* 커스텀 둥근 검색창 스타일 */
 .custom-search-input {
     width: 100%;
-    padding: 18px 60px 18px 30px; /* 위아래 여백을 조금 더 늘려서 더 통통하고 둥글게 보이도록 수정 */
+    height: 60px; /* 안정적인 높이 지정 */
+    padding: 0 60px 0 30px; /* 좌우 여백 확보 */
     border: 1.5px solid #E2E8F0;
-    border-radius: 999px; /* 모서리를 극한으로 둥글게 (완벽한 반원 보장) */
+    border-radius: 999px; /* 모서리를 극한으로 둥글게 (완전한 반원 보장) */
     box-sizing: border-box;
     font-size: 1.05rem;
     background-color: #FFFFFF;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     transition: all 0.2s ease-in-out;
     color: var(--text-dark);
+    outline: none;
 }
 
 .custom-search-input::placeholder {
@@ -129,7 +132,6 @@ nav a.menu-link:hover {
 
 /* 검색창을 클릭했을 때 (포커스) */
 .custom-search-input:focus {
-    outline: none;
     border-color: var(--main-burgundy);
     box-shadow: 0 0 0 4px rgba(138, 21, 56, 0.15); /* 부드러운 버건디 글로우 */
 }
