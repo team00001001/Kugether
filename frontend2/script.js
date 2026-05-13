@@ -1,16 +1,22 @@
 const API_URL = 'https://campusgonggu-production.up.railway.app/products';
 
+var _defaultImages = {
+    '식재료 / 배달': 'images/default-food.png',
+    '자취 / 생필품': 'images/default-living.png',
+    '전공 / 문구': 'images/default-study.png',
+    '기타 물품': 'images/default-etc.png'
+};
+
 function onImgError(img) {
     img.onerror = null;
     img.onload = null;
-    img.style.visibility = 'hidden';
+    img.src = _defaultImages[img.dataset.category] || 'images/default-etc.png';
+    var overlay = img.parentElement && img.parentElement.querySelector('.no-image-overlay');
+    if (overlay) overlay.style.display = 'flex';
 }
 
 function onImgSuccess(img) {
-    if (img.naturalWidth > 0) {
-        var overlay = img.parentElement && img.parentElement.querySelector('.no-image-overlay');
-        if (overlay) overlay.style.display = 'none';
-    } else {
+    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
         onImgError(img);
     }
 }
@@ -102,9 +108,10 @@ const imageSrc = hasValidImage
 const cardHTML = `
     <div class="product-card" onclick="location.href='product.html?id=${product.id}'"
     style="cursor:pointer; ${isClosed ? 'opacity: 0.8;' : ''}"> <div class="img-area">
-            <img src="${hasValidImage ? imageSrc : ''}" class="product-thumbnail"
+            <img src="${imageSrc}" class="product-thumbnail"
+            data-category="${product.category}"
             style="${isClosed ? 'filter: grayscale(0.5);' : ''}"
-            onerror="onImgError(this)" onload="onImgSuccess(this)"> <div class="no-image-overlay" style="display:flex;">
+            onerror="onImgError(this)" onload="onImgSuccess(this)"> <div class="no-image-overlay" style="display:${hasValidImage ? 'none' : 'flex'};">
                 등록된 사진이 없습니다
             </div>
         </div>
