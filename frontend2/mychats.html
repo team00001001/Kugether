@@ -27,51 +27,53 @@
     </div>
 
     <script>
-        // 1. 페이지 열리자마자 헤더 가져오기 (mypage.html과 동일)
-        fetch('header.html')
-            .then(res => {
-                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
-                return res.text();
-            })
-            .then(data => {
-                document.getElementById('header-placeholder').innerHTML = data;
-                updateHeader(); // 로그인 상태에 따른 헤더 버튼 업데이트
-            })
-            .catch(err => console.error(err));
+        // 1. 페이지 열리자마자 헤더 가져오기
+fetch('header.html')
+    .then(res => {
+        if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+        return res.text();
+    })
+    .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        updateHeader();
 
-        // 헤더 로그인/로그아웃 상태 업데이트 함수
-        function updateHeader() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            
-            const authButtons = document.querySelectorAll('.auth-only');
-            const guestButtons = document.querySelectorAll('.guest-only');
-
-            if (isLoggedIn) {
-                authButtons.forEach(btn => btn.style.display = 'inline-block');
-                guestButtons.forEach(btn => btn.style.display = 'none');
-            } else {
-                authButtons.forEach(btn => btn.style.display = 'none');
-                guestButtons.forEach(btn => btn.style.display = 'inline-block');
-            }
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.onclick = function() {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('userNickname');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('joinedGroups');
+                    alert('로그아웃 되었습니다.');
+                    location.href = 'main_login.html'; 
+                }
+            };
         }
+    })
+    .catch(err => console.error(err));
 
-        // 2. 로그아웃 기능 (버튼 클릭 감시 - mypage.html과 동일)
-        document.addEventListener('click', function(e) {
-            if(e.target && e.target.id === 'logout-btn') {
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('userNickname');
-                localStorage.removeItem('userEmail');
-                localStorage.removeItem('userId');
-localStorage.removeItem('joinedGroups');
-                alert('로그아웃 되었습니다.');
-                location.href = 'main_login.html'; 
-            }
-        });
+function updateHeader() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const authButtons = document.querySelectorAll('.auth-only');
+    const guestButtons = document.querySelectorAll('.guest-only');
 
-        document.addEventListener('DOMContentLoaded', async () => {
+    if (isLoggedIn) {
+        authButtons.forEach(btn => btn.style.display = 'inline-block');
+        guestButtons.forEach(btn => btn.style.display = 'none');
+    } else {
+        authButtons.forEach(btn => btn.style.display = 'none');
+        guestButtons.forEach(btn => btn.style.display = 'inline-block');
+    }
+}
+
+// 2. 채팅방 목록 로드 및 렌더링
+document.addEventListener('DOMContentLoaded', async () => {
     const listContainer = document.getElementById('chat-list');
     const emptyView = document.getElementById('empty-view');
     const countBadge = document.getElementById('count-badge');
+    const pageTitleText = document.querySelector('.page-title');
 
     const userId = localStorage.getItem('userId');
 
@@ -82,42 +84,103 @@ localStorage.removeItem('joinedGroups');
     }
 
     try {
+        // 1. 내가 '참여한' 채팅(공구) 리스트 가져오기
         const response = await fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`);
-        const myChats = await response.json();
+        let joinedChats = await response.json();
 
-        countBadge.innerText = myChats.length;
+        // 2. 전체 상품 가져와서 내가 '직접 올린' 공고 필터링하기
+        const productResponse = await fetch('https://campusgonggu-production.up.railway.app/products');
+        const allProducts = await productResponse.json();
+        const myCreatedProducts = allProducts.filter(p => String(p.user_id) === String(userId));
 
-        if (myChats.length === 0) {
+        // 3. 두 목록 병합 (중복 방지)
+        const joinedChatIds = joinedChats.map(p => String(p.product_id || p.id));
+        myCreatedProducts.forEach(myProduct => {
+            if (!joinedChatIds.includes(String(myProduct.id))) {
+                joinedChats.push({
+                    ...myProduct,
+                    product_id: myProduct.id
+                });
+            }
+        });
+
+        // 4. 최신 글이 위로 오도록 정렬
+        joinedChats.sort((a, b) => (b.product_id || b.id) - (a.product_id || a.id));
+
+        // UI 업데이트
+        countBadge.innerText = joinedChats.length;
+        pageTitleText.innerHTML = `내 참여 채팅방 <span id="count-badge">${joinedChats.length}</span>`;
+
+        if (joinedChats.length === 0) {
             emptyView.style.display = 'block';
             return;
         }
 
+        // 카테고리별 기본 이미지 매핑
+        const categoryMap = {
+            '식재료 / 배달': { defaultImg: 'images/default-food.png' },
+            '자취 / 생필품': { defaultImg: 'images/default-living.png' },
+            '전공 / 문구': { defaultImg: 'images/default-study.png' },
+            '기타 물품': { defaultImg: 'images/default-etc.png' }
+        };
+        const defaultEtcImg = 'images/default-etc.png';
+
         listContainer.innerHTML = '';
 
-        myChats.forEach(chat => {
+        joinedChats.forEach(chat => {
             const card = document.createElement('div');
             card.className = 'chat-card';
 
+            const productId = chat.product_id || chat.id;
+            
+            // 상태 뱃지 계산
+            const now = Math.floor(Date.now() / 1000);
+            const isCompleted = (chat.currentCount >= chat.targetCount) || 
+                                chat.isClosed || 
+                                (Number(chat.duration) <= now);
+            
+            const statusClass = isCompleted ? 'status-completed' : 'status-recruiting';
+            const statusText = isCompleted ? '마감됨' : '모집중';
+            
+            // 💡 내가 올린 글(방장)인지 확인
+            const isHost = String(chat.user_id) === String(userId);
+
+            // 모집 상태 뱃지 (모집중일 때 버건디 색상 적용)
+            const statusHtml = `<span class="status-badge ${statusClass}" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; margin-bottom: 6px; display: inline-block; font-weight: 600; ${isCompleted ? 'background: #e9ecef; color: #868e96;' : 'background: #8A1538; color: white;'}">${statusText}</span>`;
+
+            // 방장 전용 뱃지 HTML (깔끔한 버건디 아웃라인)
+            const hostBadgeHtml = isHost 
+                ? `<span style="font-size: 0.7rem; color: #8A1538; border: 1px solid #8A1538; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; white-space: nowrap;">👑 방장</span>` 
+                : '';
+
+            // 카테고리별 기본 이미지 처리
+            const catInfo = categoryMap[chat.category] || { defaultImg: defaultEtcImg };
+            const displayImg = chat.imageUrl || catInfo.defaultImg;
+
             card.innerHTML = `
-                <img src="${chat.imageUrl || 'images/default-etc.png'}" alt="상품" class="product-img">
-                <div class="chat-info">
-                    <div class="chat-category">${chat.category || '기타'}</div>
-                    <div class="chat-name">${chat.title}</div>
-                    <div class="chat-meta">
-                        <span>💰 ${Number(chat.price).toLocaleString()}원</span>
-                        <span>📍 ${chat.location || '교내'}</span>
-                        <span>👥 ${chat.currentCount}/${chat.targetCount}</span>
+                <img src="${displayImg}" alt="상품" class="product-img" onerror="this.onerror=null; this.src='${defaultEtcImg}';">
+                <div class="chat-info" style="min-width: 0;">
+                    ${statusHtml}
+                    <div class="chat-category" style="font-size: 0.85rem; color: #666;">${chat.category || '기타'}</div>
+                    <div class="chat-name" style="font-weight: 600; margin: 4px 0; display: flex; align-items: center;">
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${chat.title}</span>
+                        ${hostBadgeHtml}
+                    </div>
+                    <div class="chat-meta" style="font-size: 0.9rem; color: #444;">
+                        <span style="margin-right: 8px;">💰 ${Number(chat.price).toLocaleString()}원</span>
+                        <span style="margin-right: 8px;">📍 ${chat.location || '교내'}</span>
+                        <span>👥 ${chat.currentCount || 0}/${chat.targetCount || 0}</span>
                     </div>
                 </div>
-                <a href="direct_chattings.html?id=${chat.product_id}" class="enter-btn">채팅방 입장</a>
+                <a href="direct_chattings.html?id=${productId}" class="enter-btn" style="margin-left: auto; white-space: nowrap;">채팅방 입장</a>
             `;
 
             listContainer.appendChild(card);
         });
-
+        
     } catch (error) {
         console.error('채팅방 목록 로드 실패:', error);
-        alert('채팅방 목록을 불러오지 못했습니다.');
+        listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">채팅방 목록을 불러오는 중 오류가 발생했습니다.</p>';
     }
 });
     </script>
