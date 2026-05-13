@@ -98,31 +98,60 @@ nav a.menu-link:hover {
 /* 대형 검색창 섹션 */
 .search-hero {
     background-color: var(--bg-light-gray);
-    /* 고정 헤더 70px를 고려하여 상단 패딩 늘림 */
     padding: 120px 60px 80px; 
     text-align: center;
 }
 
+/* 1. 검색창 래퍼: 버튼을 안에 넣기 위해 relative만 추가 */
 .search-box-wrapper {
     max-width: 700px;
     margin: 0 auto;
-    position: relative;
+    position: relative; 
 }
 
+/* 2. 입력창: 보내주셨던 속성들 그대로 복구 */
 .search-box-wrapper input {
     width: 100%;
-    padding: 22px 35px;
+    /* 위아래 22px, 왼쪽 35px은 유지, 오른쪽만 버튼 안 겹치게 70px로 변경 */
+    padding: 22px 70px 22px 35px; 
     font-size: 18px;
     border: none;
-    border-radius: 40px; 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border-radius: 40px; /* ★ 이 부분! 동글동글하게 유지 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* ★ 은은한 그림자 유지 */
     outline: none;
     box-sizing: border-box;
     transition: all 0.3s ease;
 }
 
+/* 포커스 시 버건디 그림자 효과 유지 */
 .search-box-wrapper input:focus {
     box-shadow: 0 4px 25px rgba(138, 21, 56, 0.15);
+}
+
+/* 3. 돋보기 버튼: 둥근 모서리 안쪽에 투명하게 배치 */
+#search-btn {
+    position: absolute;
+    right: 25px; /* 둥근 곡선 안쪽 적당한 위치 */
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* 아이콘 색상 조절 */
+#search-btn svg {
+    stroke: #888; /* 차분한 회색 */
+    transition: stroke 0.2s;
+}
+
+#search-btn:hover svg {
+    stroke: #555; /* 마우스 올리면 조금 더 진한 회색 */
 }
 
 /* 카테고리 필터 버튼 영역 */
