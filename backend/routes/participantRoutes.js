@@ -105,7 +105,7 @@ router.post('/join', async (req, res) => {
                     createNotification(
                         productInfo.user_id,
                         '참여자가 다시 들어왔습니다',
-                        `"${productInfo.title}" 공구에 <b>${rejoinUser.nickname}</b>님이 다시 참여했습니다.`,'success'
+                        `"${productInfo.title}" 공구에 <b>${rejoinUser.nickname}</b>님이 다시 참여했습니다.`, 'success', productId
                     );
                 }
 
@@ -115,10 +115,10 @@ router.post('/join', async (req, res) => {
                         `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                         [productId]
                     );
-                    createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success');
+                    createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success', productId);
                     allParticipants.forEach(p => {
                         if (String(p.user_id) !== String(productInfo.user_id)) {
-                            createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success');
+                            createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success', productId);
                         }
                     });
                 }
@@ -172,9 +172,8 @@ router.post('/join', async (req, res) => {
             createNotification(
                 productInfo.user_id,
                 '새 참여자가 생겼습니다',
-
-`"${productInfo.title}" 공구에 <b>${joinedUser.nickname}</b>님이 참여했습니다.`,
-                'success'
+                `"${productInfo.title}" 공구에 <b>${joinedUser.nickname}</b>님이 참여했습니다.`,
+                'success', productId
             );
         }
 
@@ -184,10 +183,10 @@ router.post('/join', async (req, res) => {
                 `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                 [productId]
             );
-            createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success');
+            createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success', productId);
             allParticipants.forEach(p => {
                 if (String(p.user_id) !== String(productInfo.user_id)) {
-                    createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success');
+                    createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success', productId);
                 }
             });
         }
@@ -295,9 +294,8 @@ router.patch('/cancel', async (req, res) => {
             createNotification(
                 productInfo.user_id,
                 '참여자가 나갔습니다',
-
-`"${productInfo.title}" 공구에서 <b>${cancelUser.nickname}</b>님이 나갔습니다.`,
-                'notice'
+                `"${productInfo.title}" 공구에서 <b>${cancelUser.nickname}</b>님이 나갔습니다.`,
+                'notice', productId
             );
         }
 
@@ -408,7 +406,7 @@ router.patch('/status', async (req, res) => {
                 userId,
                 '노쇼 처리 안내',
                 '노쇼 처리가 반영되었습니다.',
-                'notice'
+                'notice', targetProductId
             );
 
         } else {
@@ -422,10 +420,10 @@ router.patch('/status', async (req, res) => {
 
             // 🔔 [알림 전송] 참여자에게 확인 완료 알림
             createNotification(
-                userId, 
-                '참여 확인 완료', 
-                `"${productTitle}" 공구 방장이 참여를 확인했습니다. 물건 수령 후 '수령 확인' 버튼을 눌러주세요.`, 
-                'success'
+                userId,
+                '참여 확인 완료',
+                `"${productTitle}" 공구 방장이 참여를 확인했습니다. 물건 수령 후 '수령 확인' 버튼을 눌러주세요.`,
+                'success', targetProductId
             );
         }
 
