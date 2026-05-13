@@ -8,8 +8,12 @@ function onImgError(img) {
     if (overlay) overlay.style.display = 'flex';
 }
 
-function onImgLoad(img) {
-    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+function onImgSuccess(img) {
+    if (img.naturalWidth > 0) {
+        img.style.display = 'block';
+        var overlay = img.parentElement && img.parentElement.querySelector('.no-image-overlay');
+        if (overlay) overlay.style.display = 'none';
+    } else {
         onImgError(img);
     }
 }
@@ -101,9 +105,9 @@ const imageSrc = hasValidImage
 const cardHTML = `
     <div class="product-card" onclick="location.href='product.html?id=${product.id}'"
     style="cursor:pointer; ${isClosed ? 'opacity: 0.8;' : ''}"> <div class="img-area">
-            <img src="${imageSrc}" class="product-thumbnail"
-            style="${isClosed ? 'filter: grayscale(0.5);' : ''}"
-            onerror="onImgError(this)"> <div class="no-image-overlay" style="display:${hasValidImage ? 'none' : 'flex'};">
+            <img src="${hasValidImage ? imageSrc : ''}" class="product-thumbnail"
+            style="display:none; ${isClosed ? 'filter: grayscale(0.5);' : ''}"
+            onerror="onImgError(this)" onload="onImgSuccess(this)"> <div class="no-image-overlay" style="display:flex;">
                 등록된 사진이 없습니다
             </div>
         </div>
@@ -134,14 +138,6 @@ const cardHTML = `
     </div>
 `;
     roomGrid.insertAdjacentHTML('beforeend', cardHTML);
-
-    if (hasValidImage) {
-        const card = roomGrid.lastElementChild;
-        const imgEl = card && card.querySelector('img.product-thumbnail');
-        if (imgEl) {
-            imgEl.decode().catch(() => onImgError(imgEl));
-        }
-    }
 });
 
     // 더보기 버튼 표시 여부
