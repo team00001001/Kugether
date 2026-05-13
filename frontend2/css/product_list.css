@@ -24,7 +24,7 @@ body {
 
 /* ==========================================
 ✅ 마이페이지와 완벽히 동일한 헤더 CSS 추가
-    ========================================== */
+========================================== */
 header {
     background-color: var(--ku-crimson);
     backdrop-filter: blur(8px);
@@ -93,45 +93,51 @@ nav a.menu-link:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(138, 21, 56, 0.4);
 }
-/* ========================================== */
 
-/* 대형 검색창 섹션 */
+/* ==========================================
+✅ 대형 검색창 섹션 (깔끔한 알약 디자인)
+========================================== */
 .search-hero {
     background-color: var(--bg-light-gray);
     padding: 120px 60px 80px; 
     text-align: center;
 }
 
-/* 1. 검색창 래퍼: 버튼을 안에 넣기 위해 relative만 추가 */
 .search-box-wrapper {
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
     position: relative; 
 }
 
-/* 2. 입력창: 보내주셨던 속성들 그대로 복구 */
-.search-box-wrapper input {
+/* 커스텀 둥근 검색창 스타일 (완전한 알약/반원 형태 극대화) */
+.custom-search-input {
     width: 100%;
-    /* 위아래 22px, 왼쪽 35px은 유지, 오른쪽만 버튼 안 겹치게 70px로 변경 */
-    padding: 22px 70px 22px 35px; 
-    font-size: 18px;
-    border: none;
-    border-radius: 40px; /* ★ 이 부분! 동글동글하게 유지 */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* ★ 은은한 그림자 유지 */
-    outline: none;
+    padding: 18px 60px 18px 30px; /* 위아래 여백을 조금 더 늘려서 더 통통하고 둥글게 보이도록 수정 */
+    border: 1.5px solid #E2E8F0;
+    border-radius: 999px; /* 모서리를 극한으로 둥글게 (완벽한 반원 보장) */
     box-sizing: border-box;
-    transition: all 0.3s ease;
+    font-size: 1.05rem;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease-in-out;
+    color: var(--text-dark);
 }
 
-/* 포커스 시 버건디 그림자 효과 유지 */
-.search-box-wrapper input:focus {
-    box-shadow: 0 4px 25px rgba(138, 21, 56, 0.15);
+.custom-search-input::placeholder {
+    color: #A0AEC0;
 }
 
-/* 3. 돋보기 버튼: 둥근 모서리 안쪽에 투명하게 배치 */
-#search-btn {
+/* 검색창을 클릭했을 때 (포커스) */
+.custom-search-input:focus {
+    outline: none;
+    border-color: var(--main-burgundy);
+    box-shadow: 0 0 0 4px rgba(138, 21, 56, 0.15); /* 부드러운 버건디 글로우 */
+}
+
+/* 돋보기 버튼 */
+.search-btn-custom {
     position: absolute;
-    right: 25px; /* 둥근 곡선 안쪽 적당한 위치 */
+    right: 18px; 
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -141,20 +147,28 @@ nav a.menu-link:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
 }
 
-/* 아이콘 색상 조절 */
-#search-btn svg {
-    stroke: #888; /* 차분한 회색 */
-    transition: stroke 0.2s;
+.search-btn-custom svg {
+    stroke: #A0AEC0;
+    transition: stroke 0.2s ease;
 }
 
-#search-btn:hover svg {
-    stroke: #555; /* 마우스 올리면 조금 더 진한 회색 */
+/* 돋보기 버튼 호버 효과 */
+.search-btn-custom:hover {
+    background-color: #FFF0F3;
 }
 
-/* 카테고리 필터 버튼 영역 */
+.search-btn-custom:hover svg {
+    stroke: var(--main-burgundy);
+}
+
+/* ==========================================
+✅ 카테고리 필터 버튼 영역
+========================================== */
 .category-filter-row {
     display: flex;
     justify-content: center;
@@ -188,7 +202,9 @@ nav a.menu-link:hover {
 .btn-study { background-color: var(--color-study); }
 .btn-etc { background-color: var(--color-etc); }
 
-/* 메인 콘텐츠 컨테이너 */
+/* ==========================================
+✅ 메인 콘텐츠 및 상품 카드
+========================================== */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -232,36 +248,30 @@ nav a.menu-link:hover {
 }
 
 .img-area {
-position: relative;
-overflow: hidden;
+    position: relative;
+    overflow: hidden;
 }
 
 .product-thumbnail {
-width: 100%;
-height: 200px;
-object-fit: cover;
-border-radius: 15px;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
 }
 
 .no-image-overlay {
-position: absolute;
-inset: 0;
-
-display: flex;
-align-items: center;
-justify-content: center;
-
-background: rgba(0, 0, 0, 0.28);
-color: white;
-
-font-size: 0.95rem;
-font-weight: 700;
-
-backdrop-filter: blur(2px);
-
-border-radius: 15px;
-
-letter-spacing: -0.2px;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.28);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    backdrop-filter: blur(2px);
+    border-radius: 15px;
+    letter-spacing: -0.2px;
 }
 
 .card-body {

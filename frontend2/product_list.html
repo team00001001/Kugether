@@ -19,20 +19,16 @@
     <div id="header-placeholder"></div>
 
     <section class="search-hero">
-        <div class="search-box-wrapper" style="position: relative; max-width: 600px; margin: 0 auto;">
-        <!-- 검색창: value 유지를 위해 id="main-search" 확인 -->
-        <input type="text" id="main-search" placeholder="어떤 물품을 찾고 계신가요?" 
-               style="width: 100%; padding: 12px 50px 12px 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-        
-        <!-- 회색 SVG 돋보기 버튼 -->
-        <button id="search-btn" type="button" 
-                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; display: flex; align-items: center; padding: 5px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-    </div>
+        <div class="search-box-wrapper">
+            <input type="text" id="main-search" class="custom-search-input" placeholder="어떤 물품을 찾고 계신가요?">
+            
+            <button id="search-btn" type="button" class="search-btn-custom">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </div>
 
         <div class="category-filter-row" id="category-buttons">
             <button class="filter-btn btn-food" onclick="filterCategory('식재료 / 배달')">🍊 식재료 / 배달</button>
@@ -40,7 +36,6 @@
             <button class="filter-btn btn-study" onclick="filterCategory('전공 / 문구')">📚 전공 / 문구</button>
             <button class="filter-btn btn-etc" onclick="filterCategory('기타 물품')">📦 기타 물품</button>
             <button class="filter-btn" onclick="clearCategory()" style="background-color: #eee;">🏠 전체</button>
-            <!-- 추가하느라.. -->
         </div>
     </section>
 
