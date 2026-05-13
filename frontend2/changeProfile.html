@@ -66,21 +66,27 @@
 
     <script>
         // 🚨 1. 알림 배지 업데이트 함수 추가
-        async function updateHeaderNotificationBadge() {
-            const userId = localStorage.getItem('userId');
-            const badge = document.querySelector('.noti-badge');
-            if (!badge || !userId) return;
-            try {
-                const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
-                const notifications = await res.json();
-                const hasUnread = notifications.some(n => Number(n.is_read) === 0);
-                badge.style.display = hasUnread ? 'block' : 'none';
-            } catch (err) {
-                badge.style.display = 'none';
-            }
+    async function updateHeaderNotificationBadge() {
+        const userId = localStorage.getItem('userId');
+        const badge = document.querySelector('.noti-badge');
+        if (!badge || !userId) return;
+        try {
+            const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
+            const notifications = await res.json();
+            const hasUnread = notifications.some(n => Number(n.is_read) === 0);
+            badge.style.display = hasUnread ? 'block' : 'none';
+        } catch (err) {
+            badge.style.display = 'none';
         }
+    }
 
-        // 헤더 파일 불러오기 로직
+    // 🚨 DOM이 로드된 후 실행되도록 통합 (joined_products.html 스타일 적용)
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 페이지 로드 시 사용자 정보 세팅
+        document.getElementById('user-email').value = localStorage.getItem('userEmail') || '';
+        document.getElementById('user-nickname').value = localStorage.getItem('userNickname') || '';
+
+        // 2. 헤더 파일 불러오기 로직
         fetch('header.html')
             .then(res => {
                 if (!res.ok) throw new Error('header.html을 찾을 수 없습니다.');
@@ -88,32 +94,40 @@
             })
             .then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
-                updateHeader();
                 
-                // 🚨 2. 헤더 로드 직후 알림 배지 함수 실행
+                // 헤더 UI 업데이트 및 알림 배지 로드
+                updateHeader();
                 updateHeaderNotificationBadge();
+                
+                // 로그아웃 버튼 이벤트 연결 추가 (매우 중요)
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.onclick = function() {
+                        if (confirm('로그아웃 하시겠습니까?')) {
+                            localStorage.removeItem('userId');
+                            localStorage.removeItem('isLoggedIn');
+                            alert('로그아웃 되었습니다.');
+                            location.href = 'main_login.html';
+                        }
+                    };
+                }
             })
             .catch(err => console.error(err));
+    });
 
-        function updateHeader() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const authButtons = document.querySelectorAll('.auth-only');
-            const guestButtons = document.querySelectorAll('.guest-only');
+    function updateHeader() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const authButtons = document.querySelectorAll('.auth-only');
+        const guestButtons = document.querySelectorAll('.guest-only');
 
-            if (isLoggedIn) {
-                authButtons.forEach(btn => btn.style.display = 'inline-block');
-                guestButtons.forEach(btn => btn.style.display = 'none');
-            } else {
-                // 비로그인 상태일 경우 로그인 페이지로 리다이렉트
-                location.href = 'login.html';
-            }
+        if (isLoggedIn) {
+            authButtons.forEach(btn => btn.style.display = 'inline-block');
+            guestButtons.forEach(btn => btn.style.display = 'none');
+        } else {
+            // 비로그인 상태일 경우 로그인 페이지로 리다이렉트
+            location.href = 'login.html';
         }
-
-        // 페이지 로드 시 사용자 정보 세팅
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('user-email').value = localStorage.getItem('userEmail') || '';
-            document.getElementById('user-nickname').value = localStorage.getItem('userNickname') || '';
-        });
+    }
 
         // 닉네임 변경 함수
         async function updateNickname() {
