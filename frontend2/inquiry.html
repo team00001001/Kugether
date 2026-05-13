@@ -53,6 +53,20 @@
     </div>
 
     <script>
+        async function updateHeaderNotificationBadge() {
+            const userId = localStorage.getItem('userId');
+            const badge = document.querySelector('.noti-badge');
+            if (!badge || !userId) return;
+            try {
+                const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
+                const notifications = await res.json();
+                const hasUnread = notifications.some(n => Number(n.is_read) === 0);
+                badge.style.display = hasUnread ? 'block' : 'none';
+            } catch (err) {
+                badge.style.display = 'none';
+            }
+        }
+
         // 1. 공통 헤더 불러오기 (help.html 로직 동일)
         fetch('header.html')
             .then(res => {
@@ -62,6 +76,9 @@
             .then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
                 updateHeader();
+
+                // 🚨 2. 헤더 로드 직후 알림 배지 함수 실행
+                updateHeaderNotificationBadge();
             })
             .catch(err => console.error(err));
 

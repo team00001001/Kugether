@@ -27,32 +27,46 @@
     </div>
 
     <script>
-        // 1. 페이지 열리자마자 헤더 가져오기
-fetch('header.html')
-    .then(res => {
-        if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
-        return res.text();
-    })
-    .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-        updateHeader();
-
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.onclick = function() {
-                if (confirm('로그아웃 하시겠습니까?')) {
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('userNickname');
-                    localStorage.removeItem('userEmail');
-                    localStorage.removeItem('userId');
-                    localStorage.removeItem('joinedGroups');
-                    alert('로그아웃 되었습니다.');
-                    location.href = 'main_login.html'; 
-                }
-            };
+        // 🚨 1. 알림 배지 업데이트 함수 추가
+        async function updateHeaderNotificationBadge() {
+            const userId = localStorage.getItem('userId');
+            const badge = document.querySelector('.noti-badge');
+            if (!badge || !userId) return;
+            try {
+                const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
+                const notifications = await res.json();
+                const hasUnread = notifications.some(n => Number(n.is_read) === 0);
+                badge.style.display = hasUnread ? 'block' : 'none';
+            } catch (err) {
+                badge.style.display = 'none';
+            }
         }
-    })
-    .catch(err => console.error(err));
+
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+                return res.text();
+            })
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                updateHeader();
+
+                // 🚨 2. 헤더 로드 직후 알림 배지 함수 실행
+                updateHeaderNotificationBadge();
+
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.onclick = function() {
+                        if (confirm('로그아웃 하시겠습니까?')) {
+                            localStorage.removeItem('userId');
+                            localStorage.removeItem('isLoggedIn');
+                            alert('로그아웃 되었습니다.');
+                            location.href = 'main_login.html';
+                        }
+                    };
+                }
+            }) 
+            .catch(err => console.error(err));
 
 function updateHeader() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';

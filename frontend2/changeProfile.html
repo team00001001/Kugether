@@ -65,6 +65,21 @@
     </div>
 
     <script>
+        // 🚨 1. 알림 배지 업데이트 함수 추가
+        async function updateHeaderNotificationBadge() {
+            const userId = localStorage.getItem('userId');
+            const badge = document.querySelector('.noti-badge');
+            if (!badge || !userId) return;
+            try {
+                const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
+                const notifications = await res.json();
+                const hasUnread = notifications.some(n => Number(n.is_read) === 0);
+                badge.style.display = hasUnread ? 'block' : 'none';
+            } catch (err) {
+                badge.style.display = 'none';
+            }
+        }
+
         // 헤더 파일 불러오기 로직
         fetch('header.html')
             .then(res => {
@@ -74,6 +89,9 @@
             .then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
                 updateHeader();
+                
+                // 🚨 2. 헤더 로드 직후 알림 배지 함수 실행
+                updateHeaderNotificationBadge();
             })
             .catch(err => console.error(err));
 
