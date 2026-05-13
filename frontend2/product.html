@@ -227,9 +227,6 @@
                 extraUrlsHtml += `<br>🔗 <strong>상품 URL</strong>: <a href="${product.productUrl}" target="_blank" style="color: #007bff; text-decoration: underline; word-break: break-all;">${product.productUrl}</a>`;
             }
 
-            if (isValidImageUrl) {
-                extraUrlsHtml += `<br>🖼️ <strong>상품 이미지 URL</strong>: <a href="${product.imageUrl}" target="_blank" style="color: #007bff; text-decoration: underline; word-break: break-all;">${product.imageUrl}</a>`;
-            }
 
             // ✅ 상세 설명에 URL 정보 합치기
             const descHtml = `
