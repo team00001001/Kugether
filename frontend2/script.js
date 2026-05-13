@@ -2,9 +2,16 @@ const API_URL = 'https://campusgonggu-production.up.railway.app/products';
 
 function onImgError(img) {
     img.onerror = null;
+    img.onload = null;
     img.style.display = 'none';
     var overlay = img.parentElement && img.parentElement.querySelector('.no-image-overlay');
     if (overlay) overlay.style.display = 'flex';
+}
+
+function onImgLoad(img) {
+    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+        onImgError(img);
+    }
 }
 const roomGrid = document.getElementById('roomGrid');
 const loadMoreArea = document.getElementById('loadMoreArea');
@@ -96,7 +103,7 @@ const cardHTML = `
     style="cursor:pointer; ${isClosed ? 'opacity: 0.8;' : ''}"> <div class="img-area">
             <img src="${imageSrc}" class="product-thumbnail"
             style="${isClosed ? 'filter: grayscale(0.5);' : ''}"
-            onerror="onImgError(this)"> <div class="no-image-overlay" style="display:${hasValidImage ? 'none' : 'flex'};">
+            onerror="onImgError(this)" onload="onImgLoad(this)"> <div class="no-image-overlay" style="display:${hasValidImage ? 'none' : 'flex'};">
                 등록된 사진이 없습니다
             </div>
         </div>
