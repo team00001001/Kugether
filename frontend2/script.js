@@ -41,6 +41,7 @@ function getPageSize() { return getCurrentCols() * 2; }
 const urlParams = new URLSearchParams(window.location.search);
 const currentCategory = urlParams.get('category');
 const initialSearch = urlParams.get('search') || '';
+const isHideClosed = urlParams.get('hideClosed') === 'true'; 
 
 // 1. 데이터 가져오기 (가장 먼저 실행)
 async function fetchProducts() {
@@ -59,6 +60,7 @@ async function fetchProducts() {
 }
 
 // 2. 필터링 로직
+// 2. 필터링 로직
 function applyFilter(keyword) {
     const term = keyword.toLowerCase().trim();
 
@@ -69,8 +71,16 @@ function applyFilter(keyword) {
         // 검색어 필터링
         const matchSearch = p.title.toLowerCase().includes(term) || 
                             p.category.toLowerCase().includes(term);
+                            
+        // ✨ 마감 숨기기 필터링 로직 추가
+        // 이미 기한이 지났거나(isClosed) 인원이 다 찬 경우 마감된 것으로 판별
+        const isProductClosed = p.isClosed || (p.currentCount >= p.targetCount);
         
-        return matchCat && matchSearch;
+        // 숨기기 옵션이 켜져있는데 마감된 상품이라면 걸러냄 (false 반환)
+        const matchHideClosed = isHideClosed ? !isProductClosed : true;
+        
+        // 세 가지 조건(카테고리, 검색어, 숨기기)이 모두 맞는 것만 화면에 남김
+        return matchCat && matchSearch && matchHideClosed; 
     });
 
     displayCount = getPageSize(); // 필터링 될 때마다 2행 분량으로 초기화
