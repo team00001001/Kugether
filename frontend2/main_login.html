@@ -13,8 +13,6 @@
 </head>
 <body>
 
-    <!-- 1. 상단바 -->
-    <!-- index.html 상단 -->
     <div id="header-placeholder"></div>
 
     <script>
@@ -108,9 +106,7 @@
         });
     </script>
 
-    <!-- 2. 메인 컨텐츠 영역 -->
     <main>
-        <!-- 다이나믹 히어로 섹션 -->
         <section class="hero-section">
             <div class="hero-text-area">
                 <span class="hero-badge">🔥 실시간 트렌드</span>
@@ -130,35 +126,6 @@
             </div>
         </section>
 
-        <!-- 카테고리 (파스텔 & 이모지) -->
-        <div class="section-title">👀 카테고리 둘러보기</div>
-        <section class="cat-grid">
-            <div class="cat-card cat-1" onclick="filterCategory('식재료 / 배달')">
-                <span class="cat-icon">🍊</span>
-                <div class="cat-title">식재료 / 배달</div>
-            </div>
-            <div class="cat-card cat-2" onclick="filterCategory('자취 / 생필품')">
-                <span class="cat-icon">🧴</span>
-                <div class="cat-title">자취 / 생필품</div>
-            </div>
-            <div class="cat-card cat-3" onclick="filterCategory('전공 / 문구')">
-                <span class="cat-icon">📚</span>
-                <div class="cat-title">전공 / 문구</div>
-            </div>
-            <div class="cat-card cat-4" onclick="filterCategory('기타 물품')">
-                <span class="cat-icon">📦</span>
-                <div class="cat-title">기타 물품</div>
-            </div>
-        </section>
-
-        <script>
-            function filterCategory(categoryName) {
-                // 카테고리 이름을 URL 파라미터로 담아서 이동
-                location.href = `product_list.html?category=${encodeURIComponent(categoryName)}`;
-            }
-        </script>
-
-        <!-- 이용 방법 가이드: 비로그인 / 회원가입 직후에만 표시 -->
         <div id="guide-section" style="display:none;">
         <div class="section-title">🚀 이용 방법</div>
         <section class="how-it-works">
@@ -193,9 +160,33 @@
         <div style="text-align:center; margin-top:-40px; margin-bottom:70px;">
             <button class="hiw-detail-btn" onclick="openGuideModal()">📖 단계별 상세 가이드 보기</button>
         </div>
-        </div><!-- /guide-section -->
+        </div><div class="section-title">👀 카테고리 둘러보기</div>
+        <section class="cat-grid">
+            <div class="cat-card cat-1" onclick="filterCategory('식재료 / 배달')">
+                <span class="cat-icon">🍊</span>
+                <div class="cat-title">식재료 / 배달</div>
+            </div>
+            <div class="cat-card cat-2" onclick="filterCategory('자취 / 생필품')">
+                <span class="cat-icon">🧴</span>
+                <div class="cat-title">자취 / 생필품</div>
+            </div>
+            <div class="cat-card cat-3" onclick="filterCategory('전공 / 문구')">
+                <span class="cat-icon">📚</span>
+                <div class="cat-title">전공 / 문구</div>
+            </div>
+            <div class="cat-card cat-4" onclick="filterCategory('기타 물품')">
+                <span class="cat-icon">📦</span>
+                <div class="cat-title">기타 물품</div>
+            </div>
+        </section>
 
-        <!-- 상세 가이드 모달 -->
+        <script>
+            function filterCategory(categoryName) {
+                // 카테고리 이름을 URL 파라미터로 담아서 이동
+                location.href = `product_list.html?category=${encodeURIComponent(categoryName)}`;
+            }
+        </script>
+
         <div id="guide-modal" class="guide-modal-overlay" onclick="closeGuideModal(event)">
             <div class="guide-modal">
                 <button class="guide-modal-close" onclick="closeGuideModal()">✕</button>
@@ -206,7 +197,6 @@
                     <button class="guide-tab" onclick="switchTab('host', this)">✏️ 공구 개설하기</button>
                 </div>
 
-                <!-- 참여하기 흐름 -->
                 <div id="tab-join" class="guide-flow">
                     <div class="gf-step">
                         <div class="gf-num">1</div>
@@ -254,7 +244,6 @@
                     </div>
                 </div>
 
-                <!-- 개설하기 흐름 -->
                 <div id="tab-host" class="guide-flow" style="display:none;">
                     <div class="gf-step">
                         <div class="gf-num">1</div>
@@ -304,13 +293,10 @@
             </div>
         </div>
 
-        <!-- 공구방 리스트 -->
         <div class="section-title">⚡최근 올라온 공구방</div>
         <section class="room-grid" id="recent-room-grid">
         </section>
     </main>
-    <!-- 3. 플로팅 게시글 작성 버튼 (Pen Icon) -->
-    <!-- style="display: none;"을 추가해 기본적으로 숨겨둡니다 -->
     <a href="writefront.html" id="write-fab" class="write-fab" title="공구방 만들기" style="display: none;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round">

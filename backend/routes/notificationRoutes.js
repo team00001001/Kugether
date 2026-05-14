@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// 특정 유저 알림 모두 읽음 처리
+// 1. 특정 유저 알림 모두 읽음 처리
 router.patch('/user/:userId/read-all', (req, res) => {
   const { userId } = req.params;
 
@@ -22,7 +22,7 @@ router.patch('/user/:userId/read-all', (req, res) => {
   });
 });
 
-// 내 알림 목록 조회
+// 2. 내 알림 목록 조회
 router.get('/:userId', (req, res) => {
   const { userId } = req.params;
 
@@ -43,7 +43,7 @@ router.get('/:userId', (req, res) => {
   });
 });
 
-// 알림 읽음 처리
+// 3. 알림 읽음 처리
 router.patch('/:id/read', (req, res) => {
   const { id } = req.params;
 
@@ -63,7 +63,7 @@ router.patch('/:id/read', (req, res) => {
   });
 });
 
-// 💡 [새로 추가된 부분] 알림 삭제 처리 (프론트엔드의 DELETE 요청을 받음)
+// 4. 알림 삭제 처리
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
@@ -82,16 +82,31 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-// 테스트용 알림 생성
+// 5. 💡 [수정된 부분] 알림 생성 (동적 메세지 처리)
 router.post('/', (req, res) => {
-  const { user_id, title, message, type } = req.body;
+  // 클라이언트 요청에서 product_name을 추가로 구조분해할당 받습니다.
+  const { user_id, title, message, type, product_name } = req.body;
+
+  let finalMessage = message; 
+
+  // product_name이 존재할 경우 알림 메세지를 포맷팅합니다.
+  if (product_name) {
+    if (title === '거래 완료 확인 필요') {
+      finalMessage = `"${product_name}" 공구의 거래 완료 확인이 필요합니다.`;
+    } else if (title === '공구 마감') {
+      finalMessage = `"${product_name}" 공구가 곧 마감됩니다.`;
+    } else {
+      finalMessage = `"${product_name}" 공구에 대한 알림이 있습니다.`;
+    }
+  }
 
   const sql = `
         INSERT INTO notifications (user_id, title, message, type)
         VALUES (?, ?, ?, ?)
     `;
 
-  db.query(sql, [user_id, title, message, type || 'info'], (err, result) => {
+  // 원래의 message 대신 포맷팅된 finalMessage를 DB에 저장합니다.
+  db.query(sql, [user_id, title, finalMessage, type || 'info'], (err, result) => {
     if (err) {
       console.error('알림 생성 에러:', err);
       return res.status(500).json({ message: '알림 생성 실패' });
