@@ -130,3 +130,16 @@ nav a.menu-link:hover {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 .modal-overlay.active { opacity: 1; visibility: visible; }
+
+.logo {
+    text-decoration: none;
+    /* 이미지를 수직 중앙 정렬하기 위해 추가 */
+    display: flex;
+    align-items: center;
+}
+
+/* 새로 추가하는 이미지 스타일 */
+.logo-img {
+    height: 40px; /* 헤더 높이 70px에 맞춰 적절히 조정 */
+    width: auto;  /* 이미지 비율 유지 */
+}
