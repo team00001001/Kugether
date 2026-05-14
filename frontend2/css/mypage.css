@@ -246,29 +246,27 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .main-content > .section-title:first-child { margin-top: 0; }
 
 
-/* ── 공구 그리드 (table-style) ── */
+/* ── 공구 그리드 ── */
 .gonggu-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid var(--ln);
-  border-top: none;
+  gap: 12px;
+  padding-top: 12px;
   margin-bottom: 4px;
 }
 
 .gonggu-card {
   background: var(--wh);
-  border-right: 1px solid var(--ln);
-  border-bottom: 1px solid var(--ln);
+  border: 1px solid var(--ln);
   padding: 22px 20px;
   cursor: pointer;
-  transition: background 0.14s;
+  transition: background 0.14s, border-color 0.14s;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.gonggu-card:nth-child(2n) { border-right: none; }
-.gonggu-card:hover { background: #FAFAFA; }
+.gonggu-card:hover { background: #FAFAFA; border-color: #C8C8C8; }
 
 /* 뱃지 */
 .badge {
