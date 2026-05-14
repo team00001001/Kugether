@@ -117,6 +117,7 @@
         const API_BASE_URL = 'https://campusgonggu-production.up.railway.app';
         const currentUserId = localStorage.getItem('userId');
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        let currentProductData = null;
 
         // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', async () => {
@@ -148,6 +149,7 @@
 
                 const product = await pRes.json();
                 product.members = mRes.ok ? await mRes.json() : [];
+                currentProductData = product;
 
                 // 3. UI 렌더링 시작
                 renderProductBasicInfo(product);
@@ -453,7 +455,13 @@
         async function joinGroupBuy() {
             if (!isLoggedIn) { alert('로그인이 필요합니다.'); location.href = 'login.html'; return; }
             const productId = new URLSearchParams(window.location.search).get('id');
-            if (!confirm('이 공동구매에 참여하시겠습니까?')) return;
+
+            const isLastSlot = currentProductData &&
+                (parseInt(currentProductData.currentCount) + 1 >= parseInt(currentProductData.targetCount));
+            const confirmMsg = isLastSlot
+                ? '참여하면 모집 인원이 꽉 차 공구가 마감되며, 이후 취소가 불가능합니다.\n그래도 참여하시겠습니까?'
+                : '이 공동구매에 참여하시겠습니까?';
+            if (!confirm(confirmMsg)) return;
 
             try {
                 const res = await fetch(`${API_BASE_URL}/participants/join`, {
