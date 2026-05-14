@@ -36,7 +36,8 @@
   }
 
   .search-hero {
-    padding: 95px 18px 36px !important;
+    /* 💡 수정됨: 하단 여백을 36px -> 18px로 줄임 */
+    padding: 95px 18px 18px !important;
   }
 
   .search-box-wrapper {
@@ -78,7 +79,8 @@
   }
 
   .container {
-    padding: 24px 16px !important;
+    /* 💡 수정됨: 상단 여백을 24px -> 12px로 줄임 (하단은 24px 유지) */
+    padding: 12px 16px 24px !important;
   }
 
   .product-grid {
