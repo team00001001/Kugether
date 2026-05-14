@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="./css/product.css">
-    <link rel="stylesheet" href="./css/skeleton.css">
     <link rel="stylesheet" href="css_mobile/product_mobile.css" media="(max-width: 768px)">
 </head>
 
@@ -16,20 +15,7 @@
     <div id="header-placeholder"></div>
 
     <div class="container">
-        <!-- 로딩 스켈레톤 -->
-        <div id="product-skeleton" class="skeleton-hero">
-            <div class="sk-image skeleton"></div>
-            <div class="sk-info">
-                <div class="sk-badge skeleton"></div>
-                <div class="sk-title skeleton"></div>
-                <div class="sk-price skeleton"></div>
-                <div class="sk-bar skeleton"></div>
-                <div class="sk-bar-sm skeleton"></div>
-                <div class="sk-btn skeleton"></div>
-            </div>
-        </div>
-
-        <section class="product-hero card" id="product-hero" style="display:none;">
+        <section class="product-hero card">
             <div class="product-image-container">
                 <img src="" alt="상품 이미지" class="product-image" id="product-img">
                 <div id="detail-no-image-overlay" class="detail-no-image-overlay">등록된 사진이 없습니다</div>
@@ -49,8 +35,6 @@
                         <span class="n-pay-label">공구 참여가 (인당)</span>
                         <div class="n-pay-price" id="product-price">0원 <span id="product-target-count">(0명 기준)</span>
                         </div>
-                    </div>
-                    <div id="price-breakdown" style="display:none; margin-top:8px; font-size:0.82rem; color:#888; line-height:1.7;">
                     </div>
                 </div>
 
@@ -185,10 +169,6 @@
 
         // --- 공통 데이터 렌더링 ---
         function renderProductBasicInfo(product) {
-            // 스켈레톤 숨기고 실제 콘텐츠 표시
-            document.getElementById('product-skeleton').style.display = 'none';
-            document.getElementById('product-hero').style.display = '';
-
             document.getElementById('product-title').innerText = product.title;
             document.getElementById('host-name').innerText = product.writer || '익명 학우';
             document.getElementById('host-trust-score').innerText = product.writer_trust_score ?? '-';
@@ -205,30 +185,7 @@
             catBadge.innerText = `${catInfo.emoji} ${product.category}`;
             catBadge.className = `category-badge ${catInfo.className}`;
 
-            // 인당 금액 계산
-            const basePrice = Number(product.price) || 0;
-            const shippingFee = Number(product.shipping_fee) || 0;
-            const targetCount = Number(product.targetCount) || 1;
-            const pType = product.price_type || 'per';
-            let perPerson;
-            if (pType === 'total') {
-                perPerson = Math.ceil((basePrice + shippingFee) / targetCount);
-            } else {
-                perPerson = Math.ceil(basePrice + shippingFee / targetCount);
-            }
-            document.getElementById('product-price').innerHTML = `${perPerson.toLocaleString()}원 <span>(${product.targetCount}명 기준)</span>`;
-
-            // 가격 상세 내역 표시
-            const breakdownEl = document.getElementById('price-breakdown');
-            if (shippingFee > 0 || pType === 'total') {
-                const label = pType === 'total' ? '상품 전체가' : '상품 개당가';
-                breakdownEl.innerHTML = `
-                    ${label}: ${basePrice.toLocaleString()}원
-                    ${shippingFee > 0 ? ` + 배송비: ${shippingFee.toLocaleString()}원` : ''}
-                    ${pType === 'total' ? ` ÷ ${targetCount}명` : ''}
-                `;
-                breakdownEl.style.display = 'block';
-            }
+            document.getElementById('product-price').innerHTML = `${Number(product.price).toLocaleString()}원 <span>(${product.targetCount}명 기준)</span>`;
             document.getElementById('status-count-text').innerHTML = `현재 <strong>${product.currentCount}명</strong> / 목표 ${product.targetCount}명`;
 
             // 프로그래스바
@@ -354,7 +311,6 @@
                 }
             }
 
-            // 💡 수정된 부분: 방장이거나 참여자면 회원 목록 렌더링을 호출합니다.
             if (isHost || isParticipant) {
                 renderMemberList(product, isHost);
             }
@@ -367,12 +323,16 @@
             const mgmtArea = document.getElementById('member-management-area');
             const validMembers = product.members.filter(m => m.status !== 'noshow');
 
-            // 방장일 때와 참여자일 때의 제목을 다르게 설정
+            // 방장일 때와 참여자일 때의 제목 및 안내 문구 설정
             const titleText = isHost ? '👥 참여자 관리 (방장 전용)' : '👥 참여자';
+            const subText = isHost 
+                ? '참여자가 송금하지 않은 경우 노쇼 버튼을 통해 참여자를 내보내는 것이 가능합니다.'
+                : '송금하지 않은 경우 공구에서 내보내지는 노쇼 처리가 될 수 있습니다.';
 
             let html = `
                 <div class="member-list card" style="margin-top:30px; padding:20px; border:1px solid #eee;">
-                    <h3 style="margin-bottom:15px;">${titleText}</h3>
+                    <h3 style="margin-bottom:5px;">${titleText}</h3>
+                    <p style="font-size:13px; color:#666; margin-top:0; margin-bottom:15px; word-break:keep-all;">${subText}</p>
                     <div id="member-items">
             `;
 
