@@ -128,6 +128,14 @@
                     return;
                 }
 
+                const nowSec = Math.floor(Date.now() / 1000);
+                const isClosed = product.isClosed || product.currentCount >= product.targetCount || Number(product.duration) <= nowSec;
+                if (isClosed) {
+                    alert('이미 마감된 공고는 수정할 수 없습니다.');
+                    location.href = `product.html?id=${productId}`;
+                    return;
+                }
+
                 document.getElementById('productName').value = product.title;
                 document.getElementById('people').value = product.targetCount;
                 document.getElementById('price').value = product.price;
@@ -147,7 +155,6 @@
                 }
 
                 currentExpireAt = Number(product.duration);
-                const nowSec = Math.floor(Date.now() / 1000);
                 const diffSec = currentExpireAt - nowSec;
                 
                 const timeDisplay = document.getElementById('remaining-time-display');

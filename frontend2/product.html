@@ -264,10 +264,11 @@
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <button class="join-btn" style="background-color: var(--ku-crimson);" onclick="location.href='direct_chattings.html?id=${product.id}'">💬 채팅방 들어가기 (방장)</button>
 
+                        ${!isClosed ? `
                         <div style="display:flex; gap:10px;">
                             <button class="join-btn" style="background:#4A5056; flex:1; font-size: 14px;" onclick="location.href='edit.html?id=${product.id}'">내용 수정</button>
-                            ${!isClosed ? `<button class="join-btn" style="background:#222222; flex:1; font-size: 14px;" onclick="earlyCloseProduct('${product.id}')">모집 조기 마감</button>` : ''}
-                        </div>
+                            <button class="join-btn" style="background:#222222; flex:1; font-size: 14px;" onclick="earlyCloseProduct('${product.id}')">모집 조기 마감</button>
+                        </div>` : ''}
 
                         <button class="join-btn" style="background:none; border:1px solid #EAECEF; color:#818991; padding: 12px; font-size: 14px;" onclick="deleteProduct('${product.id}')">공구방 삭제</button>
                     </div>

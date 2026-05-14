@@ -129,7 +129,7 @@ if (durationNum !== null && Number.isNaN(durationNum)) {
 });
 
 // 4. 상품 수정
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     const productId = req.params.id;
 
     const {
@@ -143,6 +143,22 @@ router.put('/:id', (req, res) => {
         productUrl,
         description
     } = req.body;
+
+    try {
+        const [rows] = await db.promise().query(
+            'SELECT isClosed, currentCount, targetCount, duration FROM products WHERE id = ?',
+            [productId]
+        );
+        if (rows.length === 0) return res.status(404).json({ error: '상품을 찾을 수 없습니다.' });
+        const p = rows[0];
+        const nowSec = Math.floor(Date.now() / 1000);
+        if (p.isClosed || p.currentCount >= p.targetCount || Number(p.duration) <= nowSec) {
+            return res.status(403).json({ error: '이미 마감된 공고는 수정할 수 없습니다.' });
+        }
+    } catch (e) {
+        console.error('수정 전 마감 체크 실패:', e);
+        return res.status(500).json({ error: '서버 에러' });
+    }
 
     let durationNum = null;
 
