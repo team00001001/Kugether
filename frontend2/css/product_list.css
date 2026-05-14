@@ -224,12 +224,42 @@ nav a.menu-link:hover {
     color: var(--main-burgundy);
 }
 
+/* 열 선택 버튼 */
+.cols-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+}
+.cols-label {
+    font-size: 13px;
+    color: #999;
+    margin-right: 4px;
+}
+.col-btn {
+    padding: 5px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: #fff;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.col-btn:hover { border-color: #8A1538; color: #8A1538; }
+.col-btn.active { background: #8A1538; color: #fff; border-color: #8A1538; font-weight: 600; }
+.mobile-only { display: none; }
+
 /* 상품 그리드 레이아웃 */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 30px;
+    gap: 24px;
 }
+.product-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.product-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.product-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.product-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
 
 /* 상품 카드 디자인 */
 .product-card {

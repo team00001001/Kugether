@@ -43,8 +43,21 @@
         <!-- 검색 결과 문구 영역 -->
         <div id="resultText" class="result-info" style="display: none; margin-bottom: 20px"></div>
 
+        <!-- 열 선택 버튼 -->
+        <div class="cols-selector">
+            <span class="cols-label">보기</span>
+            <!-- 모바일 전용 (1열) -->
+            <button class="col-btn mobile-only" data-cols="1" onclick="setGridCols(1)">1열</button>
+            <!-- 공통 (2·3열) -->
+            <button class="col-btn" data-cols="2" onclick="setGridCols(2)">2열</button>
+            <button class="col-btn" data-cols="3" onclick="setGridCols(3)">3열</button>
+            <!-- 데스크톱 전용 (4·6열) -->
+            <button class="col-btn desktop-only" data-cols="4" onclick="setGridCols(4)">4열</button>
+            <button class="col-btn desktop-only" data-cols="6" onclick="setGridCols(6)">6열</button>
+        </div>
+
         <!-- 3. 공구방 카드 리스트 영역 -->
-        <div id="roomGrid" class="product-grid"></div>
+        <div id="roomGrid" class="product-grid cols-3"></div>
 
         <!-- 4. 더보기 버튼 영역 -->
         <div id="loadMoreArea" style="text-align: center; margin-top: 40px; display: none;">
@@ -81,8 +94,37 @@
             }
         }
 
+        // 열 선택 기능
+        function isMobile() { return window.innerWidth <= 768; }
+
+        function setGridCols(cols) {
+            const grid = document.getElementById('roomGrid');
+            grid.className = grid.className.replace(/\bcols-\d+\b/, '').trim();
+            grid.classList.add(`cols-${cols}`);
+
+            const storageKey = isMobile() ? 'gridColsMobile' : 'gridColsDesktop';
+            localStorage.setItem(storageKey, cols);
+
+            document.querySelectorAll('.col-btn').forEach(btn => {
+                btn.classList.toggle('active', Number(btn.dataset.cols) === cols);
+            });
+        }
+
+        function initGridCols() {
+            const mobile = isMobile();
+            const storageKey = mobile ? 'gridColsMobile' : 'gridColsDesktop';
+            const defaultCols = mobile ? 2 : 3;
+            const maxMobile = 3;
+
+            let saved = Number(localStorage.getItem(storageKey)) || defaultCols;
+            if (mobile && saved > maxMobile) saved = maxMobile;
+
+            setGridCols(saved);
+        }
+
         // [로직] 페이지 초기 로드 처리
         document.addEventListener('DOMContentLoaded', () => {
+            initGridCols();
             // 1. 헤더 불러오기
             fetch('header.html')
                 .then(res => {
