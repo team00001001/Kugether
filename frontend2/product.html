@@ -308,8 +308,15 @@
                     <div id="member-items">
             `;
 
+            html += `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f5f5f5;">
+                    <span><strong>${product.writer}</strong> 학우</span>
+                    <span style="color:#8A1538; font-weight:bold; font-size:13px;">👑 방장</span>
+                </div>
+            `;
+
             if (validMembers.length === 0) {
-                html += `<p style="color:#999;">아직 참여자가 없습니다.</p>`;
+                html += `<p style="color:#999; padding-top:12px;">추가 참여자가 없습니다.</p>`;
             } else {
                 validMembers.forEach(m => {
                     const isConfirmed = m.status === 'confirmed' || m.status === 'completed';
