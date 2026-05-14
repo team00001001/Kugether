@@ -1,0 +1,90 @@
+@keyframes skeleton-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #ececec 25%, #d8d8d8 50%, #ececec 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite linear;
+    border-radius: 6px;
+    color: transparent !important;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* 상품 카드 스켈레톤 */
+.skeleton-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    pointer-events: none;
+}
+.skeleton-card .sk-img {
+    width: 100%;
+    height: 180px;
+}
+.skeleton-card .sk-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.skeleton-card .sk-tag  { height: 12px; width: 55%; border-radius: 4px; }
+.skeleton-card .sk-title { height: 18px; width: 90%; border-radius: 4px; }
+.skeleton-card .sk-bar  { height: 8px;  width: 100%; border-radius: 4px; }
+.skeleton-card .sk-foot { display: flex; justify-content: space-between; margin-top: 2px; }
+.skeleton-card .sk-price { height: 16px; width: 32%; border-radius: 4px; }
+.skeleton-card .sk-status { height: 16px; width: 28%; border-radius: 4px; }
+
+/* 상품 상세 스켈레톤 */
+.skeleton-hero {
+    display: flex;
+    gap: 32px;
+    padding: 32px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(138,21,56,0.06);
+    margin-bottom: 24px;
+}
+.skeleton-hero .sk-image {
+    width: 340px;
+    min-width: 340px;
+    height: 300px;
+    border-radius: 14px;
+}
+.skeleton-hero .sk-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.skeleton-hero .sk-badge  { height: 22px; width: 40%; border-radius: 20px; }
+.skeleton-hero .sk-title  { height: 28px; width: 80%; border-radius: 6px; }
+.skeleton-hero .sk-price  { height: 32px; width: 50%; border-radius: 6px; }
+.skeleton-hero .sk-bar    { height: 10px; width: 100%; border-radius: 6px; }
+.skeleton-hero .sk-bar-sm { height: 10px; width: 60%; border-radius: 6px; }
+.skeleton-hero .sk-btn    { height: 48px; width: 100%; border-radius: 12px; margin-top: 10px; }
+
+/* 프로필 스켈레톤 */
+.skeleton-profile-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+.skeleton-profile-card .sk-avatar { width: 80px; height: 80px; border-radius: 50%; }
+.skeleton-profile-card .sk-name   { height: 22px; width: 120px; border-radius: 6px; }
+.skeleton-profile-card .sk-score  { height: 28px; width: 90px; border-radius: 20px; }
+.skeleton-profile-card .sk-stats  { display: flex; gap: 24px; margin-top: 8px; }
+.skeleton-profile-card .sk-stat   { width: 70px; height: 48px; border-radius: 10px; }
+
+@media (max-width: 768px) {
+    .skeleton-hero { flex-direction: column; padding: 18px; }
+    .skeleton-hero .sk-image { width: 100%; min-width: unset; height: 200px; }
+}

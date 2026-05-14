@@ -43,19 +43,37 @@ const currentCategory = urlParams.get('category');
 const initialSearch = urlParams.get('search') || '';
 const isHideClosed = urlParams.get('hideClosed') === 'true'; 
 
+// 스켈레톤 카드 생성
+function showSkeletons(count) {
+    if (!roomGrid) return;
+    const cols = getCurrentCols();
+    const skeletonHTML = Array.from({ length: count || cols * 2 }, () => `
+        <div class="skeleton-card">
+            <div class="sk-img skeleton"></div>
+            <div class="sk-body">
+                <div class="sk-tag skeleton"></div>
+                <div class="sk-title skeleton"></div>
+                <div class="sk-bar skeleton"></div>
+                <div class="sk-foot">
+                    <div class="sk-price skeleton"></div>
+                    <div class="sk-status skeleton"></div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    roomGrid.innerHTML = skeletonHTML;
+}
+
 // 1. 데이터 가져오기 (가장 먼저 실행)
 async function fetchProducts() {
+    showSkeletons();
     try {
         const response = await fetch(API_URL);
         allProducts = await response.json();
-        
-        console.log("가져온 데이터 개수:", allProducts.length);
-
-        // 데이터 가져오기에 성공하면 바로 필터링 및 렌더링 실행
         applyFilter(initialSearch);
     } catch (error) {
         console.error("데이터 로딩 실패:", error);
-        if(roomGrid) roomGrid.innerHTML = "<p>서버와 연결할 수 없습니다.</p>";
+        if(roomGrid) roomGrid.innerHTML = "<p style='text-align:center;padding:50px;'>서버와 연결할 수 없습니다.</p>";
     }
 }
 

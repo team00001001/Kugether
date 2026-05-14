@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>방장 프로필 | KU GONGGU</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/skeleton.css">
     <style>
         :root { --ku-crimson: #8A1538; --ku-gradient: linear-gradient(135deg, #8A1538, #D32F2F); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,7 +93,17 @@
 </div>
 
 <div class="container">
-    <div id="loading">프로필 불러오는 중...</div>
+    <div id="loading">
+        <div class="skeleton-profile-card">
+            <div class="sk-avatar skeleton"></div>
+            <div class="sk-name skeleton"></div>
+            <div class="sk-score skeleton"></div>
+            <div class="sk-stats">
+                <div class="sk-stat skeleton"></div>
+                <div class="sk-stat skeleton"></div>
+            </div>
+        </div>
+    </div>
 
     <div id="profile-wrap" style="display:none;">
         <div class="profile-card">

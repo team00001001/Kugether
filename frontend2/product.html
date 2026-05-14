@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="./css/product.css">
+    <link rel="stylesheet" href="./css/skeleton.css">
     <link rel="stylesheet" href="css_mobile/product_mobile.css" media="(max-width: 768px)">
 </head>
 
@@ -15,7 +16,20 @@
     <div id="header-placeholder"></div>
 
     <div class="container">
-        <section class="product-hero card">
+        <!-- 로딩 스켈레톤 -->
+        <div id="product-skeleton" class="skeleton-hero">
+            <div class="sk-image skeleton"></div>
+            <div class="sk-info">
+                <div class="sk-badge skeleton"></div>
+                <div class="sk-title skeleton"></div>
+                <div class="sk-price skeleton"></div>
+                <div class="sk-bar skeleton"></div>
+                <div class="sk-bar-sm skeleton"></div>
+                <div class="sk-btn skeleton"></div>
+            </div>
+        </div>
+
+        <section class="product-hero card" id="product-hero" style="display:none;">
             <div class="product-image-container">
                 <img src="" alt="상품 이미지" class="product-image" id="product-img">
                 <div id="detail-no-image-overlay" class="detail-no-image-overlay">등록된 사진이 없습니다</div>
@@ -171,6 +185,10 @@
 
         // --- 공통 데이터 렌더링 ---
         function renderProductBasicInfo(product) {
+            // 스켈레톤 숨기고 실제 콘텐츠 표시
+            document.getElementById('product-skeleton').style.display = 'none';
+            document.getElementById('product-hero').style.display = '';
+
             document.getElementById('product-title').innerText = product.title;
             document.getElementById('host-name').innerText = product.writer || '익명 학우';
             document.getElementById('host-trust-score').innerText = product.writer_trust_score ?? '-';
