@@ -381,3 +381,49 @@ nav a.menu-link:hover {
     font-size: 13px;
     font-weight: 700;
 }
+
+/* 커스텀 체크박스 래퍼 */
+.custom-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    user-select: none;
+}
+
+/* 기본 체크박스 숨기기 */
+.custom-checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+/* 커스텀 체크박스 모양 */
+.checkbox-icon {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    margin-right: 8px;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 체크되었을 때의 스타일 (포인트 컬러 적용) */
+.custom-checkbox-label input[type="checkbox"]:checked + .checkbox-icon {
+    background-color: #8A1538; 
+    border-color: #8A1538;
+}
+
+/* 체크되었을 때 나타나는 V자 마크 */
+.custom-checkbox-label input[type="checkbox"]:checked + .checkbox-icon::after {
+    content: "";
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-bottom: 2px;
+}

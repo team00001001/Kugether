@@ -40,6 +40,14 @@
     </section>
 
     <main class="container">
+        <div class="filter-toggle-wrap" style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <label for="hide-completed" class="custom-checkbox-label">
+                <input type="checkbox" id="hide-completed">
+                <span class="checkbox-icon"></span>
+                모집완료 숨기기
+            </label>
+        </div>
+
         <!-- 검색 결과 문구 영역 -->
         <div id="resultText" class="result-info" style="display: none; margin-bottom: 20px"></div>
 
@@ -135,50 +143,71 @@
             setGridCols(saved);
         }
 
-        // [로직] 페이지 초기 로드 처리
         document.addEventListener('DOMContentLoaded', () => {
-            initGridCols();
-            // 1. 헤더 불러오기
-            fetch('header.html')
-                .then(res => {
-                    if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
-                    return res.text();
-                })
-                .then(data => {
-                    document.getElementById('header-placeholder').innerHTML = data;
-                    updateHeader();
-                })
-                .catch(err => console.error('헤더 로딩 에러:', err));
+    // 1. 헤더 불러오기
+    fetch('header.html')
+        .then(res => {
+            if (!res.ok) throw new Error('header.html 파일을 찾을 수 없습니다.');
+            return res.text();
+        })
+        .then(data => {
+            document.getElementById('header-placeholder').innerHTML = data;
+            updateHeader();
+        })
+        .catch(err => console.error('헤더 로딩 에러:', err));
 
-            // 2. URL 파라미터에 따른 검색창 Placeholder 변경
-            const urlParams = new URLSearchParams(window.location.search);
-            const category = urlParams.get('category');
-            const searchTerm = urlParams.get('search'); 
-            const searchInput = document.getElementById('main-search');
-            const searchBtn = document.getElementById('search-btn'); // 돋보기 버튼
+    // 2. URL 파라미터 읽어오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const searchTerm = urlParams.get('search');
+    const hideClosed = urlParams.get('hideClosed');
 
-            if (category && searchInput) {
-                searchInput.placeholder = `"${category}" 내에서 검색...`;
-            }
+    const searchInput = document.getElementById('main-search');
+    const searchBtn = document.getElementById('search-btn'); // 돋보기 버튼
+    const hideCheckbox = document.getElementById('hide-completed'); // 체크박스
 
-            // 4. [추가] 검색어가 있으면 검색창에 글자 유지
+    // 3. 검색어 상태 복구
     if (searchTerm && searchInput) {
         searchInput.value = searchTerm;
     }
 
-    // 5. [이벤트 연결] 엔터키 눌렀을 때
-    if (searchInput) {
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                performSearch(); // 아까 만든 공통 함수 호출
+    // 4. 모집완료 숨기기 체크박스 상태 복구
+    if (hideClosed === 'true' && hideCheckbox) {
+        hideCheckbox.checked = true;
+    }
+
+    // 5. 현재 선택된 카테고리 버튼 강조 (프로젝트 포인트 컬러 적용)
+    if (category) {
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            if (btn.innerText.includes(category)) {
+                btn.style.backgroundColor = '#8A1538';
+                btn.style.color = 'white';
             }
         });
     }
 
-    // 6. [이벤트 연결] 돋보기 버튼 눌렀을 때
+    // 6. 이벤트 리스너 연결
+    // 6-1. 검색창에서 엔터키 눌렀을 때
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(); 
+            }
+        });
+    }
+
+    // 6-2. 돋보기 버튼 눌렀을 때
     if (searchBtn) {
         searchBtn.addEventListener('click', () => {
-            performSearch(); // 아까 만든 공통 함수 호출
+            performSearch(); 
+        });
+    }
+
+    // 6-3. 체크박스 상태를 변경했을 때 바로 필터링 적용
+    if (hideCheckbox) {
+        hideCheckbox.addEventListener('change', () => {
+            performSearch();
         });
     }
 });
@@ -186,19 +215,29 @@
 
 function performSearch() {
     const searchInput = document.getElementById('main-search');
+    const hideCheckbox = document.getElementById('hide-completed'); // 체크박스 가져오기
     if (!searchInput) return;
 
     const keyword = searchInput.value.trim();
+    const isHideClosed = hideCheckbox ? hideCheckbox.checked : false;
     const urlParams = new URLSearchParams(window.location.search);
     const currentCat = urlParams.get('category');
 
+    // 1. 검색어 포함
     let targetUrl = `product_list.html?search=${encodeURIComponent(keyword)}`;
+    
+    // 2. 카테고리 유지
     if (currentCat) {
         targetUrl += `&category=${encodeURIComponent(currentCat)}`;
     }
+
+    // 3. ✅ 모집완료 숨기기 상태 포함
+    if (isHideClosed) {
+        targetUrl += `&hideClosed=true`;
+    }
+
     location.href = targetUrl;
 }
-
         // [로직] 로그아웃 버튼 클릭 처리
         document.addEventListener('click', function (e) {
             const logoutBtn = e.target.closest('#logout-btn');
