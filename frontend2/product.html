@@ -6,14 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상품 상세 | KU GONGGU</title>
 
-    <link rel="stylesheet" href="css/product.css" media="(min-width: 769px)">
-
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="./css/product.css">
     <link rel="stylesheet" href="css_mobile/product_mobile.css" media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
 </head>
 
 <body>
@@ -236,7 +232,7 @@
                     ${extraUrlsHtml}
                 </div>
                 <div style="line-height: 1.5;">
-                    ${product.description.replace(/\n/g, '<br>')}
+                    ${escapeHtml(product.description).replace(/\n/g, '<br>')}
                 </div>
             `;
             document.getElementById('product-description').innerHTML = descHtml;
@@ -432,6 +428,9 @@
                         alert("✅ 수령 확인이 등록되었습니다.");
                     }
                     location.reload();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || "수령 처리에 실패했습니다.");
                 }
             } catch (e) { alert("서버 연결 실패"); }
         }
@@ -573,7 +572,22 @@
             fetch('header.html').then(res => res.text()).then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
                 updateHeader();
+                updateHeaderNotificationBadge();
             });
+        }
+
+        async function updateHeaderNotificationBadge() {
+            const userId = localStorage.getItem('userId');
+            const badge = document.querySelector('.noti-badge');
+            if (!badge || !userId) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/notifications/${userId}`);
+                const notifications = await res.json();
+                const hasUnread = notifications.some(n => Number(n.is_read) === 0);
+                badge.style.display = hasUnread ? 'block' : 'none';
+            } catch (err) {
+                badge.style.display = 'none';
+            }
         }
 
         function updateHeader() {
@@ -594,9 +608,20 @@
             return `${date.getMonth() + 1}월 ${date.getDate()}일 ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}까지`;
         }
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function startTimer(expireAt) {
             const el = document.getElementById('deadline-text');
-            const timer = setInterval(() => {
+            let timer;
+
+            function update() {
                 const now = Math.floor(Date.now() / 1000);
                 const diff = Number(expireAt) - now;
                 if (diff <= 0) {
@@ -610,7 +635,10 @@
                 const s = diff % 60;
                 let text = d > 0 ? `${d}일 ${h}시간` : h > 0 ? `${h}시간 ${m}분` : `${m}분 ${s}초`;
                 el.innerHTML = `<span>⏳</span> 남은 기간: <strong>${text} 남음</strong>`;
-            }, 1000);
+            }
+
+            update();
+            timer = setInterval(update, 1000);
         }
 
         // =========================================================
