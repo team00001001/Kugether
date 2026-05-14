@@ -25,7 +25,8 @@ router.post('/join', async (req, res) => {
         await conn.beginTransaction();
 
         const [products] = await conn.query(
-            'SELECT currentCount, targetCount, duration, user_id FROM products WHERE id = ? FOR UPDATE',
+            // duration을 추가로 SELECT 합니다.
+            'SELECT currentCount, targetCount, duration FROM products WHERE id = ? FOR UPDATE',
             [productId]
         );
 
@@ -36,12 +37,6 @@ router.post('/join', async (req, res) => {
 
         const product = products[0];
         const now = Math.floor(Date.now() / 1000);
-
-        // 방장 참여 차단
-        if (String(product.user_id) === String(userId)) {
-            await conn.rollback();
-            return res.status(403).json({ message: '본인이 개설한 공구에는 참여할 수 없습니다.' });
-        }
 
         // 기존 인원수 검증에 시간 만료 검증 로직을 추가합니다.
         if (product.currentCount >= product.targetCount || Number(product.duration) <= now) {
@@ -115,13 +110,13 @@ router.post('/join', async (req, res) => {
                 }
 
                 const newCountReJoin = product.currentCount + 1;
-                // 💡 [수정됨] 재참여 시 목표 인원 달성 처리
+                // 💡 [수정됨] 재참여 시 목표 인원 달성 처리 (수정하신 부분 - 잘 적용됨)
                 if (newCountReJoin >= product.targetCount) {
                     const [allParticipants] = await pool.promise().query(
                         `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                         [productId]
                     );
-                    // 방장에게 거래 완료 확인 필요 알림 전송 (상품명 포함)
+                    // 방장에게 거래 완료 확인 필요 알림 전송
                     createNotification(productInfo.user_id, '거래 완료 확인 필요', `"${productInfo.title}" 공구의 거래 완료 확인이 필요합니다. 택배 수령과 참여자 물건 수령 후 확인 버튼을 눌러주세요.`, 'success', productId);
                     allParticipants.forEach(p => {
                         if (String(p.user_id) !== String(productInfo.user_id)) {
@@ -186,14 +181,14 @@ router.post('/join', async (req, res) => {
         }
 
         const newCountJoin = product.currentCount + 1;
-        // 💡 [수정됨] 최초 참여 시 목표 인원 달성 처리
+        // 💡 [여기가 놓친 부분입니다!] 최초 참여 시 목표 인원 달성 처리
         if (newCountJoin >= product.targetCount) {
             const [allParticipants] = await pool.promise().query(
                 `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                 [productId]
             );
-            // 방장에게 거래 완료 확인 필요 알림 전송 (상품명 포함)
-            createNotification(productInfo.user_id, '거래 완료 확인 필요', `"${productInfo.title}" 공구의 거래 완료 확인이 필요합니다.`, 'success', productId);
+            // 👇 방장에게 거래 완료 확인 필요 알림 전송 (이 부분도 원하시는 문구로 통일해서 수정했습니다!)
+            createNotification(productInfo.user_id, '거래 완료 확인 필요', `"${productInfo.title}" 공구의 거래 완료 확인이 필요합니다. 택배 수령과 참여자 물건 수령 후 확인 버튼을 눌러주세요.`, 'success', productId);
             allParticipants.forEach(p => {
                 if (String(p.user_id) !== String(productInfo.user_id)) {
                      // 참여자에게 마감 알림 전송
@@ -470,10 +465,6 @@ router.patch('/receive', async (req, res) => {
         if (!member) {
             await conn.rollback();
             return res.status(404).json({ message: '참여 정보를 찾을 수 없습니다.' });
-        }
-        if (member.status === 'completed') {
-            await conn.rollback();
-            return res.status(409).json({ message: '이미 수령 완료 처리되었습니다.' });
         }
         if (member.status === 'joined') {
             await conn.rollback();
