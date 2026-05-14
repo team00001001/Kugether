@@ -103,7 +103,12 @@
                 <label>학교 이메일</label>
                 <div class="email-input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
                     <input type="text" id="email-id" placeholder="이메일 아이디" required style="flex: 1;">
-                    <span style="font-weight: 600; color: #555;">@ korea.ac.kr</span>
+                    <span style="font-weight: 600; color: #555;">@</span>
+                    <select id="email-domain" style="padding: 11px 10px; border: 1.5px solid #E2E2E2; border-radius: 6px; font-size: 0.93rem; font-family: inherit; background: #FAFAFA; color: #111; cursor: pointer;">
+                        <option value="korea.ac.kr">korea.ac.kr</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="naver.com">naver.com</option>
+                    </select>
                 </div>
                 <button type="button" class="btn btn-secondary" id="btn-send-code" style="width: 100%;">인증번호 전송</button>
             </div>
@@ -153,7 +158,7 @@ KU GONGGU는 안전하고 신뢰할 수 있는 학우 간 공동구매 서비스
 
 1. 수집하는 개인정보 항목
 • 필수 항목: 고려대학교 이메일, 비밀번호, 닉네임
-(※ 비밀번호는 본 서비스 전용입니다. 포털 등 타 서비스와 다른 비밀번호 사용을 권장합니다.)
+(※서비스 이용 아이디는 이메일 앞부분으로 자동 설정되며, 다른 이용자에게는 절대 노출되지 않습니다. 비밀번호는 본 서비스 전용이므로 학교 포털 등 타 서비스와 다른 비밀번호 사용을 권장합니다.)
 
 2. 개인정보의 수집 및 이용 목적
 • 고려대학교 재학생 본인 인증 및 회원 식별
@@ -199,8 +204,6 @@ KU GONGGU는 안전하고 신뢰할 수 있는 학우 간 공동구매 서비스
             if (event.target == termsModal) { termsModal.style.display = 'none'; }
         });
 
-        // ✅ 이메일 도메인 고정
-        const FIXED_DOMAIN = 'korea.ac.kr';
         let isEmailVerified = false;
 
         // 이메일 입력값이 변경되면 인증 상태를 초기화하는 함수
@@ -214,17 +217,19 @@ KU GONGGU는 안전하고 신뢰할 수 있는 학우 간 공동구매 서비스
         }
 
         document.getElementById('email-id').addEventListener('input', resetVerification);
+        document.getElementById('email-domain').addEventListener('change', resetVerification);
 
         // 2. 인증번호 전송 버튼 클릭 로직
         btnSendCode.addEventListener('click', async () => {
             const emailId = document.getElementById('email-id').value.trim();
+            const domain = document.getElementById('email-domain').value;
 
             if (!emailId) {
                 alert('이메일 아이디를 입력해주세요.');
                 return;
             }
 
-            const email = `${emailId}@${FIXED_DOMAIN}`;
+            const email = `${emailId}@${domain}`;
 
             try {
                 const response = await fetch('https://campusgonggu-production.up.railway.app/api/send-auth-email', {
@@ -258,7 +263,8 @@ KU GONGGU는 안전하고 신뢰할 수 있는 학우 간 공동구매 서비스
         btnVerifyCode.addEventListener('click', async () => {
             const code = document.getElementById('verification-code').value.trim();
             const emailId = document.getElementById('email-id').value.trim();
-            const email = `${emailId}@${FIXED_DOMAIN}`;
+            const domain = document.getElementById('email-domain').value;
+            const email = `${emailId}@${domain}`;
 
             if (!code) {
                 verificationMsg.textContent = '인증번호를 입력해주세요.';
@@ -340,10 +346,11 @@ KU GONGGU는 안전하고 신뢰할 수 있는 학우 간 공동구매 서비스
             }
 
             const emailId = document.getElementById('email-id').value.trim();
+            const emailDomain = document.getElementById('email-domain').value;
 
             const userData = {
                 emailId: emailId,
-                emailDomain: FIXED_DOMAIN,
+                emailDomain: emailDomain,
                 nickname: document.getElementById('nickname').value.trim(),
                 password: passwordInput.value
             };
