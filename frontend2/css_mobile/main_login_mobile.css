@@ -140,4 +140,19 @@
     right: 18px !important;
   }
 
+  .how-it-works {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hiw-arrow {
+    transform: rotate(90deg);
+    font-size: 1.4rem;
+  }
+
+  .hiw-step {
+    padding: 24px 20px;
+    width: 100%;
+  }
+
 }

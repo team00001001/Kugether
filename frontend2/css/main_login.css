@@ -530,3 +530,65 @@ main {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(138, 21, 56, 0.4);
 }
+/* ==========================================
+  이용 방법 가이드 (How It Works)
+  ========================================== */
+.how-it-works {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 70px;
+}
+
+.hiw-step {
+  flex: 1;
+  background: var(--surface-color);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid var(--border-light);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.hiw-step:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(138, 21, 56, 0.1);
+}
+
+.hiw-icon {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+}
+
+.hiw-step-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ku-crimson);
+  background: #f9ecef;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.hiw-step-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.hiw-step-desc {
+  font-size: 0.88rem;
+  color: var(--text-gray);
+  line-height: 1.6;
+}
+
+.hiw-arrow {
+  font-size: 2rem;
+  color: #ccc;
+  flex-shrink: 0;
+  user-select: none;
+}
