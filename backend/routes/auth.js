@@ -6,12 +6,20 @@ const axios = require('axios');
 
 const authCodes = {};
 
+// ✅ 고정된 도메인 상수화
+const ALLOWED_DOMAIN = '@korea.ac.kr';
+
 // 🚀 1. 인증번호 전송 API
 router.post('/send-auth-email', async (req, res) => {
     const { email } = req.body;
     
+    // 💡 방어 코드: 이메일이 고려대학교 도메인으로 끝나는지 검사
+    if (!email.endsWith(ALLOWED_DOMAIN)) {
+        return res.status(403).json({ message: '고려대학교 학생(@korea.ac.kr)만 가입할 수 있습니다.' });
+    }
+    
     try {
-        // 💡 1. DB에 이메일이 이미 존재하는지 문지기가 먼저 검사!
+        // 1. DB에 이메일이 이미 존재하는지 문지기가 먼저 검사!
         const [rows] = await pool.promise().query(
             'SELECT * FROM users WHERE email = ?',
             [email]
@@ -42,20 +50,22 @@ router.post('/send-auth-email', async (req, res) => {
         res.status(200).json({ message: '인증번호가 전송되었습니다. 이메일을 확인해주세요!' });
 
     } catch (error) {
-    console.error('인증번호 처리 에러 전체:', error);
-    console.error('에러 코드:', error.code);
-    console.error('에러 응답:', error.response);
+        console.error('인증번호 처리 에러 전체:', error);
+        console.error('에러 코드:', error.code);
+        console.error('에러 응답:', error.response);
 
-    res.status(500).json({
-        message: '메일 전송에 실패했습니다.',
-        error: error.message
-    });
-}
+        res.status(500).json({
+            message: '메일 전송에 실패했습니다.',
+            error: error.message
+        });
+    }
 });
+
 // 🚀 2. 인증번호 확인 API
 router.post('/verify-auth-code', (req, res) => {
     const { email, code } = req.body;
-console.log('인증 메일 요청 들어옴:', email);
+    console.log('인증 메일 요청 들어옴:', email);
+    
     // 저장된 인증번호와 입력한 번호가 같은지 확인
     if (authCodes[email] && authCodes[email] === code) {
         // 성공하면 삭제해서 재사용 방지
@@ -72,6 +82,11 @@ router.post('/signup', async (req, res) => {
         const { emailId, emailDomain, nickname, password } = req.body;
 
         const fullEmail = `${emailId}@${emailDomain}`;
+
+        // 💡 방어 코드: 프론트엔드에서 강제로 조작해서 보낼 경우를 대비
+        if (emailDomain !== 'korea.ac.kr' || !fullEmail.endsWith(ALLOWED_DOMAIN)) {
+             return res.status(403).json({ message: '고려대학교 학생(@korea.ac.kr)만 가입할 수 있습니다.' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -228,6 +243,5 @@ router.post('/send-email', async (req, res) => {
         res.status(500).json({ message: '문의 접수에 실패했습니다. 잠시 후 다시 시도해주세요.' });
     }
 });
-
 
 module.exports = router;
