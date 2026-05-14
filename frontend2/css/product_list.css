@@ -224,42 +224,72 @@ nav a.menu-link:hover {
     color: var(--main-burgundy);
 }
 
-/* 열 선택 버튼 */
+/* 열 순환 버튼 */
 .cols-selector {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
     justify-content: flex-end;
+    margin-bottom: 20px;
 }
-.cols-label {
-    font-size: 13px;
-    color: #999;
-    margin-right: 4px;
-}
-.col-btn {
-    padding: 5px 12px;
-    border: 1px solid #ddd;
+.col-cycle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1.5px solid #ddd;
     border-radius: 20px;
     background: #fff;
     font-size: 13px;
     color: #555;
     cursor: pointer;
     transition: all 0.15s;
+    font-family: inherit;
 }
-.col-btn:hover { border-color: #8A1538; color: #8A1538; }
-.col-btn.active { background: #8A1538; color: #fff; border-color: #8A1538; font-weight: 600; }
-.mobile-only { display: none; }
+.col-cycle-btn:hover { border-color: #8A1538; color: #8A1538; }
 
 /* 상품 그리드 레이아웃 */
 .product-grid {
     display: grid;
-    gap: 24px;
+    gap: 20px;
+    align-items: start;
 }
 .product-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
 .product-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .product-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
 .product-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* 2열: 이미지-텍스트 가로 레이아웃 */
+.product-grid.cols-2 .product-card { flex-direction: row; }
+.product-grid.cols-2 .img-area {
+    width: 220px;
+    flex-shrink: 0;
+}
+.product-grid.cols-2 .product-thumbnail {
+    height: 100%;
+    border-radius: 0;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+.product-grid.cols-2 .no-image-overlay {
+    border-radius: 0;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+.product-grid.cols-2 .card-body { justify-content: center; }
+
+/* 4열·6열: 컴팩트 */
+.product-grid.cols-4 .product-thumbnail,
+.product-grid.cols-6 .product-thumbnail { height: 140px; }
+.product-grid.cols-6 .product-thumbnail { height: 110px; }
+.product-grid.cols-4 .card-body,
+.product-grid.cols-6 .card-body { padding: 12px; }
+.product-grid.cols-4 .product-title,
+.product-grid.cols-6 .product-title { font-size: 13px; margin-bottom: 8px; }
+.product-grid.cols-4 .price,
+.product-grid.cols-6 .price { font-size: 14px; }
+.product-grid.cols-4 .category-tag,
+.product-grid.cols-6 .category-tag { font-size: 11px; margin-bottom: 6px; }
+.product-grid.cols-4 .badge,
+.product-grid.cols-6 .badge { font-size: 11px; padding: 4px 8px; }
 
 /* 상품 카드 디자인 */
 .product-card {

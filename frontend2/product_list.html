@@ -43,17 +43,22 @@
         <!-- 검색 결과 문구 영역 -->
         <div id="resultText" class="result-info" style="display: none; margin-bottom: 20px"></div>
 
-        <!-- 열 선택 버튼 -->
+        <!-- 열 선택 버튼 (클릭마다 순환) -->
         <div class="cols-selector">
-            <span class="cols-label">보기</span>
-            <!-- 모바일 전용 (1열) -->
-            <button class="col-btn mobile-only" data-cols="1" onclick="setGridCols(1)">1열</button>
-            <!-- 공통 (2·3열) -->
-            <button class="col-btn" data-cols="2" onclick="setGridCols(2)">2열</button>
-            <button class="col-btn" data-cols="3" onclick="setGridCols(3)">3열</button>
-            <!-- 데스크톱 전용 (4·6열) -->
-            <button class="col-btn desktop-only" data-cols="4" onclick="setGridCols(4)">4열</button>
-            <button class="col-btn desktop-only" data-cols="6" onclick="setGridCols(6)">6열</button>
+            <button class="col-cycle-btn" id="col-cycle-btn" onclick="cycleGridCols()">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
+                    <rect x="0" y="0" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="4.75" y="0" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="9.5" y="0" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="0" y="4.75" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="4.75" y="4.75" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="9.5" y="4.75" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="0" y="9.5" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="4.75" y="9.5" width="3.5" height="3.5" rx="0.8"/>
+                    <rect x="9.5" y="9.5" width="3.5" height="3.5" rx="0.8"/>
+                </svg>
+                <span id="col-label">3열</span>
+            </button>
         </div>
 
         <!-- 3. 공구방 카드 리스트 영역 -->
@@ -94,31 +99,34 @@
             }
         }
 
-        // 열 선택 기능
+        // 열 순환 기능
+        const DESKTOP_COLS = [2, 3, 4, 6];
+        const MOBILE_COLS  = [1, 2, 3];
+
         function isMobile() { return window.innerWidth <= 768; }
 
         function setGridCols(cols) {
             const grid = document.getElementById('roomGrid');
             grid.className = grid.className.replace(/\bcols-\d+\b/, '').trim();
             grid.classList.add(`cols-${cols}`);
+            localStorage.setItem(isMobile() ? 'gridColsMobile' : 'gridColsDesktop', cols);
+            document.getElementById('col-label').textContent = `${cols}열`;
+        }
 
-            const storageKey = isMobile() ? 'gridColsMobile' : 'gridColsDesktop';
-            localStorage.setItem(storageKey, cols);
-
-            document.querySelectorAll('.col-btn').forEach(btn => {
-                btn.classList.toggle('active', Number(btn.dataset.cols) === cols);
-            });
+        function cycleGridCols() {
+            const cols = isMobile() ? MOBILE_COLS : DESKTOP_COLS;
+            const grid = document.getElementById('roomGrid');
+            const m = grid.className.match(/cols-(\d+)/);
+            const cur = m ? Number(m[1]) : cols[0];
+            const idx = cols.indexOf(cur);
+            setGridCols(cols[(idx + 1) % cols.length]);
         }
 
         function initGridCols() {
             const mobile = isMobile();
-            const storageKey = mobile ? 'gridColsMobile' : 'gridColsDesktop';
-            const defaultCols = mobile ? 2 : 3;
-            const maxMobile = 3;
-
-            let saved = Number(localStorage.getItem(storageKey)) || defaultCols;
-            if (mobile && saved > maxMobile) saved = maxMobile;
-
+            const cols   = mobile ? MOBILE_COLS : DESKTOP_COLS;
+            let saved    = Number(localStorage.getItem(mobile ? 'gridColsMobile' : 'gridColsDesktop'));
+            if (!cols.includes(saved)) saved = mobile ? 2 : 3;
             setGridCols(saved);
         }
 
