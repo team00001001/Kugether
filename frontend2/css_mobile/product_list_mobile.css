@@ -106,6 +106,9 @@
   .product-grid.cols-3 .price { font-size: 12px !important; }
   .product-grid.cols-3 .category-tag { font-size: 10px !important; margin-bottom: 4px !important; }
   .product-grid.cols-3 .badge { display: none !important; }
+  .product-grid.cols-3 .no-image-overlay { font-size: 9px !important; letter-spacing: -0.3px !important; word-break: keep-all !important; text-align: center !important; padding: 4px !important; }
+  /* 2열도 오버레이 글자 조정 */
+  .product-grid.cols-2 .no-image-overlay { font-size: 11px !important; word-break: keep-all !important; }
 
   .product-card {
     width: 100% !important;
