@@ -110,14 +110,17 @@ router.post('/join', async (req, res) => {
                 }
 
                 const newCountReJoin = product.currentCount + 1;
+                // 💡 [수정됨] 재참여 시 목표 인원 달성 처리
                 if (newCountReJoin >= product.targetCount) {
                     const [allParticipants] = await pool.promise().query(
                         `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                         [productId]
                     );
-                    createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success', productId);
+                    // 방장에게 거래 완료 확인 필요 알림 전송 (상품명 포함)
+                    createNotification(productInfo.user_id, '거래 완료 확인 필요', `"${productInfo.title}" 공구의 거래 완료 확인이 필요합니다.`, 'success', productId);
                     allParticipants.forEach(p => {
                         if (String(p.user_id) !== String(productInfo.user_id)) {
+                            // 참여자에게 마감 알림 전송
                             createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success', productId);
                         }
                     });
@@ -178,14 +181,17 @@ router.post('/join', async (req, res) => {
         }
 
         const newCountJoin = product.currentCount + 1;
+        // 💡 [수정됨] 최초 참여 시 목표 인원 달성 처리
         if (newCountJoin >= product.targetCount) {
             const [allParticipants] = await pool.promise().query(
                 `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
                 [productId]
             );
-            createNotification(productInfo.user_id, '목표 인원 달성', `"${productInfo.title}" 공구가 목표 인원을 달성했습니다. 거래 완료 확인을 진행해주세요.`, 'success', productId);
+            // 방장에게 거래 완료 확인 필요 알림 전송 (상품명 포함)
+            createNotification(productInfo.user_id, '거래 완료 확인 필요', `"${productInfo.title}" 공구의 거래 완료 확인이 필요합니다.`, 'success', productId);
             allParticipants.forEach(p => {
                 if (String(p.user_id) !== String(productInfo.user_id)) {
+                     // 참여자에게 마감 알림 전송
                     createNotification(p.user_id, '목표 인원 달성', `참여 중인 "${productInfo.title}" 공구가 목표 인원을 달성했습니다.`, 'success', productId);
                 }
             });
