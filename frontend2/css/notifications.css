@@ -28,8 +28,8 @@ body {
 }
 
 /* ==========================================
-    공통 헤더 CSS
-    ========================================== */
+   공통 헤더 CSS
+   ========================================= */
 header {
     background-color: var(--ku-crimson);
     backdrop-filter: blur(8px);
@@ -133,8 +133,8 @@ nav a.menu-link:hover {
 }
 
 /* ==========================================
-    알림 메인 컨텐츠
-    ========================================== */
+   알림 메인 컨텐츠
+   ========================================= */
 .container {
     max-width: 700px;
     margin: 0 auto;
@@ -154,17 +154,34 @@ nav a.menu-link:hover {
     color: var(--text-dark);
 }
 
-.btn-read-all {
-    background: none;
+/* 💡 모두 읽음 / 모두 삭제 버튼 래퍼 및 공통 스타일 (강력 초기화 포함) */
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-read-all,
+.btn-delete-all {
+    -webkit-appearance: none; /* 브라우저 기본 버튼 스타일 제거 */
+    -moz-appearance: none;
+    appearance: none;
+    background: transparent;
     border: none;
+    outline: none;
     color: var(--text-gray);
+    font-family: 'Pretendard', sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
+    letter-spacing: -0.3px;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
     transition: color 0.2s;
 }
 
-.btn-read-all:hover {
+.btn-read-all:hover,
+.btn-delete-all:hover {
     color: var(--text-dark);
 }
 
@@ -279,7 +296,7 @@ nav a.menu-link:hover {
     opacity: 0.3;
 }
 
-/* 💡 추가된 알림 삭제 버튼 스타일 */
+/* 개별 알림 삭제 버튼 스타일 */
 .btn-delete-noti {
     background: none;
     border: none;
