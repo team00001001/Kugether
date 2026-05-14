@@ -661,7 +661,7 @@
 
                 if (dbData.exists) {
                     document.querySelector('.tracking-input-container').style.display = 'none';
-                    await autoFetchTrackingInfo(dbData.data.carrier_id, dbData.data.tracking_number);
+                    await autoFetchTrackingInfo(dbData.data.carrier_id, dbData.data.tracking_number, productId);
                 }
             } catch (error) {
                 console.error('배송 정보 초기 로딩 에러:', error);
@@ -674,9 +674,9 @@
             if (deliverySection) deliverySection.style.display = 'none';
         }
 
-        async function autoFetchTrackingInfo(carrierId, trackingNumber) {
+        async function autoFetchTrackingInfo(carrierId, trackingNumber, productId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}`);
+                const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}&productId=${productId}`);
                 const data = await response.json();
 
                 if (data.status === false || data.code) {
@@ -693,7 +693,7 @@
                 }));
 
                 const carrierName = getCarrierName(carrierId);
-                renderTimeline(carrierName, trackingNumber, formattedData);
+                renderTimeline(carrierName, trackingNumber, formattedData, data._cachedAt);
             } catch (error) {
                 console.error('자동 배송 조회 에러:', error);
             }
@@ -729,7 +729,7 @@
 
                 document.querySelector('.tracking-input-container').style.display = 'none';
 
-                const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}`);
+                const response = await fetch(`${API_BASE_URL}/delivery/tracking?carrierId=${carrierId}&trackId=${trackingNumber}&productId=${productId}`);
                 const data = await response.json();
 
                 if (data.status === false || data.code) {
@@ -750,19 +750,22 @@
                     details: detail.telno ? `영업소/기사님 연락처: ${detail.telno}` : ''
                 }));
 
-                renderTimeline(carrierName, trackingNumber, formattedData);
+                renderTimeline(carrierName, trackingNumber, formattedData, data._cachedAt);
             } catch (error) {
                 console.error('배송 조회 및 등록 에러:', error);
                 alert('서버와 통신하는 데 실패했습니다.');
             }
         }
 
-        function renderTimeline(carrierName, trackingNumber, dataList) {
+        function renderTimeline(carrierName, trackingNumber, dataList, cachedAt) {
             const resultContainer = document.getElementById('tracking-result');
             const infoText = document.getElementById('delivery-info-text');
             const timelineList = document.getElementById('timeline-list');
 
-            infoText.innerText = `${carrierName} [${trackingNumber}]`;
+            const cacheNote = cachedAt
+                ? ` · 마지막 업데이트: ${new Date(Number(cachedAt) * 1000).toLocaleString()}`
+                : '';
+            infoText.innerText = `${carrierName} [${trackingNumber}]${cacheNote}`;
             timelineList.innerHTML = '';
 
             dataList.forEach((item, index) => {

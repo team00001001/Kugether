@@ -137,6 +137,28 @@ async function addColumnIfNotExists(columnName) {
 addColumnIfNotExists('closing_notified').catch(err => console.error('closing_notified 컬럼 추가 실패:', err));
 addColumnIfNotExists('transaction_notified').catch(err => console.error('transaction_notified 컬럼 추가 실패:', err));
 
+// 배송 조회 결과 캐시 컬럼 추가
+(async () => {
+    try {
+        const [r1] = await pool.promise().query(
+            `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'products' AND COLUMN_NAME = 'tracking_result'`
+        );
+        if (r1[0].cnt === 0) {
+            await pool.promise().query(`ALTER TABLE products ADD COLUMN tracking_result LONGTEXT NULL`);
+            console.log('tracking_result 컬럼 추가 완료');
+        }
+        const [r2] = await pool.promise().query(
+            `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'products' AND COLUMN_NAME = 'tracking_cached_at'`
+        );
+        if (r2[0].cnt === 0) {
+            await pool.promise().query(`ALTER TABLE products ADD COLUMN tracking_cached_at BIGINT NULL`);
+            console.log('tracking_cached_at 컬럼 추가 완료');
+        }
+    } catch (err) {
+        console.error('배송 캐시 컬럼 추가 실패:', err);
+    }
+})();
+
 // 5분마다 공구 상태 체크
 setInterval(async () => {
     try {
