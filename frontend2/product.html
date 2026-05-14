@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-<!-- v2 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -278,7 +277,6 @@
                         <button class="join-btn" style="background:none; border:1px solid #EAECEF; color:#818991; padding: 12px; font-size: 14px;" onclick="deleteProduct('${product.id}')">공구방 삭제</button>
                     </div>
                 `;
-                renderHostMemberManagement(product);
             } else if (isNoshow) {
                 actionArea.innerHTML = `
                     <div style="padding: 15px; background-color: #f8d7da; border-radius: 8px; text-align: center; color: #721c24;">
@@ -313,17 +311,25 @@
                 }
             }
 
+            // 💡 수정된 부분: 방장이거나 참여자면 회원 목록 렌더링을 호출합니다.
+            if (isHost || isParticipant) {
+                renderMemberList(product, isHost);
+            }
+
             renderCompletionSection(product, isHost, myInfo);
         }
 
-        // --- 방장 전용 참여자 관리 ---
-        function renderHostMemberManagement(product) {
+        // --- 💡 수정된 함수: 방장과 참여자 모두에게 맞게 리스트를 렌더링 ---
+        function renderMemberList(product, isHost) {
             const mgmtArea = document.getElementById('member-management-area');
             const validMembers = product.members.filter(m => m.status !== 'noshow');
 
+            // 방장일 때와 참여자일 때의 제목을 다르게 설정
+            const titleText = isHost ? '👥 참여자 관리 (방장 전용)' : '👥 참여자';
+
             let html = `
                 <div class="member-list card" style="margin-top:30px; padding:20px; border:1px solid #eee;">
-                    <h3 style="margin-bottom:15px;">👥 참여자 관리 (방장 전용)</h3>
+                    <h3 style="margin-bottom:15px;">${titleText}</h3>
                     <div id="member-items">
             `;
 
@@ -339,16 +345,28 @@
             } else {
                 validMembers.forEach(m => {
                     const isConfirmed = m.status === 'confirmed' || m.status === 'completed';
+                    
+                    // 확인 완료 여부 및 권한에 따라 보여줄 버튼/텍스트 처리
+                    let actionHtml = '';
+                    if (isConfirmed) {
+                        actionHtml = '<span style="color:#28a745; font-weight:bold;">✅ 확인 완료</span>';
+                    } else {
+                        if (isHost) {
+                            // 방장일 때는 기존처럼 관리 버튼 출력
+                            actionHtml = `
+                                <button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'confirmed')" style="color:#007bff; border:1px solid #007bff; background:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">확인</button>
+                                <button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'noshow')" style="color:#dc3545; border:1px solid #dc3545; background:none; padding:4px 8px; border-radius:4px; margin-left:5px; cursor:pointer; font-size:13px; font-weight:bold;">노쇼</button>
+                            `;
+                        } else {
+                            // 참여자일 때는 버튼 대신 대기중 텍스트 출력
+                            actionHtml = '<span style="color:#999; font-weight:bold; font-size:13px;">⏳ 대기중</span>';
+                        }
+                    }
+
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f5f5f5;">
                             <span><strong>${m.nickname}</strong> 학우</span>
-                            <div>
-                                ${isConfirmed ?
-                            '<span style="color:#28a745; font-weight:bold;">✅ 확인 완료</span>' :
-                            `<button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'confirmed')" style="color:#007bff; border:1px solid #007bff; background:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">확인</button>
-                                    <button onclick="markStatus(${m.participant_id}, ${m.user_id}, 'noshow')" style="color:#dc3545; border:1px solid #dc3545; background:none; padding:4px 8px; border-radius:4px; margin-left:5px; cursor:pointer; font-size:13px; font-weight:bold;">노쇼</button>`
-                        }
-                            </div>
+                            <div>${actionHtml}</div>
                         </div>
                     `;
                 });
