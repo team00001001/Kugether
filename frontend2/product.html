@@ -139,6 +139,11 @@
                     fetch(`${API_BASE_URL}/participants?productId=${productId}`)
                 ]);
 
+                if (pRes.status === 404) {
+                    alert('해당 상품을 찾을 수 없습니다. 삭제되었거나 존재하지 않는 공구입니다.');
+                    location.href = 'main_login.html';
+                    return;
+                }
                 if (!pRes.ok) throw new Error('상품 정보를 불러오지 못했습니다.');
 
                 const product = await pRes.json();
@@ -153,7 +158,8 @@
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('product-title').innerText = "데이터 로딩 실패";
+                alert('상품 정보를 불러오는 데 실패했습니다.');
+                location.href = 'main_login.html';
             }
         });
 
