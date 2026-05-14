@@ -149,9 +149,8 @@
     </main>
 
     <script>
-        // ✅ Cloudinary 설정 (cloudinary.com 무료 가입 후 아래 두 값 교체)
-        const CLOUDINARY_CLOUD_NAME = 'YOUR_CLOUD_NAME';
-        const CLOUDINARY_UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET';
+        // ✅ ImgBB API 키 (api.imgbb.com 에서 발급)
+        const IMGBB_API_KEY = 'YOUR_IMGBB_API_KEY';
 
         async function uploadImage(input) {
             const file = input.files[0];
@@ -164,20 +163,28 @@
             statusEl.textContent = '⏳ 업로드 중...';
             statusEl.style.color = '#888';
 
+            // 파일을 base64로 변환
+            const base64 = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+
             const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            formData.append('key', IMGBB_API_KEY);
+            formData.append('image', base64);
 
             try {
-                const res = await fetch(
-                    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-                    { method: 'POST', body: formData }
-                );
+                const res = await fetch('https://api.imgbb.com/1/upload', {
+                    method: 'POST',
+                    body: formData
+                });
                 const data = await res.json();
 
-                if (data.secure_url) {
-                    document.getElementById('imageUrl').value = data.secure_url;
-                    previewEl.src = data.secure_url;
+                if (data.success) {
+                    const url = data.data.url;
+                    document.getElementById('imageUrl').value = url;
+                    previewEl.src = url;
                     previewEl.style.display = 'block';
                     placeholderEl.style.display = 'none';
                     statusEl.textContent = '✅ 업로드 완료';
@@ -188,7 +195,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                statusEl.textContent = 'Cloudinary 설정을 확인해주세요.';
+                statusEl.textContent = '업로드 실패. API 키를 확인해주세요.';
                 statusEl.style.color = '#e00';
             }
         }
