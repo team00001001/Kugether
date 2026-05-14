@@ -1,201 +1,317 @@
+/* ═══════════════════════════════════════════
+   KU GONGGU — My Page
+═══════════════════════════════════════════ */
+
 :root {
-    /* main_login.html과 동일한 컬러 변수 추가 */
-    --ku-crimson: #8A1538;
-    --text-dark: #222222;
-
-    /* mypage.html 고유 변수 */
-    --crimson: #8B0029;
-    --bg-gray: #EDF0F3;
-    --card-white: #FFFFFF;
-    --text-main: #333333;
-    --text-sub: #888888;
+  --c:   #8A1538;
+  --cd:  #6E102A;
+  --ink: #111111;
+  --t3:  #6B7280;
+  --t4:  #9CA3AF;
+  --bg:  #F3F4F6;
+  --wh:  #FFFFFF;
+  --ln:  #E2E2E2;
 }
 
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body {
-    font-family: 'Pretendard', sans-serif;
-    background-color: var(--bg-gray);
-    margin: 0;
-    color: var(--text-main);
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  padding-top: 70px;
 }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
 
-/* ==========================================
-main_login.html과 완벽히 동일한 헤더 CSS
-========================================== */
-header {
-    background-color: var(--ku-crimson);
-    backdrop-filter: blur(8px);
-    height: 70px;
-    display: flex;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-}
 
-.nav-inner {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px;
-}
+/* ══════════════════ HEADER (공통 header.css 사용) ══════════════════ */
+/* btn-login-nav은 header.css에서 관리 */
 
-.logo {
-    color: white;
-    font-size: 1.6rem;
-    font-weight: 800;
-    text-decoration: none;
-    letter-spacing: -0.5px;
-}
 
-nav {
-    display: flex;
-    gap: 30px;
-    align-items: center;
-}
-
-nav a.menu-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: color 0.2s;
-}
-
-nav a.menu-link:hover {
-    color: var(--text-dark);
-}
-
-.btn-login-nav {
-    background: transparent;
-    color: white !important;
-    padding: 8px 20px;
-    border-radius: 5px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
-    text-decoration: none;
-    border: 1.5px solid rgba(255, 255, 255, 0.65);
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-}
-
-.btn-login-nav:hover {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.9);
-}
-/* ========================================== */
-
+/* ══════════════════ PAGE LAYOUT ══════════════════ */
 .container {
-    max-width: 1200px;
-    /* 고정된 헤더 높이(70px)를 고려하여 상단 여백을 100px로 유지합니다. */
-    margin: 100px auto 40px auto; 
-    display: flex;
-    gap: 25px;
-    padding: 0 20px;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
-/* 공통 카드 스타일 */
-.card {
-    background: var(--card-white);
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #E8E8E8;
-    padding: 25px;
+
+/* ══════════════════ SIDEBAR ══════════════════ */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--ln);
 }
 
-/* 왼쪽 사이드바 */
-.sidebar { width: 300px; display: flex; flex-direction: column; gap: 20px; }
+/* 프로필 카드 */
+.profile-card {
+  background: var(--wh);
+  padding: 28px 24px;
+  border-bottom: 1px solid var(--ln);
+  text-align: center;
+}
 
-.profile-card { text-align: center; }
 .profile-circle {
-    width: 90px; height: 90px; background: var(--crimson); color: white;
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem; font-weight: bold; margin: 0 auto 15px;
+  width: 72px;
+  height: 72px;
+  background: var(--c);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 auto 14px;
 }
-.user-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
-.user-handle { color: var(--text-sub); font-size: 0.85rem; margin-bottom: 20px; }
 
-/* ==========================================
-    크림슨 지수 UI CSS 수정 (방향 및 색상 제어)
-    ========================================== */
+.user-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+
+.user-handle {
+  font-size: 0.78rem;
+  color: var(--t4);
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+/* 크림슨 지수 */
 .crimson-index-section {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 20px;
-    text-align: left;
-}
-.index-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
-
-/* index-bar에 flex 적용 */
-.index-bar { 
-    height: 6px; 
-    background: #eee; 
-    border-radius: 3px; 
-    display: flex; 
-    width: 100%;
+  border-top: 1px solid var(--ln);
+  padding-top: 16px;
+  text-align: left;
+  margin-bottom: 16px;
 }
 
-.index-fill { 
-    height: 100%; 
-    border-radius: 3px; 
-    transition: width 0.3s ease, background-color 0.3s ease; 
+.index-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
-/* 양수일 때: 왼쪽부터 렌더링, 크림슨 색상 */
-.fill-positive {
-    background: var(--crimson);
-    margin-left: 0;
-    margin-right: auto;
+.index-header span:first-child {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
 }
 
-/* 음수일 때: 오른쪽부터 렌더링, 파란 색상 */
-.fill-negative {
-    background: #007AFF;
-    margin-left: auto;
-    margin-right: 0;
+.index-bar {
+  height: 3px;
+  background: var(--ln);
+  display: flex;
+  width: 100%;
 }
 
-.menu-list { list-style: none; padding: 0; margin: 0; }
+.index-fill {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.fill-positive { background: var(--c); margin-left: 0; margin-right: auto; }
+.fill-negative  { background: #2563EB; margin-left: auto; margin-right: 0; }
+
+/* 프로필 수정 버튼 */
+.profile-card button {
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 0;
+  background: var(--wh);
+  border: 1.5px solid var(--ln);
+  color: var(--t3);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: border-color 0.14s, color 0.14s;
+}
+
+.profile-card button:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+/* 사이드바 메뉴 */
+.card:not(.profile-card) {
+  background: var(--wh);
+  padding: 0;
+}
+
+.menu-list { list-style: none; }
+
 .menu-item {
-    padding: 15px 0; border-bottom: 1px solid #f5f5f5;
-    display: flex; align-items: center; color: var(--text-main);
-    text-decoration: none; font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 24px;
+  border-bottom: 1px solid var(--ln);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--t3);
+  transition: background 0.13s, color 0.13s;
 }
-.menu-item:last-child { border: none; }
 
-/* 오른쪽 메인 컨텐츠 */
-.main-content { flex: 1; }
+.menu-item:last-child { border-bottom: none; }
 
+.menu-item:hover {
+  background: #FAFAFA;
+  color: var(--ink);
+}
+
+
+/* ══════════════════ MAIN CONTENT ══════════════════ */
+.main-content { flex: 1; min-width: 0; }
+
+
+/* ── 통계 스트립 ── */
 .top-stats {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--ln);
+  margin-bottom: 36px;
 }
+
 .stat-card {
-    background: white; padding: 20px; border-radius: 12px; text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    cursor: pointer;
+  background: var(--wh);
+  border-right: 1px solid var(--ln);
+  padding: 24px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.14s;
 }
-.stat-card:hover { background: #f9f9f9; }
-.stat-label { font-size: 0.8rem; color: var(--text-sub); margin-bottom: 10px; display: block; }
-.stat-value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
 
-.section-title { font-size: 1rem; font-weight: 700; margin: 30px 0 15px; display: flex; justify-content: space-between; }
+.stat-card:last-child { border-right: none; }
+.stat-card:hover { background: #FAFAFA; }
 
-.gonggu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.jjim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.stat-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t4);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -1px;
+}
+
+
+/* ── 섹션 헤더 ── */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ln);
+  margin-bottom: 0;
+}
+
+.section-title > span:first-child {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+
+.section-title > span:last-child {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--t4);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: color 0.14s;
+}
+
+.section-title > span:last-child:hover { color: var(--ink); }
+
+/* 섹션 간격 */
+.main-content > .section-title { margin-top: 36px; }
+.main-content > .section-title:first-child { margin-top: 0; }
+
+
+/* ── 공구 그리드 (table-style) ── */
+.gonggu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--ln);
+  border-top: none;
+  margin-bottom: 4px;
+}
+
 .gonggu-card {
-    background: white; padding: 20px; border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    border: 1px solid #E8E8E8; position: relative;
+  background: var(--wh);
+  border-right: 1px solid var(--ln);
+  border-bottom: 1px solid var(--ln);
+  padding: 22px 20px;
+  cursor: pointer;
+  transition: background 0.14s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.badge {
-    font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; margin-bottom: 10px; display: inline-block;
-}
-.badge.recruiting { background: #FFF0F3; color: var(--crimson); }
-.badge.success { background: #E8F5E9; color: #2E7D32; }
 
-.gonggu-title { font-weight: 700; font-size: 1rem; margin-bottom: 10px; display: block; }
-.gonggu-info { font-size: 0.85rem; color: var(--text-sub); display: flex; justify-content: space-between; }
+.gonggu-card:nth-child(2n) { border-right: none; }
+.gonggu-card:hover { background: #FAFAFA; }
+
+/* 뱃지 */
+.badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  align-self: flex-start;
+}
+
+.badge.recruiting { background: #FFF0F3; color: var(--c); }
+.badge.success    { background: #F0FDF4; color: #15803D; }
+
+.gonggu-title {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gonggu-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--t4);
+  font-weight: 500;
+  margin-top: auto;
+}
+
+
+/* ── 빈 상태 ── */
+.empty-msg {
+  grid-column: 1 / -1;
+  padding: 40px 0;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--t4);
+  background: var(--wh);
+  border-bottom: 1px solid var(--ln);
+}
