@@ -24,7 +24,7 @@
 <div class="container">
     <div class="sidebar">
         <div class="card profile-card">
-            <div class="profile-circle" id="profile-circle">?</div>
+            <div class="profile-circle" id="profile-circle"></div>
             <div class="user-name" id="user-name">사용자</div>
             <div class="user-handle" id="user-handle">@username</div>
             
@@ -79,12 +79,25 @@
 </div>
 
 <script>
+    const API_BASE_URL = 'https://campusgonggu-production.up.railway.app'; // API 베이스 URL 정의
+
+    // 💡 크림슨 지수에 따라 이모티콘을 반환하는 함수 정의
+    function getGradeEmoji(score) {
+        if (score >= 86) return "🏛️"; // 안암동 지배자
+        if (score >= 61) return "👑"; // 왕관 쓴 호랑이
+        if (score >= 31) return "🐯"; // 늠름한 호랑이
+        if (score >= 0)  return "🐱"; // 아기 고양이
+        if (score >= -30) return "🐥"; // 방황하는 삐약이
+        if (score >= -70) return "🦅"; // 길 잃은 독수리
+        return "❄️";                 // 잠든 그림자
+    }
+
     async function updateHeaderNotificationBadge() {
         const userId = localStorage.getItem('userId');
         const badge = document.querySelector('.noti-badge');
         if (!badge || !userId) return;
         try {
-            const res = await fetch(`https://campusgonggu-production.up.railway.app/notifications/${userId}`);
+            const res = await fetch(`${API_BASE_URL}/notifications/${userId}`);
             const notifications = await res.json();
             const hasUnread = notifications.some(n => Number(n.is_read) === 0);
             badge.style.display = hasUnread ? 'block' : 'none';
@@ -124,7 +137,7 @@
     function updateProfileCard() {
         const nickname = localStorage.getItem('userNickname');
         const email = localStorage.getItem('userEmail');
-        const profileCircle = document.getElementById('profile-circle');
+        // const profileCircle = document.getElementById('profile-circle'); // 💡 지수 로드 후 업데이트하므로 여기선 주석 처리
         const userName = document.getElementById('user-name');
         const userHandle = document.getElementById('user-handle');
 
@@ -135,8 +148,9 @@
         // 💡 이메일에서 @ 앞의 아이디 부분만 추출해서 보여줌
         const emailId = email.split('@')[0] || email;
         userHandle.textContent = '@' + emailId;
-        // 프사 이니셜은 닉네임 첫 글자로 고정
-        profileCircle.textContent = nickname[0] ? nickname[0].toUpperCase() : 'K';
+        
+        // 💡 프사 이니셜 설정 로직 제거 (지수 이모티콘으로 대체)
+        // profileCircle.textContent = nickname[0] ? nickname[0].toUpperCase() : 'K';
     }
 
     // ==========================================
@@ -185,24 +199,31 @@
         if (!userId) return;
 
         try {
-            const res = await fetch(`https://campusgonggu-production.up.railway.app/participants/trust-score/${userId}`);
+            const res = await fetch(`${API_BASE_URL}/participants/trust-score/${userId}`); // 수정된 API 경로 사용
             
             if (res.ok) {
                 const data = await res.json();
-                updateCrimsonIndexUI(data.trust_score || 0);
+                const score = data.trust_score || 0;
+                updateCrimsonIndexUI(score);
+                
+                // 💡 4. 프로필 사진 영역에 등급 이모티콘 적용
+                const emoji = getGradeEmoji(score);
+                document.getElementById('profile-circle').textContent = emoji;
             } else {
                 updateCrimsonIndexUI(0);
+                document.getElementById('profile-circle').textContent = getGradeEmoji(0); // 기본값
             }
         } catch (e) {
             console.error("네트워크 에러 발생:", e);
             updateCrimsonIndexUI(0);
+            document.getElementById('profile-circle').textContent = getGradeEmoji(0); // 에러 시 기본값
         }
     }
 
     fetchUserTrustScore();
 
     // 올린 공고 수 카운트
-    fetch('https://campusgonggu-production.up.railway.app/products')
+    fetch(`${API_BASE_URL}/products`) // 수정된 API 경로 사용
         .then(res => res.json())
         .then(allProducts => {
             const myProducts = allProducts.filter(p => p.user_id == userId);
@@ -212,8 +233,8 @@
 
     // 참여 중 건수 카운트
     Promise.all([
-        fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`).then(res => res.json()),
-        fetch('https://campusgonggu-production.up.railway.app/products').then(res => res.json())
+        fetch(`${API_BASE_URL}/chats/my/${userId}`).then(res => res.json()), // 수정된 API 경로 사용
+        fetch(`${API_BASE_URL}/products`).then(res => res.json()) // 수정된 API 경로 사용
     ]).then(([chats, allProducts]) => {
         const myCreatedProducts = allProducts.filter(p => String(p.user_id) === String(userId));
         const joinedProductIds = chats.map(c => String(c.product_id));
@@ -231,8 +252,8 @@
 
     // 성공 공구 수 카운트
     Promise.all([
-        fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`).then(res => res.json()),
-        fetch('https://campusgonggu-production.up.railway.app/products').then(res => res.json())
+        fetch(`${API_BASE_URL}/chats/my/${userId}`).then(res => res.json()), // 수정된 API 경로 사용
+        fetch(`${API_BASE_URL}/products`).then(res => res.json()) // 수정된 API 경로 사용
     ]).then(([chats, allProducts]) => {
         const joinedIds = chats.map(c => String(c.product_id));
         const myCreatedIds = allProducts.filter(p => String(p.user_id) === String(userId)).map(p => String(p.id));
@@ -253,8 +274,8 @@
 
         try {
             const [chatsRes, productsRes] = await Promise.all([
-                fetch(`https://campusgonggu-production.up.railway.app/chats/my/${userId}`),
-                fetch('https://campusgonggu-production.up.railway.app/products')
+                fetch(`${API_BASE_URL}/chats/my/${userId}`), // 수정된 API 경로 사용
+                fetch(`${API_BASE_URL}/products`) // 수정된 API 경로 사용
             ]);
 
             let joinedProducts = await chatsRes.json();
@@ -324,7 +345,7 @@
         grid.innerHTML = '';
 
         try {
-            const res = await fetch('https://campusgonggu-production.up.railway.app/products');
+            const res = await fetch(`${API_BASE_URL}/products`); // 수정된 API 경로 사용
             const allProducts = await res.json();
             
             const myProducts = allProducts.filter(p => String(p.user_id) === String(userId));
