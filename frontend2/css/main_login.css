@@ -154,10 +154,12 @@ main {
 }
 
 .hero-sub-text {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: var(--text-gray);
   font-weight: 500;
   margin-bottom: 30px;
+  white-space: nowrap;
+  word-break: keep-all;
 }
 
 .search-input-box {
