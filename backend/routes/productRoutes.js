@@ -39,17 +39,10 @@ router.get('/', (req, res) => {
     const { search, hideClosed } = req.query; // 🔍 검색어 및 체크박스 상태 받기
     const now = getNow();
     
-    // 💡 변경점 1: SELECT 절에 참여자 수를 세는 서브쿼리(currentCount) 추가
     let sql = `
-        SELECT 
-            products.*, 
-            users.nickname AS writer,
-            (
-                SELECT COUNT(*) 
-                FROM product_participants 
-                WHERE product_id = products.id 
-                AND status NOT IN ('cancelled', 'noshow')
-            ) AS currentCount
+        SELECT
+            products.*,
+            users.nickname AS writer
         FROM products
         LEFT JOIN users ON products.user_id = users.id
         WHERE 1=1
@@ -62,19 +55,10 @@ router.get('/', (req, res) => {
         params.push(`%${search}%`);
     }
 
-    // ✅ 변경점 2: 모집완료 숨기기 필터 (마감기한 & 인원수 둘 다 체크)
     if (hideClosed === 'true') {
-        // 조건 A: 마감 기한이 아직 남은 것
         sql += ` AND products.duration > ?`;
         params.push(now);
-        
-        // 조건 B: 참여자 수가 목표 인원(targetCount)보다 적은 것
-        sql += ` AND products.targetCount > (
-            SELECT COUNT(*) 
-            FROM product_participants 
-            WHERE product_id = products.id 
-            AND status NOT IN ('cancelled', 'noshow')
-        )`;
+        sql += ` AND products.currentCount < products.targetCount`;
     }
 
     sql += ` ORDER BY products.id DESC`;
@@ -82,7 +66,6 @@ router.get('/', (req, res) => {
     db.query(sql, params, (err, results) => {
         if (err) return res.status(500).json({ error: '상품 조회 실패' });
         
-        // 💡 변경점 3: isClosed 판별식도 기간 만료뿐만 아니라 인원 마감까지 고려하도록 업데이트
         const updatedResults = results.map(product => ({
             ...product,
             isClosed: now > Number(product.duration) || product.currentCount >= product.targetCount
