@@ -25,8 +25,7 @@ router.post('/join', async (req, res) => {
         await conn.beginTransaction();
 
         const [products] = await conn.query(
-            // duration을 추가로 SELECT 합니다.
-            'SELECT currentCount, targetCount, duration FROM products WHERE id = ? FOR UPDATE',
+            'SELECT currentCount, targetCount, duration, user_id FROM products WHERE id = ? FOR UPDATE',
             [productId]
         );
 
@@ -37,6 +36,12 @@ router.post('/join', async (req, res) => {
 
         const product = products[0];
         const now = Math.floor(Date.now() / 1000);
+
+        // 방장 참여 차단
+        if (String(product.user_id) === String(userId)) {
+            await conn.rollback();
+            return res.status(403).json({ message: '본인이 개설한 공구에는 참여할 수 없습니다.' });
+        }
 
         // 기존 인원수 검증에 시간 만료 검증 로직을 추가합니다.
         if (product.currentCount >= product.targetCount || Number(product.duration) <= now) {
@@ -465,6 +470,10 @@ router.patch('/receive', async (req, res) => {
         if (!member) {
             await conn.rollback();
             return res.status(404).json({ message: '참여 정보를 찾을 수 없습니다.' });
+        }
+        if (member.status === 'completed') {
+            await conn.rollback();
+            return res.status(409).json({ message: '이미 수령 완료 처리되었습니다.' });
         }
         if (member.status === 'joined') {
             await conn.rollback();

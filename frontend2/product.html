@@ -273,11 +273,12 @@
                 `;
                 renderHostMemberManagement(product);
             } else if (isParticipant) {
+                const canCancel = !isClosed && myInfo.status === 'joined';
                 actionArea.innerHTML = `
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <button class="join-btn" style="background-color: #ce152d;" onclick="location.href='direct_chattings.html?id=${product.id}'">💬 채팅방 가기 (참여중)</button>
                         <div style="display:flex; gap:10px;">
-                            <button class="join-btn" style="background:#eee; color:#666; flex:1; font-size: 14px;" onclick="leaveGroup('${product.id}')">참여 취소</button>
+                            ${canCancel ? `<button class="join-btn" style="background:#eee; color:#666; flex:1; font-size: 14px;" onclick="leaveGroup('${product.id}')">참여 취소</button>` : ''}
                             <button class="join-btn" style="background:none; border:1px solid #ddd; color:#999; flex:1; font-size: 14px;" onclick="reportHost()">신고하기</button>
                         </div>
                     </div>
