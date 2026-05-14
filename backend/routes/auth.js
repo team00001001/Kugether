@@ -6,12 +6,20 @@ const axios = require('axios');
 
 const authCodes = {};
 
+// ✅ 고정된 도메인 상수화
+const ALLOWED_DOMAIN = '@korea.ac.kr';
+
 // 🚀 1. 인증번호 전송 API
 router.post('/send-auth-email', async (req, res) => {
     const { email } = req.body;
     
+    // 💡 방어 코드: 이메일이 고려대학교 도메인으로 끝나는지 검사
+    if (!email.endsWith(ALLOWED_DOMAIN)) {
+        return res.status(403).json({ message: '고려대학교 학생(@korea.ac.kr)만 가입할 수 있습니다.' });
+    }
+    
     try {
-        // 💡 1. DB에 이메일이 이미 존재하는지 문지기가 먼저 검사!
+        // 1. DB에 이메일이 이미 존재하는지 문지기가 먼저 검사!
         const [rows] = await pool.promise().query(
             'SELECT * FROM users WHERE email = ?',
             [email]
@@ -42,20 +50,22 @@ router.post('/send-auth-email', async (req, res) => {
         res.status(200).json({ message: '인증번호가 전송되었습니다. 이메일을 확인해주세요!' });
 
     } catch (error) {
-    console.error('인증번호 처리 에러 전체:', error);
-    console.error('에러 코드:', error.code);
-    console.error('에러 응답:', error.response);
+        console.error('인증번호 처리 에러 전체:', error);
+        console.error('에러 코드:', error.code);
+        console.error('에러 응답:', error.response);
 
-    res.status(500).json({
-        message: '메일 전송에 실패했습니다.',
-        error: error.message
-    });
-}
+        res.status(500).json({
+            message: '메일 전송에 실패했습니다.',
+            error: error.message
+        });
+    }
 });
+
 // 🚀 2. 인증번호 확인 API
 router.post('/verify-auth-code', (req, res) => {
     const { email, code } = req.body;
-console.log('인증 메일 요청 들어옴:', email);
+    console.log('인증 메일 요청 들어옴:', email);
+    
     // 저장된 인증번호와 입력한 번호가 같은지 확인
     if (authCodes[email] && authCodes[email] === code) {
         // 성공하면 삭제해서 재사용 방지
@@ -72,6 +82,11 @@ router.post('/signup', async (req, res) => {
         const { emailId, emailDomain, nickname, password } = req.body;
 
         const fullEmail = `${emailId}@${emailDomain}`;
+
+        // 💡 방어 코드: 프론트엔드에서 강제로 조작해서 보낼 경우를 대비
+        if (emailDomain !== 'korea.ac.kr' || !fullEmail.endsWith(ALLOWED_DOMAIN)) {
+             return res.status(403).json({ message: '고려대학교 학생(@korea.ac.kr)만 가입할 수 있습니다.' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -186,6 +201,46 @@ router.post('/forgot-password', async (req, res) => {
     } catch (error) {
         console.error('비밀번호 찾기 에러:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    }
+});
+
+// 🚀 1:1 문의 메일 전송 (운영자에게 발송) API
+router.post('/send-email', async (req, res) => {
+    const { category, title, content } = req.body;
+
+    const categoryMap = {
+        'usage': '공구 이용 문의',
+        'account': '계정 관련 문의',
+        'bug': '오류 신고',
+        'suggestion': '서비스 건의',
+        'other': '기타'
+    };
+    const categoryKr = categoryMap[category] || category;
+
+    try {
+        await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: 'KU GONGGU System', email: 'gongguyong0@gmail.com' }, 
+            to: [{ email: 'gongguyong0@gmail.com', name: '운영자' }], 
+            subject: `[1:1 문의 - ${categoryKr}] ${title}`, 
+            htmlContent: `
+                <div style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
+                    <h2>새로운 1:1 문의가 접수되었습니다.</h2>
+                    <p><strong>분류:</strong> ${categoryKr}</p>
+                    <p><strong>제목:</strong> ${title}</p>
+                    <hr style="border: 1px solid #eee; margin: 20px 0;" />
+                    <p><strong>문의 내용:</strong></p>
+                    <p style="white-space: pre-wrap;">${content}</p>
+                </div>
+            `
+        }, {
+            headers: { 'api-key': process.env.BREVO_API_KEY }
+        });
+
+        res.status(200).json({ message: '문의가 성공적으로 접수되었습니다.' });
+
+    } catch (error) {
+        console.error('문의 메일 전송 에러:', error);
+        res.status(500).json({ message: '문의 접수에 실패했습니다. 잠시 후 다시 시도해주세요.' });
     }
 });
 

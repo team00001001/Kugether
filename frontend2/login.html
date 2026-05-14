@@ -12,21 +12,12 @@
     <div class="login-container">
         <h2>LOGIN</h2>
         <form id="login-form">
-            <!-- 이메일 입력 그룹 -->
             <div class="form-group">
                 <label>학교 이메일</label>
-                <div class="email-input-group" style="display: flex; gap: 10px; margin-bottom: 5px;">
-                    <input type="text" id="user-id" placeholder="이메일 아이디" required>
-                    <select id="email-domain" onchange="toggleDomainInput()">
-                        <option value="korea.ac.kr">@ korea.ac.kr</option>
-                        <option value="gmail.com">@ gmail.com</option>
-                        <option value="naver.com">@ naver.com</option>
-                        <option value="kakao.com">@ kakao.com</option>
-                        <option value="direct">직접 입력</option>
-                    </select>
+                <div class="email-input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                    <input type="text" id="user-id" placeholder="이메일 아이디" required style="flex: 1;">
+                    <span style="font-weight: 600; color: #555;">@ korea.ac.kr</span>
                 </div>
-                <!-- 직접 입력 선택 시 나타나는 입력창 (기본 숨김) -->
-                <input type="text" id="custom-domain" placeholder="예: univ.ac.kr" style="display: none; margin-bottom: 10px;">
             </div>
 
             <div class="form-group">
@@ -45,37 +36,21 @@
     </div>
 
     <script>
-        // 직접 입력 선택 시 입력창을 보여주거나 숨기는 함수
-        function toggleDomainInput() {
-            const domainSelect = document.getElementById('email-domain').value;
-            const customDomainInput = document.getElementById('custom-domain');
-            
-            if (domainSelect === 'direct') {
-                customDomainInput.style.display = 'block';
-            } else {
-                customDomainInput.style.display = 'none';
-                customDomainInput.value = ''; // 숨길 때 기존 입력값 초기화
-            }
-        }
+        // ✅ 고정된 도메인 설정
+        const FIXED_DOMAIN = 'korea.ac.kr';
 
         async function loginToServer() {
             const emailId = document.getElementById('user-id').value.trim();
             const password = document.getElementById('user-pw').value.trim();
             
-            // 선택된 도메인 가져오기 (직접 입력인 경우 해당 input 값을 가져옴)
-            let emailDomain = document.getElementById('email-domain').value;
-            if (emailDomain === 'direct') {
-                emailDomain = document.getElementById('custom-domain').value.trim();
-            }
-
             // 빈 값 체크
-            if (!emailId || !emailDomain || !password) {
-                alert("이메일과 비밀번호를 모두 입력해주세요.");
+            if (!emailId || !password) {
+                alert("이메일 아이디와 비밀번호를 모두 입력해주세요.");
                 return;
             }
 
-            // 입력된 아이디와 도메인을 합쳐서 전체 이메일 생성
-            const fullEmail = `${emailId}@${emailDomain}`; 
+            // 입력된 아이디와 고정된 도메인을 합쳐서 전체 이메일 생성
+            const fullEmail = `${emailId}@${FIXED_DOMAIN}`; 
 
             try {
                 // 🚀 백엔드 서버(auth.js)와 통신
