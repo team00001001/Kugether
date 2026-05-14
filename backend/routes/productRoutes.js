@@ -241,30 +241,51 @@ router.patch('/:id/reduce', (req, res) => {
 });
 
 // 7. 상품 조기 마감 (Early Close)
-router.patch('/early-close', (req, res) => {
+router.patch('/early-close', async (req, res) => {
     const { productId } = req.body;
 
     if (!productId) {
         return res.status(400).json({ error: '상품 ID가 필요합니다.' });
     }
 
-    const now = getNow(); // 상단에 정의된 현재 시간 계산 함수
+    const now = getNow();
 
-    // duration(마감 기한)을 현재 시간으로 변경하여 즉시 마감 처리
-    const sql = `UPDATE products SET duration = ? WHERE id = ?`;
-    
-    db.query(sql, [now, productId], (err, result) => {
-        if (err) {
-            console.error('조기 마감 처리 중 에러 발생:', err);
-            return res.status(500).json({ error: '마감 처리에 실패했습니다.', detail: err.message });
-        }
+    try {
+        const [result] = await db.promise().query(
+            `UPDATE products SET duration = ? WHERE id = ?`,
+            [now, productId]
+        );
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: '해당 공구방을 찾을 수 없습니다.' });
         }
 
+        // 상품 정보 조회
+        const [[product]] = await db.promise().query(
+            `SELECT title, user_id FROM products WHERE id = ?`,
+            [productId]
+        );
+
+        // 참여자 조회 (취소·노쇼 제외)
+        const [participants] = await db.promise().query(
+            `SELECT user_id FROM product_participants WHERE product_id = ? AND status NOT IN ('cancelled', 'noshow')`,
+            [productId]
+        );
+
+        // 참여자 전원에게 알림 (방장 포함)
+        const msg = `"${product.title}" 공구가 조기 마감되었습니다.`;
+        createNotification(product.user_id, '공구 조기 마감', msg, 'notice', productId);
+        participants.forEach(p => {
+            if (String(p.user_id) !== String(product.user_id)) {
+                createNotification(p.user_id, '공구 조기 마감', msg, 'notice', productId);
+            }
+        });
+
         res.json({ message: '성공적으로 조기 마감되었습니다.' });
-    });
+    } catch (err) {
+        console.error('조기 마감 처리 중 에러 발생:', err);
+        res.status(500).json({ error: '마감 처리에 실패했습니다.', detail: err.message });
+    }
 });
 
 module.exports = router;
