@@ -182,6 +182,118 @@
                 <div class="hiw-step-desc">물건을 받으면 수령 확인을 눌러<br>공구를 성공적으로 마무리하세요!</div>
             </div>
         </section>
+        <div style="text-align:center; margin-top:-40px; margin-bottom:70px;">
+            <button class="hiw-detail-btn" onclick="openGuideModal()">📖 단계별 상세 가이드 보기</button>
+        </div>
+
+        <!-- 상세 가이드 모달 -->
+        <div id="guide-modal" class="guide-modal-overlay" onclick="closeGuideModal(event)">
+            <div class="guide-modal">
+                <button class="guide-modal-close" onclick="closeGuideModal()">✕</button>
+                <h2 class="guide-modal-title">📖 단계별 이용 가이드</h2>
+
+                <div class="guide-tabs">
+                    <button class="guide-tab active" onclick="switchTab('join', this)">🙋 공구 참여하기</button>
+                    <button class="guide-tab" onclick="switchTab('host', this)">✏️ 공구 개설하기</button>
+                </div>
+
+                <!-- 참여하기 흐름 -->
+                <div id="tab-join" class="guide-flow">
+                    <div class="gf-step">
+                        <div class="gf-num">1</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🏠 메인 페이지</div>
+                            <div class="gf-desc">검색창에 원하는 물건을 입력하거나, 카테고리를 클릭해 공구를 찾아보세요.</div>
+                            <div class="gf-btn-preview gf-btn-search">🔍 검색창 입력 후 Enter</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">2</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">📋 공구 목록 페이지</div>
+                            <div class="gf-desc">원하는 공구 카드를 클릭해 상세 페이지로 이동하세요.</div>
+                            <div class="gf-btn-preview gf-btn-card">공구 카드 클릭 👆</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">3</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🛍️ 공구 상세 페이지</div>
+                            <div class="gf-desc">공구 정보를 확인한 후 하단 버튼을 눌러 참여하세요.</div>
+                            <div class="gf-btn-preview gf-btn-join">이 공구에 참여하기</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">4</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">💬 채팅방</div>
+                            <div class="gf-desc">채팅방에서 방장과 수령 장소·시간을 조율하세요.</div>
+                            <div class="gf-btn-preview gf-btn-chat">채팅방 가기 (참여중)</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">5</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🛍️ 공구 상세 페이지</div>
+                            <div class="gf-desc">물건을 받은 후, 상세 페이지로 돌아와 수령 확인 버튼을 눌러 공구를 완료하세요!</div>
+                            <div class="gf-btn-preview gf-btn-receive">📦 물건 수령 확인</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 개설하기 흐름 -->
+                <div id="tab-host" class="guide-flow" style="display:none;">
+                    <div class="gf-step">
+                        <div class="gf-num">1</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🏠 메인 페이지</div>
+                            <div class="gf-desc">로그인 후 화면 오른쪽 하단의 ✏️ 버튼을 클릭하세요.</div>
+                            <div class="gf-btn-preview gf-btn-fab">✏️ (오른쪽 하단 버튼)</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">2</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">📝 공구 작성 페이지</div>
+                            <div class="gf-desc">상품명, 가격, 모집 인원, 수령 장소 등을 입력하고 공구를 올리세요.</div>
+                            <div class="gf-btn-preview gf-btn-submit">공구 올리기 🚀</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">3</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🛍️ 공구 상세 페이지</div>
+                            <div class="gf-desc">인원이 모이면 채팅방에서 참여자들과 소통하며 공구를 진행하세요.</div>
+                            <div class="gf-btn-preview gf-btn-host-chat">💬 채팅방 들어가기 (방장)</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">4</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🛍️ 공구 상세 페이지 (방장)</div>
+                            <div class="gf-desc">물건이 도착하면 참여자 목록에서 각 참여자의 수령을 확인해주세요.</div>
+                            <div class="gf-btn-preview gf-btn-confirm">참여 확인 ✓</div>
+                        </div>
+                    </div>
+                    <div class="gf-connector"></div>
+                    <div class="gf-step">
+                        <div class="gf-num">5</div>
+                        <div class="gf-body">
+                            <div class="gf-screen">🏆 완료</div>
+                            <div class="gf-desc">모든 참여자가 수령 확인을 하면 공구가 최종 성공 처리되고 신뢰도가 올라갑니다!</div>
+                            <div class="gf-btn-preview gf-btn-done">🎉 공구 성공!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 공구방 리스트 -->
         <div class="section-title">⚡최근 올라온 공구방</div>
@@ -273,6 +385,26 @@
         }
 
         loadRecentProducts();
+    </script>
+    <script>
+        function openGuideModal() {
+            document.getElementById('guide-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeGuideModal(e) {
+            if (e && e.target !== document.getElementById('guide-modal')) return;
+            document.getElementById('guide-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function switchTab(tab, btn) {
+            document.getElementById('tab-join').style.display = tab === 'join' ? 'flex' : 'none';
+            document.getElementById('tab-host').style.display = tab === 'host' ? 'flex' : 'none';
+            document.querySelectorAll('.guide-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeGuideModal({target: document.getElementById('guide-modal')});
+        });
     </script>
     <script>
         const mainSearch = document.getElementById('main-search');

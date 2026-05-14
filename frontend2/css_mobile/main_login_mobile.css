@@ -155,4 +155,14 @@
     width: 100%;
   }
 
+  .guide-modal {
+    padding: 28px 20px 24px;
+    border-radius: 18px;
+  }
+
+  .guide-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
 }
