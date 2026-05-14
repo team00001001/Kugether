@@ -16,7 +16,12 @@
                 <label>학교 이메일</label>
                 <div class="email-input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
                     <input type="text" id="user-id" placeholder="이메일 아이디" required style="flex: 1;">
-                    <span style="font-weight: 600; color: #555;">@ korea.ac.kr</span>
+                    <span style="font-weight: 600; color: #555;">@</span>
+                    <select id="email-domain" style="padding: 11px 10px; border: 1.5px solid #E2E2E2; border-radius: 6px; font-size: 0.93rem; font-family: inherit; background: #FAFAFA; color: #111; cursor: pointer;">
+                        <option value="korea.ac.kr">korea.ac.kr</option>
+                        <option value="gmail.com">gmail.com</option>
+                        <option value="naver.com">naver.com</option>
+                    </select>
                 </div>
             </div>
 
@@ -36,21 +41,17 @@
     </div>
 
     <script>
-        // ✅ 고정된 도메인 설정
-        const FIXED_DOMAIN = 'korea.ac.kr';
-
         async function loginToServer() {
             const emailId = document.getElementById('user-id').value.trim();
+            const domain = document.getElementById('email-domain').value;
             const password = document.getElementById('user-pw').value.trim();
-            
-            // 빈 값 체크
+
             if (!emailId || !password) {
                 alert("이메일 아이디와 비밀번호를 모두 입력해주세요.");
                 return;
             }
 
-            // 입력된 아이디와 고정된 도메인을 합쳐서 전체 이메일 생성
-            const fullEmail = `${emailId}@${FIXED_DOMAIN}`; 
+            const fullEmail = `${emailId}@${domain}`;
 
             try {
                 // 🚀 백엔드 서버(auth.js)와 통신
