@@ -29,6 +29,14 @@ let allProducts = [];      // 전체 데이터 저장용
 let filteredProducts = []; // 필터링된 데이터 저장용
 let displayCount = 6;      // 초기에 보여줄 개수
 
+// 현재 열 수 × 2 = 한 번에 보여줄/추가할 행 수
+function getCurrentCols() {
+    const grid = document.getElementById('roomGrid');
+    const m = grid && grid.className.match(/cols-(\d+)/);
+    return m ? Number(m[1]) : 3;
+}
+function getPageSize() { return getCurrentCols() * 2; }
+
 // URL에서 파라미터 미리 읽기
 const urlParams = new URLSearchParams(window.location.search);
 const currentCategory = urlParams.get('category');
@@ -65,7 +73,7 @@ function applyFilter(keyword) {
         return matchCat && matchSearch;
     });
 
-    displayCount = 6; // 필터링 될 때마다 6개로 초기화
+    displayCount = getPageSize(); // 필터링 될 때마다 2행 분량으로 초기화
     renderGrid();
 }
 
@@ -153,7 +161,7 @@ const cardHTML = `
 // 4. 더보기 클릭 이벤트
 if (loadMoreBtn) {
     loadMoreBtn.addEventListener('click', () => {
-        displayCount += 6;
+        displayCount += getPageSize();
         renderGrid();
     });
 }

@@ -111,6 +111,11 @@
             grid.classList.add(`cols-${cols}`);
             localStorage.setItem(isMobile() ? 'gridColsMobile' : 'gridColsDesktop', cols);
             document.getElementById('col-label').textContent = `${cols}열`;
+            // 열 변경 시 2행 분량으로 재설정 후 재렌더링
+            if (typeof displayCount !== 'undefined' && typeof renderGrid === 'function') {
+                displayCount = cols * 2;
+                renderGrid();
+            }
         }
 
         function cycleGridCols() {
