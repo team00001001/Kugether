@@ -79,6 +79,9 @@
   .hero-sub-text {
     font-size: 0.9rem;
     margin-bottom: 20px;
+    white-space: normal; /* 데스크톱의 nowrap 강제성을 취소하고 자연스러운 줄바꿈 허용 */
+    word-break: keep-all; /* 단어가 중간에 쪼개지지 않도록 유지 */
+    line-height: 1.4; /* 두 줄이 되었을 때 위아래 글씨가 붙지 않도록 줄간격 살짝 추가 */
   }
 
   .search-input-box {
