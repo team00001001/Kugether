@@ -189,4 +189,45 @@ router.post('/forgot-password', async (req, res) => {
     }
 });
 
+// 🚀 1:1 문의 메일 전송 (운영자에게 발송) API
+router.post('/send-email', async (req, res) => {
+    const { category, title, content } = req.body;
+
+    const categoryMap = {
+        'usage': '공구 이용 문의',
+        'account': '계정 관련 문의',
+        'bug': '오류 신고',
+        'suggestion': '서비스 건의',
+        'other': '기타'
+    };
+    const categoryKr = categoryMap[category] || category;
+
+    try {
+        await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: 'KU GONGGU System', email: 'gongguyong0@gmail.com' }, 
+            to: [{ email: 'gongguyong0@gmail.com', name: '운영자' }], 
+            subject: `[1:1 문의 - ${categoryKr}] ${title}`, 
+            htmlContent: `
+                <div style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
+                    <h2>새로운 1:1 문의가 접수되었습니다.</h2>
+                    <p><strong>분류:</strong> ${categoryKr}</p>
+                    <p><strong>제목:</strong> ${title}</p>
+                    <hr style="border: 1px solid #eee; margin: 20px 0;" />
+                    <p><strong>문의 내용:</strong></p>
+                    <p style="white-space: pre-wrap;">${content}</p>
+                </div>
+            `
+        }, {
+            headers: { 'api-key': process.env.BREVO_API_KEY }
+        });
+
+        res.status(200).json({ message: '문의가 성공적으로 접수되었습니다.' });
+
+    } catch (error) {
+        console.error('문의 메일 전송 에러:', error);
+        res.status(500).json({ message: '문의 접수에 실패했습니다. 잠시 후 다시 시도해주세요.' });
+    }
+});
+
+
 module.exports = router;
