@@ -216,7 +216,7 @@ router.post('/forgot-password', async (req, res) => {
 router.post('/send-email', async (req, res) => {
     console.log("👉 [1:1 문의 API 호출됨] 프론트에서 온 데이터:", req.body);
 
-    const { category, title, content } = req.body;
+    const { userId, category, title, content } = req.body;
 
     const categoryMap = {
         'usage': '공구 이용 문의',
@@ -233,7 +233,7 @@ router.post('/send-email', async (req, res) => {
             sender: { name: 'Campus Gonggu', email: 'gongguyong0@gmail.com' }, 
             // 💡 이름 속성을 빼고 수신자 이메일만 넣어 오류 가능성을 차단했습니다.
             to: [{ email: 'gongguyong0@gmail.com' }], 
-            subject: `[1:1 문의 - ${categoryKr}] ${title}`, 
+            subject: `[1:1 문의 - ${categoryKr}] ${userId}님의 문의: ${title}`,
             htmlContent: `
                 <div style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
                     <h2>새로운 1:1 문의가 접수되었습니다.</h2>
