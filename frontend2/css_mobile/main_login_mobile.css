@@ -9,43 +9,56 @@
   }
 
   /* 헤더: 높이를 고정해서 얇게 유지 */
+  /* 헤더: 잘림 방지 및 슬림화 */
   header {
-    height: 54px !important; /* 높이 확 줄임 */
-    min-height: 54px !important;
-    padding: 0 !important; /* 위아래 여백 제거 */
+    height: 50px !important; /* 더 슬림하게 조정 */
+    min-height: 50px !important;
+    padding: 0 !important;
     display: flex !important;
     align-items: center !important;
+    background: #fff !important;
+    border-bottom: 1px solid #E2E2E2 !important;
   }
 
   .nav-inner {
-    height: 100% !important;
-    padding: 0 12px !important;
+    width: 100% !important;
+    padding: 0 10px !important; /* 좌우 여백 최소화 */
     display: flex !important;
-    flex-wrap: nowrap !important; /* 웬만하면 한 줄에 유지 */
-    justify-content: space-between !important;
+    justify-content: space-between !important; /* 로고는 왼쪽, 메뉴는 오른쪽 끝 */
     align-items: center !important;
   }
 
   .logo {
-    font-size: 16px !important; /* 로고 살짝 다듬기 */
+    font-size: 15px !important; /* 로고 크기 살짝 축소 */
     font-weight: 900 !important;
-    white-space: nowrap !important;
-    flex-shrink: 0;
+    letter-spacing: -0.8px !important; /* 로고 글자 간격 좁힘 */
+    flex-shrink: 0; /* 로고가 찌그러지지 않게 고정 */
   }
 
   nav {
     display: flex !important;
-    gap: 4px !important; /* 버튼 사이 간격 더 좁게 */
+    gap: 3px !important; /* 버튼 사이 간격을 아주 좁게 */
     align-items: center !important;
+    flex-shrink: 1; /* 메뉴가 공간을 유연하게 차지함 */
+    overflow: hidden; /* 삐져나가는 것 방지 */
   }
 
   nav a.menu-link,
   nav button,
   .logout-btn {
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    padding: 4px 6px !important; /* 버튼 패딩 축소 */
-    white-space: nowrap !important;
+    font-size: 10.5px !important; /* 글씨 크기 미세 조정 */
+    font-weight: 800 !important;
+    padding: 4px 5px !important; /* 버튼 내 좌우 여백을 확 줄임 */
+    letter-spacing: -0.5px !important; /* 글자 사이 간격 압축 */
+    white-space: nowrap !important; /* 글자가 위아래로 쪼개지는 것 방지 */
+    display: inline-block !important;
+  }
+
+  /* 로그아웃 버튼처럼 중요한 건 색으로만 구분 */
+  .logout-btn {
+    color: #ef4444 !important;
+    background: #fff5f5 !important;
+    border-radius: 4px;
   }
 
   /* 메인 콘텐츠 여백 조정 */
