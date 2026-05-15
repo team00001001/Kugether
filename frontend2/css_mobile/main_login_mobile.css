@@ -33,6 +33,12 @@
     flex-shrink: 0;
   }
 
+  .logo-img {
+    height: 35px !important; 
+    width: auto !important; 
+    transform: none !important;
+  }
+
   nav {
     display: flex !important;
     gap: 4px !important;
