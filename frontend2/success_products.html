@@ -144,9 +144,7 @@
                             <div class="product-info">
                                 <span class="status-badge status-success">공구 성공</span>
                                 <a href="product.html?id=${product.id}" class="product-name" style="display:block;">${product.title}</a>
-                                <div class="product-meta">
-                                    <span>📍 ${product.location || '교내'}</span>
-                                    <span>💰 ${Number(product.price).toLocaleString()}원</span>
+                                💰 ${Number(product.price).toLocaleString()}원</span>
                                     <span style="color: var(--text-dark); font-weight: 600;">👥 ${product.currentCount} / ${product.targetCount}명</span>
                                 </div>
                             </div>
