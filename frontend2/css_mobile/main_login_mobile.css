@@ -1,5 +1,5 @@
 /* =========================
-   메인(홈) 모바일 (헤더 슬림 버전)
+   메인(홈) 모바일
 ========================= */
 @media screen and (max-width: 768px) {
 
@@ -8,11 +8,11 @@
     overflow-x: hidden;
   }
 
-  /* 헤더: 높이를 고정해서 얇게 유지 */
+  /* 헤더 */
   header {
-    height: 54px !important; /* 높이 확 줄임 */
+    height: 54px !important;
     min-height: 54px !important;
-    padding: 0 !important; /* 위아래 여백 제거 */
+    padding: 0 !important;
     display: flex !important;
     align-items: center !important;
   }
@@ -21,13 +21,13 @@
     height: 100% !important;
     padding: 0 12px !important;
     display: flex !important;
-    flex-wrap: nowrap !important; /* 웬만하면 한 줄에 유지 */
+    flex-wrap: nowrap !important;
     justify-content: space-between !important;
     align-items: center !important;
   }
 
   .logo {
-    font-size: 16px !important; /* 로고 살짝 다듬기 */
+    font-size: 16px !important;
     font-weight: 900 !important;
     white-space: nowrap !important;
     flex-shrink: 0;
@@ -35,7 +35,7 @@
 
   nav {
     display: flex !important;
-    gap: 4px !important; /* 버튼 사이 간격 더 좁게 */
+    gap: 4px !important;
     align-items: center !important;
   }
 
@@ -44,67 +44,138 @@
   .logout-btn {
     font-size: 11px !important;
     font-weight: 700 !important;
-    padding: 4px 6px !important; /* 버튼 패딩 축소 */
+    padding: 4px 6px !important;
     white-space: nowrap !important;
   }
 
-  /* 메인 콘텐츠 여백 조정 */
+  /* 메인 콘텐츠 여백 */
   main {
-    margin-top: 64px !important; /* 헤더가 얇아진 만큼 여백도 조정 */
-    padding: 0 14px 80px !important;
+    margin-top: 64px !important;
+    padding: 0 0 80px !important;
   }
 
-  /* 히어로 섹션 */
-  .hero-section {
-    flex-direction: column;
-    padding: 32px 20px !important;
-    margin-bottom: 28px;
-    gap: 18px;
-    border-radius: 12px !important;
+  /* ── 히어로 섹션 ── */
+  .hero {
+    min-height: auto !important;
+    padding: 80px 20px 36px !important; /* 기존 40px → 80px으로 증가 */
     text-align: center;
   }
 
-  .hero-main-text {
-    font-size: 2rem !important;
-    font-weight: 900 !important;
-    line-height: 1.2;
-    margin-bottom: 12px;
+  .hero-inner {
+    max-width: 100% !important;
+  }
+
+  .hero-title {
+    font-size: 2.4rem !important;
+    letter-spacing: -1.5px !important;
+    margin-bottom: 14px !important;
     word-break: keep-all;
   }
 
-  .hero-sub-text {
-    font-size: 0.95rem !important;
-    margin-bottom: 20px;
+  .hero-desc {
+    font-size: 0.9rem !important;
+    margin-bottom: 28px !important;
   }
 
-  /* 카테고리 그리드 (2x2 바둑판) */
+  .hero-eyebrow {
+    font-size: 0.68rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* 검색창 */
+  .hero-search {
+    max-width: 100% !important;
+    height: 50px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .hero-search button {
+    padding: 0 18px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* 빠른 태그 */
+  .hero-quick {
+    gap: 6px !important;
+  }
+
+  .hero-quick-tag {
+    font-size: 0.73rem !important;
+    padding: 5px 11px !important;
+  }
+
+  /* ── 피처 스트립 ── */
+  .feature-strip {
+    padding: 12px 16px !important;
+    overflow-x: auto;
+  }
+
+  .feature-strip-inner {
+    gap: 0 !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    min-width: max-content;
+  }
+
+  .feat-item {
+    padding: 0 14px !important;
+    font-size: 0.77rem !important;
+    white-space: nowrap;
+  }
+
+  /* ── 공통 섹션 ── */
+  .pg-sec {
+    padding: 36px 0 !important;
+  }
+
+  .pg-wrap {
+    padding: 0 16px !important;
+  }
+
+  .pg-head {
+    padding: 0 16px 16px !important;
+    margin-bottom: 20px !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pg-title {
+    font-size: 1.2rem !important;
+  }
+
+  /* ── 카테고리 그리드 (2x2) ── */
   .cat-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 2px !important;
     background: #D1D5DB !important;
     border: 2px solid #D1D5DB !important;
-    margin-bottom: 32px;
   }
 
   .cat-card {
-    background: #fff;
-    padding: 24px 10px !important;
+    background: #fff !important;
+    padding: 24px 16px !important;
     border-radius: 0 !important;
+    gap: 14px !important;
   }
 
-  .cat-icon {
-    font-size: 2rem !important;
-    margin-bottom: 8px !important;
+  .cat-ico {
+    width: 46px !important;
+    height: 46px !important;
+    font-size: 1.5rem !important;
   }
 
-  .cat-title {
+  .cat-name {
     font-size: 0.95rem !important;
     font-weight: 800 !important;
   }
 
-  /* 공구방 리스트 (단일 컬럼 바둑판) */
-  .room-grid {
+  .cat-arrow {
+    font-size: 1rem !important;
+  }
+
+  /* ── 공구방 그리드 (단일 컬럼) ── */
+  .product-grid {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 2px !important;
@@ -112,49 +183,102 @@
     border: 2px solid #D1D5DB !important;
   }
 
-  .room-content {
-    background: #fff;
-    padding: 22px !important;
-    height: auto !important;
+  .room-item {
+    background: #fff !important;
+    padding: 22px 20px !important;
+  }
+
+  .room-tag {
+    font-size: 0.75rem !important;
+    padding: 4px 12px !important;
+    margin-bottom: 12px !important;
   }
 
   .room-title {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     font-weight: 800 !important;
-    line-height: 1.4;
-    height: auto !important;
-    display: block !important;
+    line-height: 1.45 !important;
+    -webkit-line-clamp: 3 !important;
+    margin-bottom: 18px !important;
   }
 
-  /* 플로팅 작성 버튼 */
-  .write-fab {
-    width: 54px !important;
-    height: 54px !important;
-    bottom: 24px !important;
-    right: 18px !important;
+  .room-progress-bar {
+    margin-bottom: 14px !important;
   }
 
-  /* 이용 방법 (세로 바둑판) */
-  .how-it-works {
-    display: flex !important;
-    flex-direction: column !important;
+  .count-info {
+    font-size: 0.85rem !important;
+  }
+
+  /* ── 이용 방법 (세로 바둑판) ── */
+  .hiw-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
     gap: 2px !important;
     background: #D1D5DB !important;
     border: 2px solid #D1D5DB !important;
+    margin-bottom: 28px !important;
   }
 
-  .hiw-step {
-    background: #fff;
+  .hiw-card {
+    background: #fff !important;
     padding: 32px 20px !important;
-    width: 100%;
+    width: 100% !important;
   }
 
-  .hiw-arrow { display: none; }
+  .hiw-num {
+    font-size: 0.7rem !important;
+    margin-bottom: 16px !important;
+  }
 
-  /* 가이드 모달 */
+  .hiw-ico {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 1.6rem !important;
+    margin-bottom: 16px !important;
+  }
+
+  .hiw-card-title {
+    font-size: 1rem !important;
+    margin-bottom: 10px !important;
+  }
+
+  .hiw-card-desc {
+    font-size: 0.87rem !important;
+  }
+
+  .hiw-btn {
+    padding: 12px 32px !important;
+    font-size: 0.88rem !important;
+  }
+
+  /* ── 가이드 모달 ── */
+  .guide-modal-overlay {
+    padding: 12px !important;
+    align-items: flex-end !important;
+  }
+
   .guide-modal {
-    padding: 24px 20px !important;
+    padding: 24px 18px !important;
     border-radius: 12px !important;
-    width: 94% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .guide-tabs {
+    margin-bottom: 20px !important;
+  }
+
+  .guide-tab {
+    font-size: 0.78rem !important;
+    padding: 9px 0 !important;
+  }
+
+  /* ── FAB ── */
+  .write-fab {
+    width: 52px !important;
+    height: 52px !important;
+    bottom: 24px !important;
+    right: 18px !important;
   }
 }
