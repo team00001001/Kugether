@@ -203,7 +203,7 @@
             document.getElementById('profile-nickname').textContent = profile.nickname;
             document.getElementById('profile-score').textContent = score;
             document.getElementById('stat-deals').textContent = profile.completedDeals ?? 0;
-            document.getElementById('stat-reviews').textContent = profile.reviewCount ?? 0;
+            document.getElementById('stat-reviews').textContent = reviews.length;
 
             document.title = `${profile.nickname} 프로필 | KU GONGGU`;
 
