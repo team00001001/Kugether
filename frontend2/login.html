@@ -17,11 +17,7 @@
                 <div class="email-input-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
                     <input type="text" id="user-id" placeholder="이메일 아이디" required style="flex: 1;">
                     <span style="font-weight: 600; color: #555;">@</span>
-                    <select id="email-domain" style="padding: 11px 10px; border: 1.5px solid #E2E2E2; border-radius: 6px; font-size: 0.93rem; font-family: inherit; background: #FAFAFA; color: #111; cursor: pointer;">
-                        <option value="korea.ac.kr">korea.ac.kr</option>
-                        <option value="gmail.com">gmail.com</option>
-                        <option value="naver.com">naver.com</option>
-                    </select>
+                    <span id="email-domain" style="padding: 11px 10px; font-size: 0.93rem; font-weight: 600; color: #555;">korea.ac.kr</span>
                 </div>
             </div>
 
@@ -43,7 +39,7 @@
     <script>
         async function loginToServer() {
             const emailId = document.getElementById('user-id').value.trim();
-            const domain = document.getElementById('email-domain').value;
+            const domain = document.getElementById('email-domain').textContent.trim();
             const password = document.getElementById('user-pw').value.trim();
 
             if (!emailId || !password) {
