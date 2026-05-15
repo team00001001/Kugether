@@ -1,5 +1,5 @@
 /* =========================
-   메인(홈) 모바일
+  메인(홈) 모바일
 ========================= */
 @media screen and (max-width: 768px) {
 
@@ -8,62 +8,14 @@
     overflow-x: hidden;
   }
 
-  /* 헤더 */
-  header {
-    height: 54px !important;
-    min-height: 54px !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  .nav-inner {
-    height: 100% !important;
-    padding: 0 12px !important;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-
-  .logo {
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-    flex-shrink: 0;
-  }
-
-  .logo-img {
-    height: 35px !important; 
-    width: auto !important; 
-    transform: none !important;
-  }
-
-  nav {
-    display: flex !important;
-    gap: 4px !important;
-    align-items: center !important;
-  }
-
-  nav a.menu-link,
-  nav button,
-  .logout-btn {
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    padding: 4px 6px !important;
-    white-space: nowrap !important;
-  }
-
-  /* 메인 콘텐츠 여백 */
   main {
     margin-top: 64px !important;
     padding: 0 0 80px !important;
   }
 
-  /* ── 히어로 섹션 ── */
   .hero {
     min-height: auto !important;
-    padding: 80px 20px 36px !important; /* 기존 40px → 80px으로 증가 */
+    padding: 80px 20px 36px !important; 
     text-align: center;
   }
 
@@ -280,7 +232,6 @@
     padding: 9px 0 !important;
   }
 
-  /* ── FAB ── */
   .write-fab {
     width: 52px !important;
     height: 52px !important;

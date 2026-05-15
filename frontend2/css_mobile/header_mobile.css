@@ -1,0 +1,55 @@
+/* =========================
+  모바일 헤더 전용 CSS (header_mobile.css)
+========================= */
+@media screen and (max-width: 768px) {
+
+  header {
+    height: 56px !important;
+  }
+
+  .nav-inner {
+    padding: 0 10px !important;
+  }
+
+  .logo {
+    font-size: 15px !important;
+    white-space: nowrap !important;
+  }
+
+  .logo-img {
+    height: 70px !important; 
+    width: auto !important;  
+    transform: none !important; 
+  }
+
+  nav {
+    gap: 8px !important;
+  }
+
+  nav a.menu-link,
+  nav button,
+  .logout-btn,
+  .btn-login-nav {
+    font-size: 10px !important;
+    padding: 4px 6px !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+  }
+
+  .btn-noti {
+    padding: 2px !important; 
+  }
+
+  .btn-noti svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .noti-badge {
+    width: 6px !important;
+    height: 6px !important;
+    top: 0px !important;
+    right: 0px !important;
+    border-width: 1px !important; 
+  }
+}
