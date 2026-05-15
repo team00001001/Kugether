@@ -125,11 +125,12 @@ router.get('/info/:productId', async (req, res) => {
         const isHost = (productInfo[0].user_id == userId);
 
         // 🚨 2. [참여자 검사]
+        // 💡 핵심 수정 포인트: status가 'joined'인 사람만 찾는 것이 아니라, 'noshow(노쇼)'가 아닌 사람을 모두 통과시킵니다.
         const [participants] = await pool.promise().query(
             `
             SELECT id 
             FROM product_participants 
-            WHERE product_id = ? AND user_id = ? AND status = 'joined'
+            WHERE product_id = ? AND user_id = ? AND status != 'noshow'
             `,
             [productId, userId]
         );
